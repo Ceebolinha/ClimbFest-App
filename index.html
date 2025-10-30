@@ -38,7 +38,7 @@
       </div>
       <div class="topbar-controls">
         <select id="selectCategoryTop" class="small">
-          <option value="boulder">Boulder (solo)</option>
+          <option value="boulder">Bouldsser (solo)</option>
           <option value="routes">Vias / Desafios (times)</option>
         </select>
         <button id="btnOpenLogin" class="btn btn-ghost">Login (juiz/admin)</button>
@@ -50,7 +50,7 @@
       <div>
         <div id="panelRanking" class="card">
           <div class="section-title">
-            <h2 id="rankingTitle">Boulder — Ranking</h2>
+            <h2 id="rankingTitle">Bouldsser — Ranking</h2>
             <div class="flex">
               <select id="filterCategory" class="small">
                 <option value="all">Todas categorias</option>
@@ -159,7 +159,7 @@
           <div>
             <label class="muted small">Categoria</label>
             <select id="judgeCategory">
-              <option value="boulder">Boulder (individual)</option>
+              <option value="boulder">Bouldsser (individual)</option>
               <option value="routes">Vias / Desafios (time)</option>
             </select>
 
@@ -736,7 +736,7 @@
 
     function refreshRanking(){
       const cat = selectCategoryTop.value;
-      rankingTitle.textContent = (cat === 'boulder') ? 'Boulder — Ranking' : 'Vias / Desafios — Ranking';
+      rankingTitle.textContent = (cat === 'boulder') ? 'Bouldsser — Ranking' : 'Vias / Desafios — Ranking';
       rankingBody.innerHTML = '';
       if (cat === 'boulder') {
         let rows = climbersCache.map(c => ({ id:c.id, ...c.data }));
