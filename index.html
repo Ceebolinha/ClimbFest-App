@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ClimbFest 2025</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa6bb;--accent:#00c77f}
+    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#eaf2fb}
+    .wrap{max-width:1100px;margin:18px auto;padding:12px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn-ghost{background:transparent;border:1px solid #203040;color:var(--muted)}
+    .btn-primary{background:var(--accent);color:#022}
+    .card{background:var(--card);border-radius:10px;padding:12px;border:1px solid #162033}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:12px}
+    @media(max-width:960px){ .grid{grid-template-columns:1fr} }
+    h1{margin:0 0 6px}
+    .muted{color:var(--muted);font-size:.9rem}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px 6px;text-align:left}
+    thead th{color:var(--muted);font-size:.85rem;border-bottom:1px solid #122233}
+    tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    select,input{width:100%;padding:8px;border-radius:8px;border:1px solid #203040;background:#07101a;color:#eaf2fb;margin-top:8px}
+    .small{font-size:.9rem}
+    .hidden{display:none}
+    .topbar-controls{display:flex;gap:8px;align-items:center}
+    .section-title{display:flex;justify-content:space-between;align-items:center}
+    .flex{display:flex;gap:8px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>ClimbFest 2025</h1>
+        <div class="muted">Leaderboard público — selecione a categoria</div>
+      </div>
+      <div class="topbar-controls">
+        <select id="selectCategoryTop" class="small">
+          <option value="boulder">Boulder (solo)</option>
+          <option value="routes">Vias / Desafios (times)</option>
+        </select>
+        <button id="btnOpenLogin" class="btn btn-ghost">Login (juiz/admin)</button>
+      </div>
+    </header>
+
+    <main class="grid" style="margin-top:12px">
+      <!-- Left: ranking / controls -->
+      <div>
+        <div id="panelRanking" class="card">
+          <div class="section-title">
+            <h2 id="rankingTitle">Boulder — Ranking</h2>
+            <div class="flex">
+              <select id="filterCategory" class="small">
+                <option value="all">Todas categorias</option>
+                <option value="kids">Kids (≤12)</option>
+                <option value="juvenil">Juvenil (13–15)</option>
+                <option value="masters">Masters (≥40)</option>
+                <option value="trans-nao-binario">Trans / Não binários</option>
+                <option value="padrao">Padrão</option>
+              </select>
+              <button id="btnExportCSV" class="btn btn-ghost">Exportar CSV</button>
+            </div>
+          </div>
+          <div style="margin-top:10px;max-height:520px;overflow:auto">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Código/Nome</th><th>Categoria</th><th>Gênero</th><th>Pontos</th></tr>
+              </thead>
+              <tbody id="rankingBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="card" style="margin-top:12px">
+          <div class="muted small">Observações</div>
+          <ul>
+            <li class="muted small">Juízes: use a área de login para registrar envios.</li>
+            <li class="muted small">Boulders são individuais. Vias/Desafios são por <b>times</b> de 3.</li>
+            <li class="muted small">Se um escalador/time já completou o desafio, sistema bloqueia nova pontuação.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right: login / admin / juiz -->
+      <aside>
+        <div id="loginCard" class="card">
+          <h3>Login — Juiz / Admin</h3>
+          
+          <input id="inputPassword" type="password" placeholder="Digite a senha" />
+          <div class="flex" style="margin-top:8px">
+            <button id="btnLogin" class="btn btn-primary">Entrar</button>
+            <button id="btnLogout" class="btn btn-ghost hidden">Sair</button>
+          </div>
+        </div>
+
+        <!-- Admin panel -->
+        <div id="adminCard" class="card hidden" style="margin-top:12px">
+          <h3>Admin — Gerenciar</h3>
+          <div class="muted small">Cadastros por seleção (mais rápido)</div>
+
+          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+          <strong>Escaladores</strong>
+          <div style="margin-top:8px">
+            <input id="newClimberName" placeholder="Nome"/>
+            <input id="newClimberCode" placeholder="Código (ex: 001)"/>
+            <input id="newClimberAge" type="number" placeholder="Idade"/>
+            <select id="newClimberGender">
+              <option value="masculino">Masculino</option>
+              <option value="feminino">Feminino</option>
+              <option value="trans-nao-binario">Trans / Não binário</option>
+              <option value="outro">Outro</option>
+            </select>
+            <div class="flex">
+              <button id="btnAddClimber" class="btn btn-primary">Adicionar</button>
+              <button id="btnDeleteClimber" class="btn btn-ghost">Excluir selecionado</button>
+            </div>
+            <select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
+          </div>
+
+          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+          <strong>Desafios / Vias / Boulders</strong>
+          <div style="margin-top:8px">
+            <input id="newRouteCode" placeholder="Código (ex: B01)"/>
+            <input id="newRouteName" placeholder="Nome do desafio"/>
+            <select id="newRouteType">
+              <option value="boulder">Boulder</option>
+              <option value="via">Via</option>
+              <option value="desafio">Kilter/Desafio</option>
+            </select>
+            <div class="flex">
+              <button id="btnAddRoute" class="btn btn-primary">Adicionar</button>
+              <button id="btnDeleteRoute" class="btn btn-ghost">Excluir selecionado</button>
+            </div>
+            <select id="selectRoutesAdmin" size="6" style="margin-top:8px"></select>
+          </div>
+
+          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+          <strong>Times (para Vias / Desafios)</strong>
+          <div style="margin-top:8px">
+            <div class="muted small">Selecione 3 escaladores e clique em "Criar Time"</div>
+            <select id="selectClimbersForTeam" multiple size="6" style="margin-top:8px"></select>
+            <input id="teamNameInput" placeholder="Nome do time (ex: Team A)"/>
+            <div class="flex">
+              <button id="btnCreateTeam" class="btn btn-primary">Criar Time</button>
+              <button id="btnDeleteTeam" class="btn btn-ghost">Excluir time selecionado</button>
+            </div>
+            <select id="selectTeamsAdmin" size="6" style="margin-top:8px"></select>
+          </div>
+
+        </div>
+
+        <!-- Judge panel -->
+        <div id="judgeCard" class="card hidden" style="margin-top:12px">
+          <h3>Juiz — Registrar envio</h3>
+
+          <div>
+            <label class="muted small">Categoria</label>
+            <select id="judgeCategory">
+              <option value="boulder">Boulder (individual)</option>
+              <option value="routes">Vias / Desafios (time)</option>
+            </select>
+
+            <label class="muted small">Escalador / Time</label>
+            <select id="judgeActorSelect" style="margin-top:6px"></select>
+
+            <label class="muted small">Desafio</label>
+            <select id="judgeRouteSelect"></select>
+
+            <label class="muted small">Tipo de envio</label>
+            <select id="judgeSendType">
+              <option value="flash">Flash — 300 pts</option>
+              <option value="cadena">Cadena — 100 pts</option>
+            </select>
+
+            <div class="flex" style="margin-top:8px">
+              <button id="btnRegister" class="btn btn-primary">Registrar</button>
+              <button id="btnClearSelection" class="btn btn-ghost">Limpar</button>
+            </div>
+
+            <div style="margin-top:10px">
+              <div class="muted small">Últimos envios</div>
+              <ul id="recentList" class="muted small" style="padding-left:14px;margin-top:6px"></ul>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Firebase (modular v11) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc,
+      onSnapshot, query, where, orderBy, serverTimestamp, arrayUnion,
+      clearIndexedDbPersistence
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // >>> SUA FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-CnTOLGSfC_cDCEv_vp14r8lQyyXgImM",
+      authDomain: "climbfest-224ed.firebaseapp.com",
+      projectId: "climbfest-224ed",
+      storageBucket: "climbfest-224ed.firebasestorage.app",
+      messagingSenderId: "808584030721",
+      appId: "1:808584030721:web:3313cdc4c9f57150396e00"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // SENHAS
+    const ADMIN_PASS = "266213";
+    const JUDGE_PASS = "jcf2025";
+
+    // DOM refs
+    const selectCategoryTop = document.getElementById('selectCategoryTop');
+    const rankingTitle = document.getElementById('rankingTitle');
+    const rankingBody = document.getElementById('rankingBody');
+    const filterCategory = document.getElementById('filterCategory');
+    const btnExportCSV = document.getElementById('btnExportCSV');
+
+    const btnOpenLogin = document.getElementById('btnOpenLogin');
+    const inputPassword = document.getElementById('inputPassword');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+
+    const adminCard = document.getElementById('adminCard');
+    const judgeCard = document.getElementById('judgeCard');
+
+    // Admin elements
+    const newClimberName = document.getElementById('newClimberName');
+    const newClimberCode = document.getElementById('newClimberCode');
+    const newClimberAge = document.getElementById('newClimberAge');
+    const newClimberGender = document.getElementById('newClimberGender');
+    const btnAddClimber = document.getElementById('btnAddClimber');
+    const selectClimbersAdmin = document.getElementById('selectClimbersAdmin');
+    const btnDeleteClimber = document.getElementById('btnDeleteClimber');
+
+    const newRouteCode = document.getElementById('newRouteCode');
+    const newRouteName = document.getElementById('newRouteName');
+    const newRouteType = document.getElementById('newRouteType');
+    const btnAddRoute = document.getElementById('btnAddRoute');
+    const selectRoutesAdmin = document.getElementById('selectRoutesAdmin');
+    const btnDeleteRoute = document.getElementById('btnDeleteRoute');
+
+    const selectClimbersForTeam = document.getElementById('selectClimbersForTeam');
+    const btnCreateTeam = document.getElementById('btnCreateTeam');
+    const selectTeamsAdmin = document.getElementById('selectTeamsAdmin');
+    const teamNameInput = document.getElementById('teamNameInput');
+    const btnDeleteTeam = document.getElementById('btnDeleteTeam');
+
+    // Judge elements
+    const judgeCategory = document.getElementById('judgeCategory');
+    const judgeActorSelect = document.getElementById('judgeActorSelect');
+    const judgeRouteSelect = document.getElementById('judgeRouteSelect');
+    const judgeSendType = document.getElementById('judgeSendType');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnClearSelection = document.getElementById('btnClearSelection');
+    const recentList = document.getElementById('recentList');
+
+    // caches
+    let climbersCache = [];
+    let routesCache = [];
+    let teamsCache = [];
+    let scoresCache = [];
+
+    // unsubscribers
+    let unsubClimbers = null;
+    let unsubRoutes = null;
+    let unsubTeams = null;
+    let unsubScores = null;
+
+    // utils
+    function computeCategory(age, gender){
+      if (gender === 'trans-nao-binario') return 'trans-nao-binario';
+      if (!age) return 'padrao';
+      if (age <= 12) return 'kids';
+      if (age >= 13 && age <= 15) return 'juvenil';
+      if (age >= 40) return 'masters';
+      return 'padrao';
+    }
+    function showToast(msg){ alert(msg); }
+
+    // populateTeamSelector is used in some places (ensure defined)
+    function populateTeamSelector(){ /* intentionally left simple; selectors are rebuilt in onSnapshot handlers */ }
+
+    // login flow
+    btnOpenLogin.addEventListener('click', ()=> { inputPassword.focus(); });
+    btnLogin.addEventListener('click', ()=> {
+      const pass = inputPassword.value.trim();
+      if (pass === ADMIN_PASS) {
+        adminCard.classList.remove('hidden'); judgeCard.classList.add('hidden');
+        btnLogout.classList.remove('hidden'); showToast('Admin: modo ativado');
+        loadAllForAdmin();
+      } else if (pass === JUDGE_PASS) {
+        judgeCard.classList.remove('hidden'); adminCard.classList.add('hidden');
+        btnLogout.classList.remove('hidden'); showToast('Juiz: modo ativado');
+        loadSelectorsForJudge();
+      } else showToast('Senha incorreta.');
+      inputPassword.value='';
+    });
+    btnLogout.addEventListener('click', ()=> {
+      adminCard.classList.add('hidden'); judgeCard.classList.add('hidden');
+      btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
+    });
+
+    // ---------- SAFE: try to clear local persistence once ----------
+    (async function tryClearLocalPersistence(){
+      try {
+        await clearIndexedDbPersistence(db);
+        console.log('Local Firestore persistence cleared.');
+      } catch (e) {
+        console.warn('Could not clear persistence (probably in use or not enabled):', e);
+      }
+      // after attempting to clear, register realtime listeners:
+      registerSnapshots();
+    })();
+
+    // ---------- REGISTER SNAPSHOTS (unsubs, filtering pending writes) ----------
+    function registerSnapshots(){
+      // ensure any previous listeners are detached
+      if (typeof unsubClimbers === 'function') { try { unsubClimbers(); } catch(e){}; unsubClimbers = null; }
+      if (typeof unsubRoutes === 'function') { try { unsubRoutes(); } catch(e){}; unsubRoutes = null; }
+      if (typeof unsubTeams === 'function') { try { unsubTeams(); } catch(e){}; unsubTeams = null; }
+      if (typeof unsubScores === 'function') { try { unsubScores(); } catch(e){}; unsubScores = null; }
+
+      // climbers
+      unsubClimbers = onSnapshot(collection(db,'climbers'), snap => {
+        climbersCache = [];
+        snap.docs.forEach(d => climbersCache.push({ id:d.id, data:d.data(), meta: d.metadata }));
+        console.log('[SNAP] climbers cache size:', climbersCache.length);
+        populateAdminClimbers();
+        populateTeamSelector();
+        refreshRanking();
+        loadSelectorsForJudge();
+      }, err => { console.error('Snapshot error (climbers):', err); });
+
+      // routes
+      unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
+        routesCache = [];
+        snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta: d.metadata }));
+        console.log('[SNAP] routes cache size:', routesCache.length);
+        populateAdminRoutes();
+        loadSelectorsForJudge();
+        refreshRanking();
+      }, err => { console.error('Snapshot error (routes):', err); });
+
+      // teams
+      unsubTeams = onSnapshot(collection(db,'teams'), snap => {
+        teamsCache = [];
+        snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta: d.metadata }));
+        console.log('[SNAP] teams cache size:', teamsCache.length);
+        populateAdminTeams();
+        loadSelectorsForJudge();
+        refreshRanking();
+      }, err => { console.error('Snapshot error (teams):', err); });
+
+      // scores - ignore pending local writes (hasPendingWrites) to avoid ghost items
+      unsubScores = onSnapshot(collection(db,'scores'), snap => {
+        scoresCache = [];
+        snap.docs.forEach(d => {
+          if (d.metadata && d.metadata.hasPendingWrites) {
+            console.debug('Ignoring local-pending score:', d.id);
+            return;
+          }
+          scoresCache.push({ id:d.id, data:d.data(), meta: d.metadata });
+        });
+        console.log('[SNAP] scores cache size (server-confirmed):', scoresCache.length);
+        populateRecent();
+      }, err => { console.error('Snapshot error (scores):', err); });
+    }
+
+    // ---------- ADMIN CRUD ----------
+    btnAddClimber.addEventListener('click', async () => {
+      try {
+        const name = newClimberName.value.trim();
+        const code = newClimberCode.value.trim() || null;
+        const age = parseInt(newClimberAge.value || '0',10);
+        const gender = newClimberGender.value;
+        if (!name) return showToast('Nome obrigatório.');
+        const category = computeCategory(age, gender);
+        await addDoc(collection(db,'climbers'), { name, code, age, gender, category, points:0, done:[], doneTeam:[] });
+        newClimberName.value=''; newClimberCode.value=''; newClimberAge.value='';
+        showToast('Escalador adicionado.');
+      } catch (err) {
+        console.error(err); showToast('Erro ao adicionar escalador: '+(err.message||err));
+      }
+    });
+
+    btnDeleteClimber.addEventListener('click', async () => {
+      const sel = selectClimbersAdmin.value;
+      if (!sel) return showToast('Selecione um escalador para excluir.');
+      if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
+      try {
+        // 1) remover scores onde actorType == 'climber' e actorId == sel
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','climber'), where('actorId','==', sel)));
+        for (const s of scoresSnap.docs) { await deleteDoc(doc(db,'scores', s.id)); }
+
+        // 2) remover o escalador dos times (se pertencer)
+        const teamsSnap = await getDocs(collection(db,'teams'));
+        for (const t of teamsSnap.docs) {
+          const data = t.data();
+          if (Array.isArray(data.members) && data.members.includes(sel)) {
+            const newMembers = data.members.filter(m => m !== sel);
+            if (newMembers.length < 3) {
+              await deleteDoc(doc(db,'teams', t.id));
+            } else {
+              await updateDoc(doc(db,'teams', t.id), { members: newMembers });
+            }
+          }
+        }
+
+        // 3) por fim remover o escalador
+        await deleteDoc(doc(db,'climbers', sel));
+        showToast('Escalador e referências excluídos.');
+      } catch (err) {
+        console.error('Erro ao excluir escalador:', err);
+        showToast('Erro ao excluir escalador: '+(err.message||err));
+      }
+    });
+
+    btnAddRoute.addEventListener('click', async () => {
+      try {
+        const code = newRouteCode.value.trim() || null;
+        const name = newRouteName.value.trim();
+        const type = newRouteType.value;
+        if (!name) return showToast('Nome do desafio obrigatório.');
+        await addDoc(collection(db,'routes'), { code, name, type });
+        newRouteCode.value=''; newRouteName.value='';
+        showToast('Desafio adicionado.');
+      } catch (err) { console.error(err); showToast('Erro ao adicionar desafio: '+(err.message||err)); }
+    });
+
+    btnDeleteRoute.addEventListener('click', async () => {
+  const sel = selectRoutesAdmin.value;
+  if (!sel) return showToast('Selecione um desafio para excluir.');
+  if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos de escaladores e times.')) return;
+
+  try {
+    // 1) pegar todos os scores relacionados a essa rota (server-confirmed)
+    const scoresSnap = await getDocs(query(collection(db,'scores'), where('routeId','==', sel)));
+    const scoresDocs = scoresSnap.docs.map(d => ({ id: d.id, data: d.data() }));
+
+    // 2) processar cada score: subtrair pontos do actor e limpar referências
+    for (const s of scoresDocs) {
+      const sc = s.data;
+      const pts = sc.points || 0;
+
+      if (sc.actorType === 'climber') {
+        // ajustar escalador: subtrair pontos e remover routeId de done
+        const cRef = doc(db,'climbers', sc.actorId);
+        const cSnap = await getDoc(cRef);
+        if (cSnap.exists()) {
+          const cdata = cSnap.data();
+          const currentPoints = cdata.points || 0;
+          const newPoints = Math.max(0, currentPoints - pts); // nunca fica negativo
+          const newDone = Array.isArray(cdata.done) ? cdata.done.filter(x => x !== sel) : [];
+          await updateDoc(cRef, { points: newPoints, done: newDone });
+          console.log(`Subtraídos ${pts} pts de escalador ${sc.actorName || sc.actorId}. Pontos: ${currentPoints} -> ${newPoints}`);
+        } else {
+          console.warn('Escalador do score não encontrado (pode já ter sido excluído):', sc.actorId);
+        }
+      } else if (sc.actorType === 'team') {
+        // ajustar time: subtrair pontos e remover routeId de done
+        const tRef = doc(db,'teams', sc.actorId);
+        const tSnap = await getDoc(tRef);
+        if (tSnap.exists()) {
+          const tdata = tSnap.data();
+          const currentPoints = tdata.points || 0;
+          const newPoints = Math.max(0, currentPoints - pts);
+          const newDone = Array.isArray(tdata.done) ? tdata.done.filter(x => x !== sel) : [];
+          await updateDoc(tRef, { points: newPoints, done: newDone });
+          console.log(`Subtraídos ${pts} pts do time ${tdata.name || sc.actorId}. Pontos: ${currentPoints} -> ${newPoints}`);
+
+          // também remover essa rota do doneTeam de cada membro (se existir)
+          if (Array.isArray(tdata.members)) {
+            for (const mid of tdata.members) {
+              try {
+                const mRef = doc(db,'climbers', mid);
+                const mSnap = await getDoc(mRef);
+                if (mSnap.exists()) {
+                  const mdata = mSnap.data();
+                  const newDoneTeam = Array.isArray(mdata.doneTeam) ? mdata.doneTeam.filter(routeId => routeId !== sel) : [];
+                  await updateDoc(mRef, { doneTeam: newDoneTeam });
+                }
+              } catch (e) {
+                console.warn('Falha ao atualizar doneTeam do membro', mid, e);
+              }
+            }
+          }
+        } else {
+          console.warn('Time do score não encontrado (pode já ter sido excluído):', sc.actorId);
+        }
+      } else {
+        console.warn('Score com actorType desconhecido:', sc);
+      }
+
+      // 3) apagar o score (log)
+      try {
+        await deleteDoc(doc(db,'scores', s.id));
+        console.log('Score removido:', s.id);
+      } catch(e) {
+        console.warn('Falha ao remover score', s.id, e);
+      }
+    } // fim loop scores
+
+    // 4) limpar referências remanescentes em climbers (caso algum escalador tenha a rota em done mesmo sem score)
+    const cSnapAll = await getDocs(collection(db,'climbers'));
+    for (const cdoc of cSnapAll.docs) {
+      const cdata = cdoc.data();
+      if (Array.isArray(cdata.done) && cdata.done.includes(sel)) {
+        const newDone = cdata.done.filter(x => x !== sel);
+        await updateDoc(doc(db,'climbers', cdoc.id), { done: newDone });
+      }
+      if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel)) {
+        const newDoneTeam = cdata.doneTeam.filter(x => x !== sel);
+        await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: newDoneTeam });
+      }
+    }
+
+    // 5) limpar referências remanescentes em teams (caso algum time tenha a rota em done sem score)
+    const tSnapAll = await getDocs(collection(db,'teams'));
+    for (const tdoc of tSnapAll.docs) {
+      const tdata = tdoc.data();
+      if (Array.isArray(tdata.done) && tdata.done.includes(sel)) {
+        const newDone = tdata.done.filter(x => x !== sel);
+        await updateDoc(doc(db,'teams', tdoc.id), { done: newDone });
+      }
+    }
+
+    // 6) por último, apagar a rota
+    await deleteDoc(doc(db,'routes', sel));
+    showToast('Rota excluída, scores removidos e pontos ajustados.');
+  } catch (err) {
+    console.error('Erro ao excluir rota com ajuste de pontos:', err);
+    showToast('Erro ao excluir rota: ' + (err.message || err));
+  }
+});
+
+
+    btnCreateTeam.addEventListener('click', async () => {
+      const selected = Array.from(selectClimbersForTeam.selectedOptions).map(o=>o.value);
+      if (selected.length !== 3) return showToast('Selecione exatamente 3 escaladores para o time.');
+      const name = teamNameInput.value.trim() || `Team ${Date.now()}`;
+      try {
+        await addDoc(collection(db,'teams'), { name, members: selected, points: 0, done: [] });
+        teamNameInput.value='';
+        showToast('Time criado.');
+      } catch (err) { console.error(err); showToast('Erro ao criar time: '+(err.message||err)); }
+    });
+
+    btnDeleteTeam.addEventListener('click', async () => {
+      const sel = selectTeamsAdmin.value;
+      if (!sel) return showToast('Selecione um time para excluir.');
+      if (!confirm('Excluir time? Isso removerá scores do time.')) return;
+      try {
+        // apagar scores do time
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','team'), where('actorId','==', sel)));
+        for (const s of scoresSnap.docs) { await deleteDoc(doc(db,'scores', s.id)); }
+
+        // limpar doneTeam dos membros referente às rotas do time
+        const tdoc = await getDoc(doc(db,'teams', sel));
+        if (tdoc.exists()) {
+          const tdata = tdoc.data();
+          if (Array.isArray(tdata.members)) {
+            for (const mid of tdata.members) {
+              const mRef = doc(db,'climbers', mid);
+              const mSnap = await getDoc(mRef);
+              if (mSnap.exists()) {
+                const m = mSnap.data();
+                if (Array.isArray(m.doneTeam)) {
+                  const newDoneTeam = m.doneTeam.filter(routeId => !(Array.isArray(tdata.done) && tdata.done.includes(routeId)));
+                  await updateDoc(mRef, { doneTeam: newDoneTeam });
+                }
+              }
+            }
+          }
+        }
+
+        // apagar o time
+        await deleteDoc(doc(db,'teams', sel));
+        showToast('Time excluído e referências removidas.');
+      } catch (err) { console.error('Erro ao excluir time:', err); showToast('Erro ao excluir time: '+(err.message||err)); }
+    });
+
+    // ---------- JUDGE: register score ----------
+    btnRegister.addEventListener('click', async () => {
+      try {
+        const category = judgeCategory.value; // 'boulder' or 'routes'
+        const actorId = judgeActorSelect.value;
+        const routeId = judgeRouteSelect.value;
+        const sendType = judgeSendType.value;
+        if (!actorId || !routeId) return showToast('Escolha escalador/time e desafio.');
+        const points = (sendType === 'flash') ? 300 : 100;
+
+        if (category === 'boulder') {
+          const cRef = doc(db,'climbers',actorId);
+          const cSnap = await getDoc(cRef);
+          if (!cSnap.exists()) return showToast('Escalador não encontrado.');
+          const c = cSnap.data();
+          if (Array.isArray(c.done) && c.done.includes(routeId)) return showToast('Escalador já completou esse boulder.');
+          const newPoints = (c.points || 0) + points;
+          const newDone = Array.isArray(c.done) ? [...c.done, routeId] : [routeId];
+          await updateDoc(cRef,{ points:newPoints, done:newDone });
+          await addDoc(collection(db,'scores'), { actorType:'climber', actorId, actorName:c.name, routeId, sendType, points, timestamp: serverTimestamp() });
+          showToast(`Registrado ${points} pts para ${c.name}`);
+        } else {
+          const tRef = doc(db,'teams',actorId);
+          const tSnap = await getDoc(tRef);
+          if (!tSnap.exists()) return showToast('Time não encontrado.');
+          const t = tSnap.data();
+          if (Array.isArray(t.done) && t.done.includes(routeId)) return showToast('Time já completou esse desafio.');
+          const newPoints = (t.points || 0) + points;
+          const newDone = Array.isArray(t.done) ? [...t.done, routeId] : [routeId];
+          await updateDoc(tRef,{ points:newPoints, done:newDone });
+          await addDoc(collection(db,'scores'), { actorType:'team', actorId, actorName:t.name, routeId, sendType, points, timestamp: serverTimestamp() });
+          // marca participação nos membros (campo doneTeam em cada climber)
+          if (Array.isArray(t.members)) {
+            for (const memberId of t.members) {
+              try {
+                const mRef = doc(db,'climbers',memberId);
+                await updateDoc(mRef, { doneTeam: arrayUnion(routeId) });
+              } catch(e) {
+                console.warn('Falha ao marcar membro:', memberId, e);
+              }
+            }
+          }
+          showToast(`Registrado ${points} pts para o time ${t.name}`);
+        }
+      } catch (err) {
+        console.error(err); showToast('Erro ao registrar pontuação: '+(err.message||err));
+      }
+    });
+
+    btnClearSelection.addEventListener('click', ()=> { judgeActorSelect.selectedIndex = 0; judgeRouteSelect.selectedIndex=0; });
+
+    // ---------- EXPORT CSV ----------
+    btnExportCSV.addEventListener('click', async () => {
+      try {
+        const cat = selectCategoryTop.value;
+        let rows = [];
+        if (cat === 'boulder') {
+          const snap = await getDocs(collection(db,'climbers'));
+          snap.forEach(d => {
+            const c = d.data();
+            rows.push([c.code || d.id, c.name, c.category || '', c.gender || '', c.points || 0]);
+          });
+        } else {
+          const snap = await getDocs(collection(db,'teams'));
+          snap.forEach(d => {
+            const t = d.data();
+            rows.push([d.id, t.name, (t.members || []).join('|'), t.points || 0]);
+          });
+        }
+        const header = (selectCategoryTop.value === 'boulder') ? 'Codigo,Nome,Categoria,Genero,Pontos' : 'ID,Time,Membros,Pontos';
+        const csv = [header].concat(rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `${selectCategoryTop.value}_leaderboard.csv`; a.click();
+      } catch (err) { console.error('Erro export CSV', err); showToast('Erro ao exportar CSV: '+(err.message||err)); }
+    });
+
+    // ---------- populate admin selects (clear before fill) ----------
+    function populateAdminClimbers(){
+      selectClimbersAdmin.innerHTML = '';
+      selectClimbersForTeam.innerHTML = '';
+      climbersCache.forEach(c => {
+        const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.data.code || c.id} — ${c.data.name}`; selectClimbersAdmin.appendChild(o);
+        const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = `${c.data.code || c.id} — ${c.data.name}`; selectClimbersForTeam.appendChild(o2);
+      });
+    }
+    function populateAdminRoutes(){
+      selectRoutesAdmin.innerHTML = '';
+      routesCache.forEach(r => {
+        const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; selectRoutesAdmin.appendChild(o);
+      });
+    }
+    function populateAdminTeams(){
+      selectTeamsAdmin.innerHTML = '';
+      teamsCache.forEach(t => {
+        const membersNames = (t.data.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
+        const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${membersNames} — ${t.data.points || 0} pts`; selectTeamsAdmin.appendChild(o);
+      });
+    }
+
+    // ---------- Judge selectors ----------
+    async function loadSelectorsForJudge(){
+      const cat = judgeCategory.value;
+      judgeActorSelect.innerHTML = '';
+      judgeRouteSelect.innerHTML = '';
+      if (cat === 'boulder') {
+        climbersCache.forEach(c => {
+          const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.data.code || c.id} — ${c.data.name}`; judgeActorSelect.appendChild(o);
+        });
+        routesCache.filter(r=>r.data.type==='boulder').forEach(r=>{
+          const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name}`; judgeRouteSelect.appendChild(o);
+        });
+      } else {
+        teamsCache.forEach(t => {
+          const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${t.data.points || 0} pts`; judgeActorSelect.appendChild(o);
+        });
+        routesCache.filter(r=>r.data.type==='via' || r.data.type==='desafio').forEach(r=>{
+          const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; judgeRouteSelect.appendChild(o);
+        });
+      }
+    }
+    judgeCategory.addEventListener('change', loadSelectorsForJudge);
+
+    // ---------- recent list (filter orphans) ----------
+    function populateRecent(){
+      recentList.innerHTML = '';
+      const sorted = scoresCache.slice().sort((a,b)=>{
+        const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+        const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
+        return tb - ta;
+      });
+      sorted.slice(0,50).forEach(s => {
+        const routeExists = !!routesCache.find(r => r.id === s.data.routeId);
+        const actorExists = s.data.actorType === 'climber' ? !!climbersCache.find(c => c.id === s.data.actorId) : !!teamsCache.find(t => t.id === s.data.actorId);
+        if (!routeExists || !actorExists) return;
+        const route = routesCache.find(r=>r.id===s.data.routeId);
+        const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
+        const li = document.createElement('li');
+        li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts`;
+        recentList.appendChild(li);
+      });
+    }
+
+    // ---------- RANKING ----------
+    selectCategoryTop.addEventListener('change', refreshRanking);
+    filterCategory.addEventListener('change', refreshRanking);
+
+    function refreshRanking(){
+      const cat = selectCategoryTop.value;
+      rankingTitle.textContent = (cat === 'boulder') ? 'Boulder — Ranking' : 'Vias / Desafios — Ranking';
+      rankingBody.innerHTML = '';
+      if (cat === 'boulder') {
+        let rows = climbersCache.map(c => ({ id:c.id, ...c.data }));
+        const filt = filterCategory.value;
+        if (filt !== 'all') rows = rows.filter(r => r.category === filt);
+        rows.sort((a,b)=> (b.points||0) - (a.points||0));
+        rows.forEach((r,i)=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${r.category||''}</td><td>${r.gender||''}</td><td>${r.points||0}</td>`;
+          tr.addEventListener('click', ()=> showClimberDetails(r.id));
+          rankingBody.appendChild(tr);
+        });
+      } else {
+        let rows = teamsCache.map(t => ({ id:t.id, ...t.data }));
+        rows.sort((a,b)=> (b.points||0) - (a.points||0));
+        rows.forEach((r,i)=>{
+          const names = (r.members||[]).map(id => { const c=climbersCache.find(x=>x.id===id); return c?c.data.name:id; }).join(' | ');
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${i+1}</td><td>${r.name}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
+          tr.addEventListener('click', ()=> showTeamDetails(r.id));
+          rankingBody.appendChild(tr);
+        });
+      }
+    }
+
+    // ---------- details views ----------
+    // substitua sua função showClimberDetails por esta
+async function showClimberDetails(docId){
+  try {
+    const snap = await getDoc(doc(db,'climbers',docId));
+    if (!snap.exists()) return alert('Não encontrado.');
+    const c = snap.data();
+
+    // Boulders individuais que o climber já mandou (IDs)
+    const doneBoulderIds = Array.isArray(c.done) ? c.done : [];
+    // Participações em rotas via/desafio por times (IDs)
+    const doneTeamIds = Array.isArray(c.doneTeam) ? c.doneTeam : [];
+
+    // montar linhas para boulders (procura também no scoresCache por entradas deste climber)
+    const boulderLines = doneBoulderIds.map(routeId => {
+      const route = routesCache.find(r => r.id === routeId);
+      const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
+      // procura no scoresCache por uma entrada de actorType 'climber' + actorId docId + routeId
+      const s = scoresCache.find(sc => sc.data.actorType === 'climber' && sc.data.actorId === docId && sc.data.routeId === routeId);
+      if (s) return `${routeLabel} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+      return `${routeLabel} — (sem registro de score visível)`;
+    });
+
+    // montar linhas para participações em times (procura qual time marcou aquele routeId)
+    const teamLines = doneTeamIds.map(routeId => {
+      const route = routesCache.find(r => r.id === routeId);
+      const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
+      // procurar no scoresCache por alguma entrada de actorType 'team' com esse routeId onde esse time inclua o climber
+      const s = scoresCache.find(sc => sc.data.actorType === 'team' && sc.data.routeId === routeId && (() => {
+        // tenta checar se esse score tem actorId de um time que contém esse climber
+        const teamId = sc.data.actorId;
+        const team = teamsCache.find(t => t.id === teamId);
+        return team && Array.isArray(team.data.members) && team.data.members.includes(docId);
+      })());
+      if (s) {
+        // incluir nome do time
+        const team = teamsCache.find(t => t.id === s.data.actorId);
+        const teamName = team ? team.data.name : s.data.actorName || s.data.actorId;
+        return `${routeLabel} — pelo time ${teamName} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+      }
+      // se não achou score (talvez time deletado), apenas mostra rota
+      return `${routeLabel} — (participação registrada, score não encontrado)`;
+    });
+
+    const doneBouldersText = boulderLines.length ? boulderLines.join('\n') : '(nenhum)';
+    const doneTeamsText = teamLines.length ? teamLines.join('\n') : '(nenhuma)';
+
+    const msg = `${c.name} — ${c.code || docId}\nCategoria: ${c.category}\nGênero: ${c.gender}\nPontos: ${c.points || 0}\n\nBoulders feitos:\n${doneBouldersText}\n\nParticipações por time (rotas):\n${doneTeamsText}`;
+    alert(msg);
+  } catch (err) {
+    console.error('Erro em showClimberDetails:', err);
+    alert('Erro ao carregar detalhes do escalador: ' + (err.message || err));
+  }
+}
+
+
+    async function showTeamDetails(teamId){
+      const tSnap = await getDoc(doc(db,'teams',teamId));
+      if (!tSnap.exists()) return alert('Time não encontrado.');
+      const t = tSnap.data();
+      const teamScores = scoresCache.filter(s => s.data.actorType==='team' && s.data.actorId === teamId);
+      const lines = teamScores.map(s => {
+        const route = routesCache.find(r => r.id === s.data.routeId);
+        const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
+        return `${routeName} — ${s.data.sendType} — ${s.data.points} pts`;
+      });
+      const membersNames = (t.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
+      const msg = `${t.name} — ${t.points || 0} pts\nMembros: ${membersNames}\n\nHistórico de rotas:\n${lines.join('\n') || '(nenhuma)'}\n\n`;
+      alert(msg);
+    }
+
+    // ---------- ADMIN helpers ----------
+    function loadAllForAdmin(){
+      populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams();
+      refreshRanking();
+    }
+
+    // ---------- Initial manual fetch removed (onSnapshot handles data) ----------
+    // no init() to avoid duplication - snapshots provide initial data
+
+    // ---------- debug helper (optional) ----------
+    // window._debugCalls = { populateAdminClimbers:0, populateAdminRoutes:0, populateAdminTeams:0, refreshRanking:0, populateRecent:0 };
+    // populateAdminClimbers = (function(orig){ return function(){ window._debugCalls.populateAdminClimbers++; console.log('populateAdminClimbers called', window._debugCalls.populateAdminClimbers); return orig(); }; })(populateAdminClimbers);
+
+  </script>
+</body>
+</html>
