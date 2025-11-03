@@ -58,7 +58,7 @@
                 <option value="juvenil">Juvenil (13–15)</option>
                 <option value="masters">Masters (≥40)</option>
                 <option value="trans-nao-binario">Trans / Não binários</option>
-                <option value="padrao">Padrão</option>
+                <option value="geral">Geral</option>
               </select>
               <button id="btnExportCSV" class="btn btn-ghost">Exportar CSV</button>
             </div>
@@ -278,11 +278,11 @@
     // utils
     function computeCategory(age, gender){
       if (gender === 'trans-nao-binario') return 'trans-nao-binario';
-      if (!age) return 'padrao';
+      if (!age) return 'geral';
       if (age <= 12) return 'kids';
       if (age >= 13 && age <= 15) return 'juvenil';
       if (age >= 40) return 'masters';
-      return 'padrao';
+      return 'geral';
     }
     function showToast(msg){ alert(msg); }
 
