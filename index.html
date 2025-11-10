@@ -50,6 +50,15 @@
     .overlay-title { color:#9aa6bb; font-size:1rem; letter-spacing:.06em; margin-bottom:10px }
     .overlay-name { font-size: clamp(28px, 7vw, 64px); font-weight:800; line-height:1.05 }
     .overlay-code { margin-top:6px; font-size: clamp(18px, 4vw, 28px); color:#00c77f; font-weight:700 }
+
+    /* ===== Telão ===== */
+    .telao{
+      position:fixed; inset:0;
+      background:#0b1220; color:white;
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      text-align:center; font-family:Inter, sans-serif;
+      z-index:9998; padding:20px;
+    }
   </style>
 </head>
 <body>
@@ -102,11 +111,10 @@
         </div>
 
         <div id="boulderDoMomentoCard" class="card hidden" style="margin-top:12px; border:1px solid #00c77f;">
-  <div style="font-weight:700; color:#00c77f; margin-bottom:4px;">🔥 Boulder do Momento</div>
-  <div id="boulderDoMomentoName" style="font-size:1.1rem; font-weight:600;"></div>
-  <div id="boulderDoMomentoCount" class="muted small"></div>
-</div>
-
+          <div style="font-weight:700; color:#00c77f; margin-bottom:4px;">🔥 Boulder do Momento</div>
+          <div id="boulderDoMomentoName" style="font-size:1.1rem; font-weight:600;"></div>
+          <div id="boulderDoMomentoCount" class="muted small"></div>
+        </div>
 
         <div style="height:12px"></div>
         <div class="card" style="margin-top:12px">
@@ -200,14 +208,12 @@
             <button id="btnRaffle" class="btn btn-primary">Sortear escalador (ao vivo)</button>
             <button id="btnEndLive" class="btn btn-ghost">Encerrar anúncio</button>
           </div>
+
           <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-<strong>Modo Telão</strong>
-<div class="muted small">Exibe o ranking automaticamente no telão.</div>
-<button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
-
+          <strong>Modo Telão</strong>
+          <div class="muted small">Exibe o ranking automaticamente no telão.</div>
+          <button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
         </div>
-
-        
 
         <!-- Judge panel -->
         <div id="judgeCard" class="card hidden" style="margin-top:12px">
@@ -255,24 +261,12 @@
     </div>
   </div>
 
-  <div id="telaoContainer" class="hidden" style="
-  position:fixed; inset:0;
-  background:#0b1220;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  font-family:Inter, sans-serif;
-  z-index:9998;
-  padding:20px;
-">
-  <div id="telaoTitle" style="font-size:2.6rem; font-weight:700; color:#00c77f; margin-bottom:28px;"></div>
-  <div id="telaoList" style="font-size:1.8rem; line-height:1.5;"></div>
-  <div style="position:absolute; bottom:16px; font-size:0.9rem; opacity:0.4;">Pressione ESC para sair</div>
-</div>
-
+  <!-- Telão (agora controlado por classe .hidden sem inline display) -->
+  <div id="telaoContainer" class="telao hidden">
+    <div id="telaoTitle" style="font-size:2.6rem; font-weight:700; color:#00c77f; margin-bottom:28px;"></div>
+    <div id="telaoList" style="font-size:1.8rem; line-height:1.5;"></div>
+    <div style="position:absolute; bottom:16px; font-size:0.9rem; opacity:0.4;">Pressione ESC para sair</div>
+  </div>
 
   <!-- Firebase (modular v11) -->
   <script type="module">
@@ -295,10 +289,11 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
-const boulderDoMomentoName = document.getElementById('boulderDoMomentoName');
-const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
 
+    // Boulder do momento elements
+    const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
+    const boulderDoMomentoName = document.getElementById('boulderDoMomentoName');
+    const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
 
     // SENHAS
     const ADMIN_PASS = "266213";
@@ -310,11 +305,12 @@ const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
     const rankingBody = document.getElementById('rankingBody');
     const filterCategory = document.getElementById('filterCategory');
     const btnExportCSV = document.getElementById('btnExportCSV');
-    const telaoContainer = document.getElementById('telaoContainer');
-const telaoTitle = document.getElementById('telaoTitle');
-const telaoList = document.getElementById('telaoList');
-const btnOpenTelao = document.getElementById('btnOpenTelao');
 
+    // Telão refs
+    const telaoContainer = document.getElementById('telaoContainer');
+    const telaoTitle = document.getElementById('telaoTitle');
+    const telaoList = document.getElementById('telaoList');
+    const btnOpenTelao = document.getElementById('btnOpenTelao');
 
     // Login
     const btnOpenLogin = document.getElementById('btnOpenLogin');
@@ -424,7 +420,7 @@ const btnOpenTelao = document.getElementById('btnOpenTelao');
 
     function populateTeamSelector(){}
 
-    // Login
+    // ===== Login / Logout =====
     btnOpenLogin.addEventListener('click', ()=> { inputPassword.focus(); });
     btnLogin.addEventListener('click', ()=> {
       const pass = inputPassword.value.trim();
@@ -442,22 +438,37 @@ const btnOpenTelao = document.getElementById('btnOpenTelao');
     btnLogout.addEventListener('click', ()=> {
       adminCard.classList.add('hidden'); judgeCard.classList.add('hidden');
       btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
+      // Se estiver no Telão, fecha também
+      closeTelao();
     });
-    btnOpenTelao.addEventListener('click', ()=>{
-  telaoMode = true;
-  telaoContainer.classList.remove('hidden');
-  renderTelao();
-  telaoInterval = setInterval(renderTelao, 10000); // 10s
-});
 
-document.addEventListener('keydown', (e)=>{
-  if (e.key === "Escape" && telaoMode){
-    telaoMode = false;
-    telaoContainer.classList.add('hidden');
-    clearInterval(telaoInterval);
-  }
-});
+    // ===== Telão: abrir/fechar somente no Admin =====
+    let telaoMode = false;
+    let telaoIndex = 0; // 0 = boulder / 1 = teams
+    let telaoInterval = null;
 
+    function openTelao(){
+      if (telaoMode) return;
+      telaoMode = true;
+      telaoTitle.textContent = 'Carregando dados…';
+      telaoList.textContent = '';
+      telaoContainer.classList.remove('hidden');
+      renderTelao();
+      telaoInterval = setInterval(renderTelao, 10000); // alterna a cada 10s
+    }
+    function closeTelao(){
+      telaoMode = false;
+      if (telaoInterval) { clearInterval(telaoInterval); telaoInterval = null; }
+      telaoContainer.classList.add('hidden');
+    }
+
+    btnOpenTelao?.addEventListener('click', openTelao);
+
+    document.addEventListener('keydown', (e)=>{
+      if (e.key === "Escape" && telaoMode){
+        closeTelao();
+      }
+    });
 
     // Clear persistence e snapshots
     (async function tryClearLocalPersistence(){
@@ -483,6 +494,7 @@ document.addEventListener('keydown', (e)=>{
         populateAdminClimbers();
         populateTeamSelector();
         refreshRanking();
+        if (telaoMode) renderTelao();
         loadSelectorsForJudge();
       });
 
@@ -492,6 +504,7 @@ document.addEventListener('keydown', (e)=>{
         populateAdminRoutes();
         loadSelectorsForJudge();
         refreshRanking();
+        if (telaoMode) renderTelao();
       });
 
       unsubTeams = onSnapshot(collection(db,'teams'), snap => {
@@ -500,6 +513,7 @@ document.addEventListener('keydown', (e)=>{
         populateAdminTeams();
         loadSelectorsForJudge();
         refreshRanking();
+        if (telaoMode) renderTelao();
       });
 
       unsubScores = onSnapshot(collection(db,'scores'), snap => {
@@ -509,6 +523,7 @@ document.addEventListener('keydown', (e)=>{
           scoresCache.push({ id:d.id, data:d.data(), meta:d.metadata });
         });
         populateRecent();
+        if (telaoMode) renderTelao();
       });
 
       // ===== Live listener (broadcast ao vivo) =====
@@ -566,7 +581,7 @@ document.addEventListener('keydown', (e)=>{
     btnDeleteClimber.addEventListener('click', async () => {
       const sel = selectClimbersAdmin.value;
       if (!sel) return showToast('Selecione um escalador para excluir.');
-      if (!confirm('Excluir escalador? Isso removerá também as referências em tempos e scores.')) return;
+      if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
       try {
         const scoresSnap = await getDocs(query(collection(db,'scores'),
           where('actorType','==','climber'), where('actorId','==', sel)));
@@ -881,66 +896,65 @@ document.addEventListener('keydown', (e)=>{
         li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
         recentList.appendChild(li);
       });
-    updateBoulderDoMomento();
-}
+      updateBoulderDoMomento();
+    }
 
     // ===== Ranking =====
     selectCategoryTop.addEventListener('change', refreshRanking);
     filterCategory.addEventListener('change', refreshRanking);
 
     function updateBoulderDoMomento(){
-  // Apenas quando o painel atual for Boulder
-  if (selectCategoryTop.value !== 'boulder') {
-    boulderDoMomentoCard.classList.add('hidden');
-    return;
-  }
+      // Apenas quando o painel atual for Boulder
+      if (selectCategoryTop.value !== 'boulder') {
+        boulderDoMomentoCard.classList.add('hidden');
+        return;
+      }
 
-  // Pega os últimos 30 envios confirmados
-  const recent = scoresCache
-    .filter(s => s.data.routeId && s.data.actorType === 'climber')
-    .sort((a,b)=>{
-      const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
-      const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
-      return tb - ta;
-    })
-    .slice(0,30);
+      // Pega os últimos 30 envios confirmados de escaladores (boulder)
+      const recent = scoresCache
+        .filter(s => s.data.routeId && s.data.actorType === 'climber')
+        .sort((a,b)=>{
+          const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+          const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
+          return tb - ta;
+        })
+        .slice(0,30);
 
-  if (!recent.length) {
-    boulderDoMomentoCard.classList.add('hidden');
-    return;
-  }
+      if (!recent.length) {
+        boulderDoMomentoCard.classList.add('hidden');
+        return;
+      }
 
-  // Conta quantos envios por Boulder
-  const counts = {};
-  recent.forEach(s=>{
-    const r = routesCache.find(x=>x.id===s.data.routeId);
-    if (!r) return;
-    if (r.data.type !== 'boulder') return;
-    counts[r.id] = (counts[r.id]||0) + 1;
-  });
+      // Conta quantos envios por Boulder
+      const counts = {};
+      recent.forEach(s=>{
+        const r = routesCache.find(x=>x.id===s.data.routeId);
+        if (!r) return;
+        if (r.data.type !== 'boulder') return;
+        counts[r.id] = (counts[r.id]||0) + 1;
+      });
 
-  const entries = Object.entries(counts);
-  if (!entries.length) {
-    boulderDoMomentoCard.classList.add('hidden');
-    return;
-  }
+      const entries = Object.entries(counts);
+      if (!entries.length) {
+        boulderDoMomentoCard.classList.add('hidden');
+        return;
+      }
 
-  // Pega o boulder mais frequente
-  entries.sort((a,b)=> b[1] - a[1]);
-  const bestId = entries[0][0];
-  const bestCount = entries[0][1];
+      // Pega o boulder mais frequente
+      entries.sort((a,b)=> b[1] - a[1]);
+      const bestId = entries[0][0];
+      const bestCount = entries[0][1];
 
-  const bestRoute = routesCache.find(r=>r.id===bestId);
-  if (!bestRoute) {
-    boulderDoMomentoCard.classList.add('hidden');
-    return;
-  }
+      const bestRoute = routesCache.find(r=>r.id===bestId);
+      if (!bestRoute) {
+        boulderDoMomentoCard.classList.add('hidden');
+        return;
+      }
 
-  boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
-  boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
-  boulderDoMomentoCard.classList.remove('hidden');
-}
-
+      boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
+      boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
+      boulderDoMomentoCard.classList.remove('hidden');
+    }
 
     function refreshRanking(){
       const cat = selectCategoryTop.value;
@@ -976,40 +990,52 @@ document.addEventListener('keydown', (e)=>{
           rankingBody.appendChild(tr);
         });
       }
-    updateBoulderDoMomento();
-}
+      updateBoulderDoMomento();
+    }
 
-let telaoMode = false;
-let telaoIndex = 0; // alterna entre 0 = boulder / 1 = teams
-let telaoInterval = null;
+    function renderTelao(){
+      if (!telaoMode) return;
 
-function renderTelao(){
-  if (!telaoMode) return;
+      const hasClimbers = climbersCache.length > 0;
+      const hasTeams = teamsCache.length > 0;
 
-  if (telaoIndex === 0){
-    telaoTitle.textContent = "🥇 BOULDER — TOP 10";
-    let list = climbersCache
-      .slice()
-      .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
-      .slice(0,10);
-    telaoList.innerHTML = list.map((c,i)=>
-      `${i+1}. ${c.data.name} — ${c.data.points||0} pts`
-    ).join("<br>");
-  } else {
-    telaoTitle.textContent = "🏆 VIAS / DESAFIOS — TOP 10 TIMES";
-    let list = teamsCache
-      .slice()
-      .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
-      .slice(0,10);
-    telaoList.innerHTML = list.map((t,i)=>
-      `${i+1}. ${t.data.name} — ${t.data.points||0} pts`
-    ).join("<br>");
-  }
+      if (!hasClimbers && !hasTeams){
+        telaoTitle.textContent = 'Carregando dados…';
+        telaoList.textContent = '';
+        return;
+      }
 
-  // alterna para a próxima
-  telaoIndex = (telaoIndex + 1) % 2;
-}
+      if (telaoIndex === 0){
+        telaoTitle.textContent = "🥇 BOULDER — TOP 10";
+        let list = climbersCache
+          .slice()
+          .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
+          .slice(0,10);
+        if (!list.length){
+          telaoList.textContent = 'Sem dados ainda.';
+        } else {
+          telaoList.innerHTML = list.map((c,i)=>
+            `${i+1}. ${c.data.name} — ${c.data.points||0} pts`
+          ).join("<br>");
+        }
+      } else {
+        telaoTitle.textContent = "🏆 VIAS / DESAFIOS — TOP 10 TIMES";
+        let list = teamsCache
+          .slice()
+          .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
+          .slice(0,10);
+        if (!list.length){
+          telaoList.textContent = 'Sem dados ainda.';
+        } else {
+          telaoList.innerHTML = list.map((t,i)=>
+            `${i+1}. ${t.data.name} — ${t.data.points||0} pts`
+          ).join("<br>");
+        }
+      }
 
+      // alterna para a próxima
+      telaoIndex = (telaoIndex + 1) % 2;
+    }
 
     // ===== Details =====
     async function showClimberDetails(docId){
