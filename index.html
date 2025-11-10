@@ -30,14 +30,16 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     @media(max-width:420px){ .row{grid-template-columns:1fr} }
 
-    /* ===== Overlay ao vivo (sorteio) ===== */
+    /* ===== Overlay ao vivo (sorteio) com fade in/out ===== */
     .overlay {
       position: fixed; inset: 0;
-      display: none; align-items: center; justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       background: rgba(0,0,0,0.7); backdrop-filter: blur(2px);
-      z-index: 9999; opacity: 0; transition: opacity .35s ease;
+      z-index: 9999;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity .35s ease, visibility .35s ease;
     }
-    .overlay.show { display: flex; opacity: 1; }
+    .overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
     .overlay-card {
       background: #0b1220; border:1px solid #1b2a44; border-radius:16px;
       padding:28px 32px; text-align:center; max-width: min(90vw, 760px);
@@ -149,7 +151,14 @@
           </div>
           <select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
 
-          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+          <!-- ====== Editor manual de pontos do escalador ====== -->
+          <div class="row" style="margin-top:8px">
+            <input id="editClimberPoints" type="number" placeholder="Pontos (override)"/>
+            <button id="btnSaveClimberPoints" class="btn btn-ghost">Salvar pontos do selecionado</button>
+          </div>
+          <div class="muted small">Dica: selecione um escalador na lista acima, digite o novo total e clique em “Salvar pontos”.</div>
+
+          <hr style="border:none;border-top:1px solid #122233;margin:12px 0" />
           <strong>Desafios / Vias / Boulders</strong>
           <div style="margin-top:8px" class="row">
             <input id="newRouteCode" placeholder="Código (ex: B01)"/>
@@ -295,6 +304,10 @@
     const selectTeamsAdmin = document.getElementById('selectTeamsAdmin');
     const teamNameInput = document.getElementById('teamNameInput');
     const btnDeleteTeam = document.getElementById('btnDeleteTeam');
+
+    // Editor manual de pontos
+    const editClimberPoints = document.getElementById('editClimberPoints');
+    const btnSaveClimberPoints = document.getElementById('btnSaveClimberPoints');
 
     // Judge inputs
     const judgeCategory = document.getElementById('judgeCategory');
@@ -478,10 +491,25 @@
       }
     });
 
+    // ====== Salvar pontos manuais do escalador ======
+    btnSaveClimberPoints.addEventListener('click', async ()=>{
+      const sel = selectClimbersAdmin.value;
+      if (!sel) return showToast('Selecione um escalador na lista.');
+      const val = Number(editClimberPoints.value);
+      if (!Number.isFinite(val) || val < 0) return showToast('Informe um número de pontos válido (≥ 0).');
+      try {
+        await updateDoc(doc(db,'climbers', sel), { points: Math.floor(val) });
+        showToast('Pontos atualizados com sucesso.');
+        editClimberPoints.value = '';
+      } catch (e) {
+        console.error(e); showToast('Erro ao salvar pontos: '+(e.message||e));
+      }
+    });
+
     btnDeleteClimber.addEventListener('click', async () => {
       const sel = selectClimbersAdmin.value;
       if (!sel) return showToast('Selecione um escalador para excluir.');
-      if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
+      if (!confirm('Excluir escalador? Isso removerá também as referências em tempos e scores.')) return;
       try {
         const scoresSnap = await getDocs(query(collection(db,'scores'),
           where('actorType','==','climber'), where('actorId','==', sel)));
@@ -922,12 +950,10 @@ ${lines.join('\n') || '(nenhuma)'}
     // ======== SORTEIO AO VIVO (Admin) =========
     btnRaffle.addEventListener('click', async ()=>{
       if (!climbersCache.length) return showToast('Não há escaladores.');
-      // escolhe aleatório
       const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
       const name = pick.data.name || '(sem nome)';
       const code = pick.data.code || pick.id;
       try {
-        // grava anúncio ativo
         await setDoc(doc(db,'live','announcement'), {
           active: true,
           kind: 'raffle',
@@ -937,11 +963,8 @@ ${lines.join('\n') || '(nenhuma)'}
           nonce: Date.now(),
           timestamp: serverTimestamp()
         });
-        // agenda encerramento global após ~5.2s
         setTimeout(async ()=>{
-          try {
-            await updateDoc(doc(db,'live','announcement'), { active:false });
-          } catch(e){}
+          try { await updateDoc(doc(db,'live','announcement'), { active:false }); } catch(e){}
         }, 5200);
       } catch (e) {
         console.error('Erro ao iniciar anúncio ao vivo:', e);
@@ -960,8 +983,7 @@ ${lines.join('\n') || '(nenhuma)'}
       liveOverlay.classList.add('show');
     }
     function hideLive(){
-      liveOverlay.classList.remove('show');
-      // (display:none é controlado via classe + transição CSS)
+      liveOverlay.classList.remove('show'); // fade-out é feito pelo CSS
     }
   </script>
 </body>
