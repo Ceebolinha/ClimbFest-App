@@ -200,7 +200,14 @@
             <button id="btnRaffle" class="btn btn-primary">Sortear escalador (ao vivo)</button>
             <button id="btnEndLive" class="btn btn-ghost">Encerrar anúncio</button>
           </div>
+          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Modo Telão</strong>
+<div class="muted small">Exibe o ranking automaticamente no telão.</div>
+<button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
+
         </div>
+
+        
 
         <!-- Judge panel -->
         <div id="judgeCard" class="card hidden" style="margin-top:12px">
@@ -248,6 +255,25 @@
     </div>
   </div>
 
+  <div id="telaoContainer" class="hidden" style="
+  position:fixed; inset:0;
+  background:#0b1220;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  font-family:Inter, sans-serif;
+  z-index:9998;
+  padding:20px;
+">
+  <div id="telaoTitle" style="font-size:2.6rem; font-weight:700; color:#00c77f; margin-bottom:28px;"></div>
+  <div id="telaoList" style="font-size:1.8rem; line-height:1.5;"></div>
+  <div style="position:absolute; bottom:16px; font-size:0.9rem; opacity:0.4;">Pressione ESC para sair</div>
+</div>
+
+
   <!-- Firebase (modular v11) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
@@ -284,6 +310,11 @@ const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
     const rankingBody = document.getElementById('rankingBody');
     const filterCategory = document.getElementById('filterCategory');
     const btnExportCSV = document.getElementById('btnExportCSV');
+    const telaoContainer = document.getElementById('telaoContainer');
+const telaoTitle = document.getElementById('telaoTitle');
+const telaoList = document.getElementById('telaoList');
+const btnOpenTelao = document.getElementById('btnOpenTelao');
+
 
     // Login
     const btnOpenLogin = document.getElementById('btnOpenLogin');
@@ -412,6 +443,21 @@ const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
       adminCard.classList.add('hidden'); judgeCard.classList.add('hidden');
       btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
     });
+    btnOpenTelao.addEventListener('click', ()=>{
+  telaoMode = true;
+  telaoContainer.classList.remove('hidden');
+  renderTelao();
+  telaoInterval = setInterval(renderTelao, 10000); // 10s
+});
+
+document.addEventListener('keydown', (e)=>{
+  if (e.key === "Escape" && telaoMode){
+    telaoMode = false;
+    telaoContainer.classList.add('hidden');
+    clearInterval(telaoInterval);
+  }
+});
+
 
     // Clear persistence e snapshots
     (async function tryClearLocalPersistence(){
@@ -932,6 +978,38 @@ const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
       }
     updateBoulderDoMomento();
 }
+
+let telaoMode = false;
+let telaoIndex = 0; // alterna entre 0 = boulder / 1 = teams
+let telaoInterval = null;
+
+function renderTelao(){
+  if (!telaoMode) return;
+
+  if (telaoIndex === 0){
+    telaoTitle.textContent = "🥇 BOULDER — TOP 10";
+    let list = climbersCache
+      .slice()
+      .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
+      .slice(0,10);
+    telaoList.innerHTML = list.map((c,i)=>
+      `${i+1}. ${c.data.name} — ${c.data.points||0} pts`
+    ).join("<br>");
+  } else {
+    telaoTitle.textContent = "🏆 VIAS / DESAFIOS — TOP 10 TIMES";
+    let list = teamsCache
+      .slice()
+      .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
+      .slice(0,10);
+    telaoList.innerHTML = list.map((t,i)=>
+      `${i+1}. ${t.data.name} — ${t.data.points||0} pts`
+    ).join("<br>");
+  }
+
+  // alterna para a próxima
+  telaoIndex = (telaoIndex + 1) % 2;
+}
+
 
     // ===== Details =====
     async function showClimberDetails(docId){
