@@ -27,6 +27,8 @@
     .topbar-controls{display:flex;gap:8px;align-items:center}
     .section-title{display:flex;justify-content:space-between;align-items:center}
     .flex{display:flex;gap:8px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    @media(max-width:420px){ .row{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
@@ -52,13 +54,18 @@
           <div class="section-title">
             <h2 id="rankingTitle">Boulder — Ranking</h2>
             <div class="flex">
-              <select id="filterCategory" class="small">
+              <select id="filterCategory" class="small" title="Filtro de categoria (boulder)">
                 <option value="all">Todas categorias</option>
                 <option value="kids">Kids (≤12)</option>
                 <option value="juvenil">Juvenil (13–15)</option>
+                <option value="juvenil-m">Juvenil Masculino</option>
+                <option value="juvenil-f">Juvenil Feminino</option>
                 <option value="masters">Masters (≥40)</option>
                 <option value="trans-nao-binario">Trans / Não binários</option>
                 <option value="geral">Geral</option>
+                <option value="geral-m">Geral Masculino</option>
+                <option value="geral-f">Geral Feminino</option>
+                <option value="pro">PRO</option>
               </select>
               <button id="btnExportCSV" class="btn btn-ghost">Exportar CSV</button>
             </div>
@@ -80,7 +87,7 @@
             <li class="muted small">Juízes: use a área de login para registrar envios.</li>
             <li class="muted small">Boulders são individuais. Vias/Desafios são por <b>times</b> de 3.</li>
             <li class="muted small">Se um escalador/time já completou o desafio, sistema bloqueia nova pontuação.</li>
-            <li class="muted small">Tenha um ótimo festival.</li>
+            <li class="muted small">Times com pelo menos um(a) atleta <b>Kids</b> começam com <b>+900 pontos</b>.</li>
           </ul>
         </div>
       </div>
@@ -89,7 +96,6 @@
       <aside>
         <div id="loginCard" class="card">
           <h3>Login — Juiz / Admin</h3>
-          
           <input id="inputPassword" type="password" placeholder="Digite a senha" />
           <div class="flex" style="margin-top:8px">
             <button id="btnLogin" class="btn btn-primary">Entrar</button>
@@ -104,26 +110,29 @@
 
           <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
           <strong>Escaladores</strong>
-          <div style="margin-top:8px">
+          <div style="margin-top:8px" class="row">
             <input id="newClimberName" placeholder="Nome"/>
             <input id="newClimberCode" placeholder="Código (ex: 001)"/>
             <input id="newClimberAge" type="number" placeholder="Idade"/>
-            <select id="newClimberGender">
+            <select id="newClimberGender" title="Gênero">
               <option value="masculino">Masculino</option>
               <option value="feminino">Feminino</option>
               <option value="trans-nao-binario">Trans / Não binário</option>
               <option value="outro">Outro</option>
             </select>
-            <div class="flex">
-              <button id="btnAddClimber" class="btn btn-primary">Adicionar</button>
-              <button id="btnDeleteClimber" class="btn btn-ghost">Excluir selecionado</button>
-            </div>
-            <select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
+            <label style="display:flex;align-items:center;gap:6px">
+              <input id="newClimberPro" type="checkbox" style="width:auto;margin-top:0"> É PRO?
+            </label>
           </div>
+          <div class="flex" style="margin-top:8px">
+            <button id="btnAddClimber" class="btn btn-primary">Adicionar</button>
+            <button id="btnDeleteClimber" class="btn btn-ghost">Excluir selecionado</button>
+          </div>
+          <select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
 
           <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
           <strong>Desafios / Vias / Boulders</strong>
-          <div style="margin-top:8px">
+          <div style="margin-top:8px" class="row">
             <input id="newRouteCode" placeholder="Código (ex: B01)"/>
             <input id="newRouteName" placeholder="Nome do desafio"/>
             <select id="newRouteType">
@@ -131,32 +140,28 @@
               <option value="via">Via</option>
               <option value="desafio">Kilter/Desafio</option>
             </select>
-            <div class="flex">
-              <button id="btnAddRoute" class="btn btn-primary">Adicionar</button>
-              <button id="btnDeleteRoute" class="btn btn-ghost">Excluir selecionado</button>
-            </div>
-            <select id="selectRoutesAdmin" size="6" style="margin-top:8px"></select>
           </div>
+          <div class="flex" style="margin-top:8px">
+            <button id="btnAddRoute" class="btn btn-primary">Adicionar</button>
+            <button id="btnDeleteRoute" class="btn btn-ghost">Excluir selecionado</button>
+          </div>
+          <select id="selectRoutesAdmin" size="6" style="margin-top:8px"></select>
 
           <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
           <strong>Times (para Vias / Desafios)</strong>
-          <div style="margin-top:8px">
-            <div class="muted small">Selecione 3 escaladores e clique em "Criar Time"</div>
-            <select id="selectClimbersForTeam" multiple size="6" style="margin-top:8px"></select>
-            <input id="teamNameInput" placeholder="Nome do time (ex: Team A)"/>
-            <div class="flex">
-              <button id="btnCreateTeam" class="btn btn-primary">Criar Time</button>
-              <button id="btnDeleteTeam" class="btn btn-ghost">Excluir time selecionado</button>
-            </div>
-            <select id="selectTeamsAdmin" size="6" style="margin-top:8px"></select>
+          <div class="muted small">Selecione 3 escaladores e clique em "Criar Time". Se houver pelo menos um(a) Kids, o time começa com +900.</div>
+          <select id="selectClimbersForTeam" multiple size="6" style="margin-top:8px"></select>
+          <input id="teamNameInput" placeholder="Nome do time (ex: Team A)"/>
+          <div class="flex" style="margin-top:8px">
+            <button id="btnCreateTeam" class="btn btn-primary">Criar Time</button>
+            <button id="btnDeleteTeam" class="btn btn-ghost">Excluir time selecionado</button>
           </div>
-
+          <select id="selectTeamsAdmin" size="6" style="margin-top:8px"></select>
         </div>
 
         <!-- Judge panel -->
         <div id="judgeCard" class="card hidden" style="margin-top:12px">
           <h3>Juiz — Registrar envio</h3>
-
           <div>
             <label class="muted small">Categoria</label>
             <select id="judgeCategory">
@@ -196,7 +201,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import {
       getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc,
-      onSnapshot, query, where, orderBy, serverTimestamp, arrayUnion,
+      onSnapshot, query, where, serverTimestamp, arrayUnion,
       clearIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
@@ -237,6 +242,7 @@
     const newClimberCode = document.getElementById('newClimberCode');
     const newClimberAge = document.getElementById('newClimberAge');
     const newClimberGender = document.getElementById('newClimberGender');
+    const newClimberPro = document.getElementById('newClimberPro');
     const btnAddClimber = document.getElementById('btnAddClimber');
     const selectClimbersAdmin = document.getElementById('selectClimbersAdmin');
     const btnDeleteClimber = document.getElementById('btnDeleteClimber');
@@ -275,21 +281,52 @@
     let unsubTeams = null;
     let unsubScores = null;
 
-    // utils
-    function computeCategory(age, gender){
-      if (gender === 'trans-nao-binario') return 'trans-nao-binario';
-      if (!age) return 'geral';
-      if (age <= 12) return 'kids';
-      if (age >= 13 && age <= 15) return 'juvenil';
-      if (age >= 40) return 'masters';
+    // ----------------- Helpers de normalização e display -----------------
+    const displayCategory = (cat) => {
+      const c = (cat||'').toLowerCase();
+      return {
+        'kids':'Kids',
+        'juvenil':'Juvenil',
+        'masters':'Masters',
+        'trans-nao-binario':'Trans / Não Binários',
+        'geral':'Geral',
+        'pro':'PRO'
+      }[c] || cat || '';
+    };
+    const displayGender = (g) => {
+      const x = (g||'').toLowerCase();
+      return {
+        'masculino':'Masculino',
+        'feminino':'Feminino',
+        'trans-nao-binario':'Trans / Não Binário',
+        'outro':'Outro'
+      }[x] || g || '';
+    };
+    const normalizeGender = (g) => {
+      const x = (g||'').toString().trim().toLowerCase();
+      if (['m','masc','masculino'].includes(x)) return 'masculino';
+      if (['f','fem','feminino'].includes(x)) return 'feminino';
+      if (['trans','tnb','trans-nb','trans nao binario','trans não binário','trans-nao-binario','trans-não-binário'].includes(x)) return 'trans-nao-binario';
+      return 'outro';
+    };
+
+    function computeCategory(age, gender, isPro){
+      if (isPro) return 'pro';
+      const g = normalizeGender(gender);
+      const a = Number.isFinite(+age) ? +age : 0;
+      if (g === 'trans-nao-binario') return 'trans-nao-binario';
+      if (!a) return 'geral';
+      if (a <= 12) return 'kids';
+      if (a >= 13 && a <= 15) return 'juvenil';
+      if (a >= 40) return 'masters';
       return 'geral';
     }
     function showToast(msg){ alert(msg); }
 
-    // populateTeamSelector is used in some places (ensure defined)
-    function populateTeamSelector(){ /* intentionally left simple; selectors are rebuilt in onSnapshot handlers */ }
+    // populateTeamSelector placeholder
+    function populateTeamSelector(){}
 
-    // login flow
+    // Login
     btnOpenLogin.addEventListener('click', ()=> { inputPassword.focus(); });
     btnLogin.addEventListener('click', ()=> {
       const pass = inputPassword.value.trim();
@@ -309,83 +346,78 @@
       btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
     });
 
-    // ---------- SAFE: try to clear local persistence once ----------
+    // Clear persistence once e registrar snapshots
     (async function tryClearLocalPersistence(){
-      try {
-        await clearIndexedDbPersistence(db);
-        console.log('Local Firestore persistence cleared.');
-      } catch (e) {
-        console.warn('Could not clear persistence (probably in use or not enabled):', e);
-      }
-      // after attempting to clear, register realtime listeners:
+      try { await clearIndexedDbPersistence(db); } catch (e) {}
       registerSnapshots();
     })();
 
-    // ---------- REGISTER SNAPSHOTS (unsubs, filtering pending writes) ----------
     function registerSnapshots(){
-      // ensure any previous listeners are detached
       if (typeof unsubClimbers === 'function') { try { unsubClimbers(); } catch(e){}; unsubClimbers = null; }
       if (typeof unsubRoutes === 'function') { try { unsubRoutes(); } catch(e){}; unsubRoutes = null; }
       if (typeof unsubTeams === 'function') { try { unsubTeams(); } catch(e){}; unsubTeams = null; }
       if (typeof unsubScores === 'function') { try { unsubScores(); } catch(e){}; unsubScores = null; }
 
-      // climbers
       unsubClimbers = onSnapshot(collection(db,'climbers'), snap => {
         climbersCache = [];
-        snap.docs.forEach(d => climbersCache.push({ id:d.id, data:d.data(), meta: d.metadata }));
-        console.log('[SNAP] climbers cache size:', climbersCache.length);
+        snap.docs.forEach(d => {
+          const c = d.data();
+          // normaliza para exibição consistente
+          c.gender = normalizeGender(c.gender);
+          c.category = (c.category||'').toLowerCase();
+          climbersCache.push({ id:d.id, data:c, meta:d.metadata });
+        });
         populateAdminClimbers();
         populateTeamSelector();
         refreshRanking();
         loadSelectorsForJudge();
-      }, err => { console.error('Snapshot error (climbers):', err); });
+      });
 
-      // routes
       unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
         routesCache = [];
-        snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta: d.metadata }));
-        console.log('[SNAP] routes cache size:', routesCache.length);
+        snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminRoutes();
         loadSelectorsForJudge();
         refreshRanking();
-      }, err => { console.error('Snapshot error (routes):', err); });
+      });
 
-      // teams
       unsubTeams = onSnapshot(collection(db,'teams'), snap => {
         teamsCache = [];
-        snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta: d.metadata }));
-        console.log('[SNAP] teams cache size:', teamsCache.length);
+        snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminTeams();
         loadSelectorsForJudge();
         refreshRanking();
-      }, err => { console.error('Snapshot error (teams):', err); });
+      });
 
-      // scores - ignore pending local writes (hasPendingWrites) to avoid ghost items
       unsubScores = onSnapshot(collection(db,'scores'), snap => {
         scoresCache = [];
         snap.docs.forEach(d => {
-          if (d.metadata && d.metadata.hasPendingWrites) {
-            console.debug('Ignoring local-pending score:', d.id);
-            return;
-          }
-          scoresCache.push({ id:d.id, data:d.data(), meta: d.metadata });
+          if (d.metadata && d.metadata.hasPendingWrites) return;
+          scoresCache.push({ id:d.id, data:d.data(), meta:d.metadata });
         });
-        console.log('[SNAP] scores cache size (server-confirmed):', scoresCache.length);
         populateRecent();
-      }, err => { console.error('Snapshot error (scores):', err); });
+      });
     }
 
-    // ---------- ADMIN CRUD ----------
+    // ----------------- ADMIN: CRUD -----------------
     btnAddClimber.addEventListener('click', async () => {
       try {
         const name = newClimberName.value.trim();
         const code = newClimberCode.value.trim() || null;
         const age = parseInt(newClimberAge.value || '0',10);
-        const gender = newClimberGender.value;
+        const gender = normalizeGender(newClimberGender.value);
+        const isPro = !!newClimberPro.checked;
+
         if (!name) return showToast('Nome obrigatório.');
-        const category = computeCategory(age, gender);
-        await addDoc(collection(db,'climbers'), { name, code, age, gender, category, points:0, done:[], doneTeam:[] });
+        const category = computeCategory(age, gender, isPro);
+
+        await addDoc(collection(db,'climbers'), {
+          name, code, age, gender, isPro, category,
+          points:0, done:[], doneTeam:[]
+        });
+
         newClimberName.value=''; newClimberCode.value=''; newClimberAge.value='';
+        newClimberGender.value='masculino'; newClimberPro.checked=false;
         showToast('Escalador adicionado.');
       } catch (err) {
         console.error(err); showToast('Erro ao adicionar escalador: '+(err.message||err));
@@ -397,11 +429,10 @@
       if (!sel) return showToast('Selecione um escalador para excluir.');
       if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
       try {
-        // 1) remover scores onde actorType == 'climber' e actorId == sel
-        const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','climber'), where('actorId','==', sel)));
+        const scoresSnap = await getDocs(query(collection(db,'scores'),
+          where('actorType','==','climber'), where('actorId','==', sel)));
         for (const s of scoresSnap.docs) { await deleteDoc(doc(db,'scores', s.id)); }
 
-        // 2) remover o escalador dos times (se pertencer)
         const teamsSnap = await getDocs(collection(db,'teams'));
         for (const t of teamsSnap.docs) {
           const data = t.data();
@@ -414,8 +445,6 @@
             }
           }
         }
-
-        // 3) por fim remover o escalador
         await deleteDoc(doc(db,'climbers', sel));
         showToast('Escalador e referências excluídos.');
       } catch (err) {
@@ -437,120 +466,105 @@
     });
 
     btnDeleteRoute.addEventListener('click', async () => {
-  const sel = selectRoutesAdmin.value;
-  if (!sel) return showToast('Selecione um desafio para excluir.');
-  if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos de escaladores e times.')) return;
+      const sel = selectRoutesAdmin.value;
+      if (!sel) return showToast('Selecione um desafio para excluir.');
+      if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos de escaladores e times.')) return;
 
-  try {
-    // 1) pegar todos os scores relacionados a essa rota (server-confirmed)
-    const scoresSnap = await getDocs(query(collection(db,'scores'), where('routeId','==', sel)));
-    const scoresDocs = scoresSnap.docs.map(d => ({ id: d.id, data: d.data() }));
+      try {
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('routeId','==', sel)));
+        const scoresDocs = scoresSnap.docs.map(d => ({ id: d.id, data: d.data() }));
 
-    // 2) processar cada score: subtrair pontos do actor e limpar referências
-    for (const s of scoresDocs) {
-      const sc = s.data;
-      const pts = sc.points || 0;
+        for (const s of scoresDocs) {
+          const sc = s.data;
+          const pts = sc.points || 0;
 
-      if (sc.actorType === 'climber') {
-        // ajustar escalador: subtrair pontos e remover routeId de done
-        const cRef = doc(db,'climbers', sc.actorId);
-        const cSnap = await getDoc(cRef);
-        if (cSnap.exists()) {
-          const cdata = cSnap.data();
-          const currentPoints = cdata.points || 0;
-          const newPoints = Math.max(0, currentPoints - pts); // nunca fica negativo
-          const newDone = Array.isArray(cdata.done) ? cdata.done.filter(x => x !== sel) : [];
-          await updateDoc(cRef, { points: newPoints, done: newDone });
-          console.log(`Subtraídos ${pts} pts de escalador ${sc.actorName || sc.actorId}. Pontos: ${currentPoints} -> ${newPoints}`);
-        } else {
-          console.warn('Escalador do score não encontrado (pode já ter sido excluído):', sc.actorId);
-        }
-      } else if (sc.actorType === 'team') {
-        // ajustar time: subtrair pontos e remover routeId de done
-        const tRef = doc(db,'teams', sc.actorId);
-        const tSnap = await getDoc(tRef);
-        if (tSnap.exists()) {
-          const tdata = tSnap.data();
-          const currentPoints = tdata.points || 0;
-          const newPoints = Math.max(0, currentPoints - pts);
-          const newDone = Array.isArray(tdata.done) ? tdata.done.filter(x => x !== sel) : [];
-          await updateDoc(tRef, { points: newPoints, done: newDone });
-          console.log(`Subtraídos ${pts} pts do time ${tdata.name || sc.actorId}. Pontos: ${currentPoints} -> ${newPoints}`);
+          if (sc.actorType === 'climber') {
+            const cRef = doc(db,'climbers', sc.actorId);
+            const cSnap = await getDoc(cRef);
+            if (cSnap.exists()) {
+              const cdata = cSnap.data();
+              const newPoints = Math.max(0, (cdata.points||0) - pts);
+              const newDone = Array.isArray(cdata.done) ? cdata.done.filter(x => x !== sel) : [];
+              await updateDoc(cRef, { points: newPoints, done: newDone });
+            }
+          } else if (sc.actorType === 'team') {
+            const tRef = doc(db,'teams', sc.actorId);
+            const tSnap = await getDoc(tRef);
+            if (tSnap.exists()) {
+              const tdata = tSnap.data();
+              const newPoints = Math.max(0, (tdata.points||0) - pts);
+              const newDone = Array.isArray(tdata.done) ? tdata.done.filter(x => x !== sel) : [];
+              await updateDoc(tRef, { points:newPoints, done:newDone });
 
-          // também remover essa rota do doneTeam de cada membro (se existir)
-          if (Array.isArray(tdata.members)) {
-            for (const mid of tdata.members) {
-              try {
-                const mRef = doc(db,'climbers', mid);
-                const mSnap = await getDoc(mRef);
-                if (mSnap.exists()) {
-                  const mdata = mSnap.data();
-                  const newDoneTeam = Array.isArray(mdata.doneTeam) ? mdata.doneTeam.filter(routeId => routeId !== sel) : [];
-                  await updateDoc(mRef, { doneTeam: newDoneTeam });
+              if (Array.isArray(tdata.members)) {
+                for (const mid of tdata.members) {
+                  try {
+                    const mRef = doc(db,'climbers', mid);
+                    const mSnap = await getDoc(mRef);
+                    if (mSnap.exists()) {
+                      const mdata = mSnap.data();
+                      const newDoneTeam = Array.isArray(mdata.doneTeam) ? mdata.doneTeam.filter(routeId => routeId !== sel) : [];
+                      await updateDoc(mRef, { doneTeam: newDoneTeam });
+                    }
+                  } catch {}
                 }
-              } catch (e) {
-                console.warn('Falha ao atualizar doneTeam do membro', mid, e);
               }
             }
           }
-        } else {
-          console.warn('Time do score não encontrado (pode já ter sido excluído):', sc.actorId);
+          try { await deleteDoc(doc(db,'scores', s.id)); } catch {}
         }
-      } else {
-        console.warn('Score com actorType desconhecido:', sc);
-      }
 
-      // 3) apagar o score (log)
-      try {
-        await deleteDoc(doc(db,'scores', s.id));
-        console.log('Score removido:', s.id);
-      } catch(e) {
-        console.warn('Falha ao remover score', s.id, e);
-      }
-    } // fim loop scores
+        const cSnapAll = await getDocs(collection(db,'climbers'));
+        for (const cdoc of cSnapAll.docs) {
+          const cdata = cdoc.data();
+          if (Array.isArray(cdata.done) && cdata.done.includes(sel)) {
+            const newDone = cdata.done.filter(x => x !== sel);
+            await updateDoc(doc(db,'climbers', cdoc.id), { done: newDone });
+          }
+          if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel)) {
+            const newDoneTeam = cdata.doneTeam.filter(x => x !== sel);
+            await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: newDoneTeam });
+          }
+        }
 
-    // 4) limpar referências remanescentes em climbers (caso algum escalador tenha a rota em done mesmo sem score)
-    const cSnapAll = await getDocs(collection(db,'climbers'));
-    for (const cdoc of cSnapAll.docs) {
-      const cdata = cdoc.data();
-      if (Array.isArray(cdata.done) && cdata.done.includes(sel)) {
-        const newDone = cdata.done.filter(x => x !== sel);
-        await updateDoc(doc(db,'climbers', cdoc.id), { done: newDone });
-      }
-      if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel)) {
-        const newDoneTeam = cdata.doneTeam.filter(x => x !== sel);
-        await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: newDoneTeam });
-      }
-    }
+        const tSnapAll = await getDocs(collection(db,'teams'));
+        for (const tdoc of tSnapAll.docs) {
+          const tdata = tdoc.data();
+          if (Array.isArray(tdata.done) && tdata.done.includes(sel)) {
+            const newDone = tdata.done.filter(x => x !== sel);
+            await updateDoc(doc(db,'teams', tdoc.id), { done: newDone });
+          }
+        }
 
-    // 5) limpar referências remanescentes em teams (caso algum time tenha a rota em done sem score)
-    const tSnapAll = await getDocs(collection(db,'teams'));
-    for (const tdoc of tSnapAll.docs) {
-      const tdata = tdoc.data();
-      if (Array.isArray(tdata.done) && tdata.done.includes(sel)) {
-        const newDone = tdata.done.filter(x => x !== sel);
-        await updateDoc(doc(db,'teams', tdoc.id), { done: newDone });
+        await deleteDoc(doc(db,'routes', sel));
+        showToast('Rota excluída, scores removidos e pontos ajustados.');
+      } catch (err) {
+        console.error('Erro ao excluir rota com ajuste de pontos:', err);
+        showToast('Erro ao excluir rota: ' + (err.message || err));
       }
-    }
-
-    // 6) por último, apagar a rota
-    await deleteDoc(doc(db,'routes', sel));
-    showToast('Rota excluída, scores removidos e pontos ajustados.');
-  } catch (err) {
-    console.error('Erro ao excluir rota com ajuste de pontos:', err);
-    showToast('Erro ao excluir rota: ' + (err.message || err));
-  }
-});
-
+    });
 
     btnCreateTeam.addEventListener('click', async () => {
       const selected = Array.from(selectClimbersForTeam.selectedOptions).map(o=>o.value);
       if (selected.length !== 3) return showToast('Selecione exatamente 3 escaladores para o time.');
-      const name = teamNameInput.value.trim() || `Team ${Date.now()}`;
+      const name = (teamNameInput.value.trim() || `Team ${Date.now()}`);
+
       try {
-        await addDoc(collection(db,'teams'), { name, members: selected, points: 0, done: [] });
+        // verifica kids
+        let hasKids = false;
+        for (const id of selected) {
+          const c = climbersCache.find(x=>x.id===id);
+          if (c && (c.data.category||'').toLowerCase() === 'kids') { hasKids = true; break; }
+        }
+        const basePoints = hasKids ? 900 : 0;
+        const bonusReason = hasKids ? 'Bônus +900: time com pelo menos um atleta Kids' : '';
+
+        await addDoc(collection(db,'teams'), {
+          name, members: selected, points: basePoints, done: [], bonus: basePoints, bonusReason
+        });
+
         teamNameInput.value='';
-        showToast('Time criado.');
+        showToast(`Time criado${hasKids ? ' (com +900 de bônus Kids)' : ''}.`);
       } catch (err) { console.error(err); showToast('Erro ao criar time: '+(err.message||err)); }
     });
 
@@ -559,11 +573,9 @@
       if (!sel) return showToast('Selecione um time para excluir.');
       if (!confirm('Excluir time? Isso removerá scores do time.')) return;
       try {
-        // apagar scores do time
         const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','team'), where('actorId','==', sel)));
         for (const s of scoresSnap.docs) { await deleteDoc(doc(db,'scores', s.id)); }
 
-        // limpar doneTeam dos membros referente às rotas do time
         const tdoc = await getDoc(doc(db,'teams', sel));
         if (tdoc.exists()) {
           const tdata = tdoc.data();
@@ -581,14 +593,12 @@
             }
           }
         }
-
-        // apagar o time
         await deleteDoc(doc(db,'teams', sel));
         showToast('Time excluído e referências removidas.');
       } catch (err) { console.error('Erro ao excluir time:', err); showToast('Erro ao excluir time: '+(err.message||err)); }
     });
 
-    // ---------- JUDGE: register score ----------
+    // ----------------- JUIZ: registrar score -----------------
     btnRegister.addEventListener('click', async () => {
       try {
         const category = judgeCategory.value; // 'boulder' or 'routes'
@@ -618,16 +628,17 @@
           const newPoints = (t.points || 0) + points;
           const newDone = Array.isArray(t.done) ? [...t.done, routeId] : [routeId];
           await updateDoc(tRef,{ points:newPoints, done:newDone });
-          await addDoc(collection(db,'scores'), { actorType:'team', actorId, actorName:t.name, routeId, sendType, points, timestamp: serverTimestamp() });
-          // marca participação nos membros (campo doneTeam em cada climber)
+          await addDoc(collection(db,'scores'), {
+            actorType:'team', actorId, actorName:t.name, routeId, sendType, points, timestamp: serverTimestamp(),
+            note: t.bonus ? (t.bonusReason || 'Bônus inicial de time') : ''
+          });
+          // marca participação nos membros
           if (Array.isArray(t.members)) {
             for (const memberId of t.members) {
               try {
                 const mRef = doc(db,'climbers',memberId);
                 await updateDoc(mRef, { doneTeam: arrayUnion(routeId) });
-              } catch(e) {
-                console.warn('Falha ao marcar membro:', memberId, e);
-              }
+              } catch(e) {}
             }
           }
           showToast(`Registrado ${points} pts para o time ${t.name}`);
@@ -639,7 +650,7 @@
 
     btnClearSelection.addEventListener('click', ()=> { judgeActorSelect.selectedIndex = 0; judgeRouteSelect.selectedIndex=0; });
 
-    // ---------- EXPORT CSV ----------
+    // ----------------- EXPORT CSV -----------------
     btnExportCSV.addEventListener('click', async () => {
       try {
         const cat = selectCategoryTop.value;
@@ -648,30 +659,31 @@
           const snap = await getDocs(collection(db,'climbers'));
           snap.forEach(d => {
             const c = d.data();
-            rows.push([c.code || d.id, c.name, c.category || '', c.gender || '', c.points || 0]);
+            rows.push([c.code || d.id, c.name, displayCategory(c.category), displayGender(c.gender), c.points || 0]);
           });
         } else {
           const snap = await getDocs(collection(db,'teams'));
           snap.forEach(d => {
             const t = d.data();
-            rows.push([d.id, t.name, (t.members || []).join('|'), t.points || 0]);
+            rows.push([d.id, t.name, (t.members || []).join('|'), t.points || 0, (t.bonus||0), (t.bonusReason||'')]);
           });
         }
-        const header = (selectCategoryTop.value === 'boulder') ? 'Codigo,Nome,Categoria,Genero,Pontos' : 'ID,Time,Membros,Pontos';
-        const csv = [header].concat(rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))).join('\n');
+        const header = (selectCategoryTop.value === 'boulder') ? 'Codigo,Nome,Categoria,Genero,Pontos' : 'ID,Time,Membros,Pontos,Bonus,BonusReason';
+        const csv = [header].concat(rows.map(r => r.map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(','))).join('\n');
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = `${selectCategoryTop.value}_leaderboard.csv`; a.click();
       } catch (err) { console.error('Erro export CSV', err); showToast('Erro ao exportar CSV: '+(err.message||err)); }
     });
 
-    // ---------- populate admin selects (clear before fill) ----------
+    // ----------------- Populate selects admin -----------------
     function populateAdminClimbers(){
       selectClimbersAdmin.innerHTML = '';
       selectClimbersForTeam.innerHTML = '';
       climbersCache.forEach(c => {
-        const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.data.code || c.id} — ${c.data.name}`; selectClimbersAdmin.appendChild(o);
-        const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = `${c.data.code || c.id} — ${c.data.name}`; selectClimbersForTeam.appendChild(o2);
+        const label = `${c.data.code || c.id} — ${c.data.name} (${displayCategory(c.data.category)}, ${displayGender(c.data.gender)}${c.data.isPro?' · PRO':''})`;
+        const o = document.createElement('option'); o.value = c.id; o.textContent = label; selectClimbersAdmin.appendChild(o);
+        const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = label; selectClimbersForTeam.appendChild(o2);
       });
     }
     function populateAdminRoutes(){
@@ -684,11 +696,12 @@
       selectTeamsAdmin.innerHTML = '';
       teamsCache.forEach(t => {
         const membersNames = (t.data.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
-        const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${membersNames} — ${t.data.points || 0} pts`; selectTeamsAdmin.appendChild(o);
+        const extra = t.data.bonus ? ` · Bônus ${t.data.bonus}` : '';
+        const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${membersNames} — ${t.data.points || 0} pts${extra}`; selectTeamsAdmin.appendChild(o);
       });
     }
 
-    // ---------- Judge selectors ----------
+    // ----------------- Judge selectors -----------------
     async function loadSelectorsForJudge(){
       const cat = judgeCategory.value;
       judgeActorSelect.innerHTML = '';
@@ -702,7 +715,8 @@
         });
       } else {
         teamsCache.forEach(t => {
-          const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${t.data.points || 0} pts`; judgeActorSelect.appendChild(o);
+          const bonus = t.data.bonus ? ` (+${t.data.bonus})` : '';
+          const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${t.data.points || 0} pts${bonus}`; judgeActorSelect.appendChild(o);
         });
         routesCache.filter(r=>r.data.type==='via' || r.data.type==='desafio').forEach(r=>{
           const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; judgeRouteSelect.appendChild(o);
@@ -711,7 +725,7 @@
     }
     judgeCategory.addEventListener('change', loadSelectorsForJudge);
 
-    // ---------- recent list (filter orphans) ----------
+    // ----------------- Recent list -----------------
     function populateRecent(){
       recentList.innerHTML = '';
       const sorted = scoresCache.slice().sort((a,b)=>{
@@ -726,12 +740,13 @@
         const route = routesCache.find(r=>r.id===s.data.routeId);
         const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
         const li = document.createElement('li');
-        li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts`;
+        const extra = s.data.note ? ` — ${s.data.note}` : '';
+        li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
         recentList.appendChild(li);
       });
     }
 
-    // ---------- RANKING ----------
+    // ----------------- Ranking -----------------
     selectCategoryTop.addEventListener('change', refreshRanking);
     filterCategory.addEventListener('change', refreshRanking);
 
@@ -739,14 +754,22 @@
       const cat = selectCategoryTop.value;
       rankingTitle.textContent = (cat === 'boulder') ? 'Boulder — Ranking' : 'Vias / Desafios — Ranking';
       rankingBody.innerHTML = '';
+
       if (cat === 'boulder') {
         let rows = climbersCache.map(c => ({ id:c.id, ...c.data }));
-        const filt = filterCategory.value;
-        if (filt !== 'all') rows = rows.filter(r => r.category === filt);
+        const filt = (filterCategory.value||'all').toLowerCase();
+
+        // filtros especiais por subcategoria/gênero
+        if (filt === 'juvenil-m') rows = rows.filter(r => r.category==='juvenil' && r.gender==='masculino');
+        else if (filt === 'juvenil-f') rows = rows.filter(r => r.category==='juvenil' && r.gender==='feminino');
+        else if (filt === 'geral-m') rows = rows.filter(r => r.category==='geral' && r.gender==='masculino');
+        else if (filt === 'geral-f') rows = rows.filter(r => r.category==='geral' && r.gender==='feminino');
+        else if (filt !== 'all') rows = rows.filter(r => r.category === filt);
+
         rows.sort((a,b)=> (b.points||0) - (a.points||0));
         rows.forEach((r,i)=>{
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${r.category||''}</td><td>${r.gender||''}</td><td>${r.points||0}</td>`;
+          tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${displayCategory(r.category)}</td><td>${displayGender(r.gender)}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showClimberDetails(r.id));
           rankingBody.appendChild(tr);
         });
@@ -755,69 +778,67 @@
         rows.sort((a,b)=> (b.points||0) - (a.points||0));
         rows.forEach((r,i)=>{
           const names = (r.members||[]).map(id => { const c=climbersCache.find(x=>x.id===id); return c?c.data.name:id; }).join(' | ');
+          const bonus = r.bonus ? ` (+${r.bonus})` : '';
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${i+1}</td><td>${r.name}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
+          tr.innerHTML = `<td>${i+1}</td><td>${r.name}${bonus}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showTeamDetails(r.id));
           rankingBody.appendChild(tr);
         });
       }
     }
 
-    // ---------- details views ----------
-    // substitua sua função showClimberDetails por esta
-async function showClimberDetails(docId){
-  try {
-    const snap = await getDoc(doc(db,'climbers',docId));
-    if (!snap.exists()) return alert('Não encontrado.');
-    const c = snap.data();
+    // ----------------- Details -----------------
+    async function showClimberDetails(docId){
+      try {
+        const snap = await getDoc(doc(db,'climbers',docId));
+        if (!snap.exists()) return alert('Não encontrado.');
+        const c = snap.data();
+        const cat = displayCategory(c.category);
+        const gen = displayGender(c.gender);
 
-    // Boulders individuais que o climber já mandou (IDs)
-    const doneBoulderIds = Array.isArray(c.done) ? c.done : [];
-    // Participações em rotas via/desafio por times (IDs)
-    const doneTeamIds = Array.isArray(c.doneTeam) ? c.doneTeam : [];
+        const doneBoulderIds = Array.isArray(c.done) ? c.done : [];
+        const doneTeamIds = Array.isArray(c.doneTeam) ? c.doneTeam : [];
 
-    // montar linhas para boulders (procura também no scoresCache por entradas deste climber)
-    const boulderLines = doneBoulderIds.map(routeId => {
-      const route = routesCache.find(r => r.id === routeId);
-      const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
-      // procura no scoresCache por uma entrada de actorType 'climber' + actorId docId + routeId
-      const s = scoresCache.find(sc => sc.data.actorType === 'climber' && sc.data.actorId === docId && sc.data.routeId === routeId);
-      if (s) return `${routeLabel} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
-      return `${routeLabel} — (sem registro de score visível)`;
-    });
+        const boulderLines = doneBoulderIds.map(routeId => {
+          const route = routesCache.find(r => r.id === routeId);
+          const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
+          const s = scoresCache.find(sc => sc.data.actorType === 'climber' && sc.data.actorId === docId && sc.data.routeId === routeId);
+          if (s) return `${routeLabel} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+          return `${routeLabel} — (sem registro de score visível)`;
+        });
 
-    // montar linhas para participações em times (procura qual time marcou aquele routeId)
-    const teamLines = doneTeamIds.map(routeId => {
-      const route = routesCache.find(r => r.id === routeId);
-      const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
-      // procurar no scoresCache por alguma entrada de actorType 'team' com esse routeId onde esse time inclua o climber
-      const s = scoresCache.find(sc => sc.data.actorType === 'team' && sc.data.routeId === routeId && (() => {
-        // tenta checar se esse score tem actorId de um time que contém esse climber
-        const teamId = sc.data.actorId;
-        const team = teamsCache.find(t => t.id === teamId);
-        return team && Array.isArray(team.data.members) && team.data.members.includes(docId);
-      })());
-      if (s) {
-        // incluir nome do time
-        const team = teamsCache.find(t => t.id === s.data.actorId);
-        const teamName = team ? team.data.name : s.data.actorName || s.data.actorId;
-        return `${routeLabel} — pelo time ${teamName} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+        const teamLines = doneTeamIds.map(routeId => {
+          const route = routesCache.find(r => r.id === routeId);
+          const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
+          const s = scoresCache.find(sc => sc.data.actorType === 'team' && sc.data.routeId === routeId && (() => {
+            const teamId = sc.data.actorId;
+            const team = teamsCache.find(t => t.id === teamId);
+            return team && Array.isArray(team.data.members) && team.data.members.includes(docId);
+          })());
+          if (s) {
+            const team = teamsCache.find(t => t.id === s.data.actorId);
+            const teamName = team ? team.data.name : s.data.actorName || s.data.actorId;
+            return `${routeLabel} — pelo time ${teamName} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+          }
+          return `${routeLabel} — (participação registrada, score não encontrado)`;
+        });
+
+        const msg = `${c.name} — ${c.code || docId}
+Categoria: ${cat}${c.isPro?' (PRO)':''}
+Gênero: ${gen}
+Pontos: ${c.points || 0}
+
+Boulders feitos:
+${boulderLines.length ? boulderLines.join('\n') : '(nenhum)'}
+
+Participações por time (rotas):
+${teamLines.length ? teamLines.join('\n') : '(nenhuma)'}`;
+        alert(msg);
+      } catch (err) {
+        console.error('Erro em showClimberDetails:', err);
+        alert('Erro ao carregar detalhes do escalador: ' + (err.message || err));
       }
-      // se não achou score (talvez time deletado), apenas mostra rota
-      return `${routeLabel} — (participação registrada, score não encontrado)`;
-    });
-
-    const doneBouldersText = boulderLines.length ? boulderLines.join('\n') : '(nenhum)';
-    const doneTeamsText = teamLines.length ? teamLines.join('\n') : '(nenhuma)';
-
-    const msg = `${c.name} — ${c.code || docId}\nCategoria: ${c.category}\nGênero: ${c.gender}\nPontos: ${c.points || 0}\n\nBoulders feitos:\n${doneBouldersText}\n\nParticipações por time (rotas):\n${doneTeamsText}`;
-    alert(msg);
-  } catch (err) {
-    console.error('Erro em showClimberDetails:', err);
-    alert('Erro ao carregar detalhes do escalador: ' + (err.message || err));
-  }
-}
-
+    }
 
     async function showTeamDetails(teamId){
       const tSnap = await getDoc(doc(db,'teams',teamId));
@@ -827,26 +848,25 @@ async function showClimberDetails(docId){
       const lines = teamScores.map(s => {
         const route = routesCache.find(r => r.id === s.data.routeId);
         const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
-        return `${routeName} — ${s.data.sendType} — ${s.data.points} pts`;
+        const extra = s.data.note ? ` — ${s.data.note}` : '';
+        return `${routeName} — ${s.data.sendType} — ${s.data.points} pts${extra}`;
       });
       const membersNames = (t.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
-      const msg = `${t.name} — ${t.points || 0} pts\nMembros: ${membersNames}\n\nHistórico de rotas:\n${lines.join('\n') || '(nenhuma)'}\n\n`;
+      const bonusLine = t.bonus ? `Bônus inicial: +${t.bonus} (${t.bonusReason||'—'})\n` : '';
+      const msg = `${t.name} — ${t.points || 0} pts
+${bonusLine}Membros: ${membersNames}
+
+Histórico de rotas:
+${lines.join('\n') || '(nenhuma)'}
+`;
       alert(msg);
     }
 
-    // ---------- ADMIN helpers ----------
+    // ----------------- Admin helpers -----------------
     function loadAllForAdmin(){
       populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams();
       refreshRanking();
     }
-
-    // ---------- Initial manual fetch removed (onSnapshot handles data) ----------
-    // no init() to avoid duplication - snapshots provide initial data
-
-    // ---------- debug helper (optional) ----------
-    // window._debugCalls = { populateAdminClimbers:0, populateAdminRoutes:0, populateAdminTeams:0, refreshRanking:0, populateRecent:0 };
-    // populateAdminClimbers = (function(orig){ return function(){ window._debugCalls.populateAdminClimbers++; console.log('populateAdminClimbers called', window._debugCalls.populateAdminClimbers); return orig(); }; })(populateAdminClimbers);
-
   </script>
 </body>
 </html>
