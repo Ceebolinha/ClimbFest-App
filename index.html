@@ -101,6 +101,13 @@
           </div>
         </div>
 
+        <div id="boulderDoMomentoCard" class="card hidden" style="margin-top:12px; border:1px solid #00c77f;">
+  <div style="font-weight:700; color:#00c77f; margin-bottom:4px;">🔥 Boulder do Momento</div>
+  <div id="boulderDoMomentoName" style="font-size:1.1rem; font-weight:600;"></div>
+  <div id="boulderDoMomentoCount" class="muted small"></div>
+</div>
+
+
         <div style="height:12px"></div>
         <div class="card" style="margin-top:12px">
           <div class="muted small">Observações</div>
@@ -262,6 +269,10 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
+const boulderDoMomentoName = document.getElementById('boulderDoMomentoName');
+const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
+
 
     // SENHAS
     const ADMIN_PASS = "266213";
@@ -824,11 +835,66 @@
         li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
         recentList.appendChild(li);
       });
-    }
+    updateBoulderDoMomento();
+}
 
     // ===== Ranking =====
     selectCategoryTop.addEventListener('change', refreshRanking);
     filterCategory.addEventListener('change', refreshRanking);
+
+    function updateBoulderDoMomento(){
+  // Apenas quando o painel atual for Boulder
+  if (selectCategoryTop.value !== 'boulder') {
+    boulderDoMomentoCard.classList.add('hidden');
+    return;
+  }
+
+  // Pega os últimos 30 envios confirmados
+  const recent = scoresCache
+    .filter(s => s.data.routeId && s.data.actorType === 'climber')
+    .sort((a,b)=>{
+      const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+      const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
+      return tb - ta;
+    })
+    .slice(0,30);
+
+  if (!recent.length) {
+    boulderDoMomentoCard.classList.add('hidden');
+    return;
+  }
+
+  // Conta quantos envios por Boulder
+  const counts = {};
+  recent.forEach(s=>{
+    const r = routesCache.find(x=>x.id===s.data.routeId);
+    if (!r) return;
+    if (r.data.type !== 'boulder') return;
+    counts[r.id] = (counts[r.id]||0) + 1;
+  });
+
+  const entries = Object.entries(counts);
+  if (!entries.length) {
+    boulderDoMomentoCard.classList.add('hidden');
+    return;
+  }
+
+  // Pega o boulder mais frequente
+  entries.sort((a,b)=> b[1] - a[1]);
+  const bestId = entries[0][0];
+  const bestCount = entries[0][1];
+
+  const bestRoute = routesCache.find(r=>r.id===bestId);
+  if (!bestRoute) {
+    boulderDoMomentoCard.classList.add('hidden');
+    return;
+  }
+
+  boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
+  boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
+  boulderDoMomentoCard.classList.remove('hidden');
+}
+
 
     function refreshRanking(){
       const cat = selectCategoryTop.value;
@@ -864,7 +930,8 @@
           rankingBody.appendChild(tr);
         });
       }
-    }
+    updateBoulderDoMomento();
+}
 
     // ===== Details =====
     async function showClimberDetails(docId){
