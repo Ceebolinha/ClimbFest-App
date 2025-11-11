@@ -5,7 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>ClimbFest 2025</title>
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa6bb;--accent:#00c77f}
+    :root{
+      --bg:#0f1724;--card:#0b1220;--muted:#9aa6bb;--accent:#00c77f;
+      /* Arcade neon (C) */
+      --up:#25ffb2;          /* verde neon */
+      --down:#ff3d6e;        /* rosa avermelhado neon */
+      --neon:#39f3ff;        /* ciano */
+      --lime:#f9ff53;        /* amarelo-limão (flash) */
+      --blue-soft:#7fb3ff;   /* azul suave (cadena) */
+      --pts:#4dff7a;         /* pontos verde */
+      --kids:#f6d365; --juvenil:#cbb2ff; --masters:#7ef9a0; --geral:#9aa6bb; --pro:#c07dff; --tnb:#ffb3d6;
+    }
+    *{box-sizing:border-box}
     body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#eaf2fb}
     .wrap{max-width:1100px;margin:18px auto;padding:12px}
     header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -20,7 +31,8 @@
     table{width:100%;border-collapse:collapse}
     th,td{padding:8px 6px;text-align:left}
     thead th{color:var(--muted);font-size:.85rem;border-bottom:1px solid #122233}
-    tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:filter .2s ease}
+    tbody tr:hover{filter:brightness(1.05)}
     select,input{width:100%;padding:8px;border-radius:8px;border:1px solid #203040;background:#07101a;color:#eaf2fb;margin-top:8px}
     .small{font-size:.9rem}
     .hidden{display:none !important}
@@ -30,28 +42,27 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     @media(max-width:420px){ .row{grid-template-columns:1fr} }
 
-    /* ===== Overlay ao vivo (sorteio) com fade in/out ===== */
+    /* ===== Overlay ao vivo (sorteio) ===== */
     .overlay {
-      position: fixed; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.7); backdrop-filter: blur(2px);
-      z-index: 9999;
-      opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity .35s ease, visibility .35s ease;
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(3px);
+      z-index: 9999; opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity .4s ease, visibility .4s ease;
     }
     .overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
     .overlay-card {
       background: #0b1220; border:1px solid #1b2a44; border-radius:16px;
-      padding:28px 32px; text-align:center; max-width: min(90vw, 760px);
-      transform: translateY(16px); transition: transform .35s ease, box-shadow .35s ease;
+      padding:28px 32px; text-align:center; width:min(92vw, 860px);
+      transform: translateY(12px); transition: transform .35s ease, box-shadow .35s ease;
       box-shadow: 0 10px 40px rgba(0,0,0,.35);
     }
     .overlay.show .overlay-card { transform: translateY(0); }
     .overlay-title { color:#9aa6bb; font-size:1rem; letter-spacing:.06em; margin-bottom:10px }
-    .overlay-name { font-size: clamp(28px, 7vw, 64px); font-weight:800; line-height:1.05 }
-    .overlay-code { margin-top:6px; font-size: clamp(18px, 4vw, 28px); color:#00c77f; font-weight:700 }
+    .overlay-name { font-size: clamp(28px, 6.5vw, 64px); font-weight:900; line-height:1.05 }
+    .overlay-code { margin-top:6px; font-size: clamp(18px, 3.6vw, 28px); color:var(--accent); font-weight:800 }
+    .roll { font-family: ui-monospace, Menlo, Consolas, monospace; color:#d9e6ff; opacity:.9 }
 
-    /* ======== TELÃO ======== */
+    /* ===== TELÃO ===== */
     #telaoContainer { display:none; }
     #telaoContainer.show { display:flex; }
     #telaoContainer{
@@ -62,18 +73,18 @@
 
     .telao-grid{ width:min(1200px, 96vw); display:grid; grid-template-columns: 1.4fr .8fr; gap:24px; }
     .telao-col{ background:#0b1220; border:1px solid #122233; border-radius:16px; padding:18px; }
-    .telao-title{ font-size:2.2rem; font-weight:800; color:#00c77f; margin-bottom:8px; }
+    .telao-title{ font-size:2.2rem; font-weight:800; color:#00c77f; margin-bottom:8px; text-shadow: 0 0 12px rgba(0,199,127,.35); }
     .telao-sub{ color:#9aa6bb; margin-bottom:14px; }
 
     .telao-list{ list-style:none; padding:0; margin:0; }
     .telao-item{ display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); }
-    .telao-pos{ width:42px; text-align:right; opacity:.7; }
-    .telao-name{ font-weight:700; }
-    .telao-points{ font-variant-numeric:tabular-nums; }
+    .telao-pos{ width:42px; text-align:right; opacity:.7; font-variant-numeric:tabular-nums }
+    .telao-name{ font-weight:800; letter-spacing:.2px }
+    .telao-points{ font-variant-numeric:tabular-nums; font-weight:700 }
 
     /* Boulder do momento (lado direito) */
     .moment-card{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:14px; margin-bottom:16px; }
-    .moment-title{ color:#00c77f; font-weight:800; margin-bottom:6px; }
+    .moment-title{ color:#00c77f; font-weight:800; margin-bottom:6px; text-shadow:0 0 10px rgba(0,199,127,.25) }
     .moment-name{ font-size:1.25rem; font-weight:800; }
     .moment-count{ color:#9aa6bb; }
 
@@ -81,11 +92,84 @@
     .ticker{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:12px; height:360px; display:flex; flex-direction:column; }
     .ticker-head{ font-weight:800; margin-bottom:8px; }
     .ticker-body{ flex:1; overflow:auto; display:flex; flex-direction:column-reverse; gap:8px; }
-    .ticker-msg{ background:#0b1220; border:1px solid #162033; border-radius:10px; padding:8px 10px; opacity:0; transform:translateY(8px); animation: tickIn .25s ease forwards; }
-    .ticker-meta{ color:#9aa6bb; font-size:.85rem; margin-bottom:2px; }
-    .ticker-text{ font-size:.95rem; }
+    .ticker-msg{
+      background:#0b1220; border:1px solid #162033; border-radius:10px; padding:8px 10px;
+      opacity:0; transform:translateY(8px); animation: tickIn .28s ease forwards;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+    .ticker-meta{ color:#9aa6bb; font-size:.85rem; margin-bottom:2px; display:flex; align-items:center; gap:6px }
+    .tick-icon{ font-weight:900; filter: drop-shadow(0 0 6px rgba(255,255,255,.15)); }
+    .tick-icon.flash{ color:var(--lime) }
+    .tick-icon.cadena{ color:var(--blue-soft) }
+    .tick-name{ font-weight:800 }
+    .tick-route{ font-weight:900 }
+    .tick-pts{ color:var(--pts); font-weight:900 }
 
-    /* Destaques de mudanças */
+    /* ===== Destaques Ranking (Arcade neon) — reforçado ===== */
+    .rise, .fall{ will-change: transform, background, box-shadow, filter; }
+    .rise{
+      /* Glow verde mais demorado + segurar halo */
+      animation: riseGlow 1.4s ease, holdGreen 1.2s ease 1.4s forwards;
+    }
+    .fall{
+      /* Vermelho mais perceptível e durando mais */
+      animation: fallFade 1.4s ease;
+    }
+    @keyframes riseGlow{
+      0%{
+        transform:scale(0.98);
+        background: rgba(37,255,178,0.12);
+        box-shadow: 0 0 0 rgba(0,0,0,0);
+      }
+      30%{
+        transform:scale(1.02);
+        background: rgba(37,255,178,0.28);
+        box-shadow:
+          0 0 26px rgba(57,243,255,.32),
+          0 0 52px rgba(37,255,178,.28),
+          inset 0 0 0 2px rgba(37,255,178,.50);
+      }
+      100%{
+        transform:scale(1);
+        background: rgba(37,255,178,0.22);
+        box-shadow:
+          0 0 14px rgba(57,243,255,.22),
+          0 0 28px rgba(37,255,178,.20),
+          inset 0 0 0 1px rgba(37,255,178,.36);
+      }
+    }
+    @keyframes holdGreen{
+      0%{
+        background: rgba(37,255,178,0.22);
+        box-shadow:
+          0 0 12px rgba(57,243,255,.20),
+          0 0 24px rgba(37,255,178,.18),
+          inset 0 0 0 1px rgba(37,255,178,.32);
+      }
+      100%{
+        background: transparent;
+        box-shadow: none;
+      }
+    }
+    @keyframes fallFade{
+      0%{
+        background: rgba(255,61,110,.30);
+        filter: brightness(1.1);
+        box-shadow:
+          0 0 12px rgba(255,61,110,.30),
+          inset 0 0 0 1px rgba(255,61,110,.38);
+      }
+      70%{
+        background: rgba(255,61,110,.16);
+      }
+      100%{
+        background: transparent;
+        filter: brightness(1);
+        box-shadow: none;
+      }
+    }
+
+    /* Pop/flash gerais */
     .pop{ animation: pop .7s ease; }
     .flash{ animation: flash .8s ease; }
     @keyframes pop {
@@ -95,6 +179,16 @@
     }
     @keyframes flash { 0%{ background:#06231a } 100%{ background:transparent } }
     @keyframes tickIn{ to{ opacity:1; transform:none; } }
+
+    /* Confete leve */
+    .confetti{ position:fixed; inset:0; pointer-events:none; z-index:10000; overflow:hidden }
+    .confetti i{
+      position:absolute; top:-10px; width:6px; height:10px; border-radius:2px;
+      animation: drop linear forwards; opacity:.9;
+    }
+    @keyframes drop{
+      to { transform: translateY(110vh) rotate(360deg); opacity:.95 }
+    }
   </style>
 </head>
 <body>
@@ -114,7 +208,6 @@
     </header>
 
     <main class="grid" style="margin-top:12px">
-      <!-- Left: ranking / controls -->
       <div>
         <div id="panelRanking" class="card">
           <div class="section-title">
@@ -289,26 +382,26 @@
     </main>
   </div>
 
-  <!-- Overlay global do Live -->
+  <!-- Overlay global do Live (usada na vinheta) -->
   <div id="liveOverlay" class="overlay">
     <div class="overlay-card">
       <div class="overlay-title">SORTEIO — CLIMBFEST</div>
       <div id="liveName" class="overlay-name">Nome do Escalador</div>
       <div id="liveCode" class="overlay-code">CÓDIGO</div>
+      <div id="liveRolling" class="roll muted small" style="margin-top:8px"></div>
     </div>
   </div>
+  <div id="confetti" class="confetti hidden"></div>
 
-  <!-- Telão (começa escondido/certinho) -->
+  <!-- Telão -->
   <div id="telaoContainer">
     <div class="telao-grid">
-      <!-- Coluna esquerda: Ranking alternado -->
       <div class="telao-col">
         <div id="telaoMainTitle" class="telao-title">Boulder — TOP 10</div>
         <div id="telaoMainSub" class="telao-sub">Atualiza automaticamente</div>
         <ul id="telaoMainList" class="telao-list"></ul>
       </div>
 
-      <!-- Coluna direita: Boulder do momento + Ticker -->
       <div class="telao-col">
         <div class="moment-card" id="momentCard">
           <div class="moment-title">🔥 Boulder do Momento</div>
@@ -347,7 +440,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Boulder do momento refs (página principal)
+    // Boulder do momento refs (página)
     const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
     const boulderDoMomentoName = document.getElementById('boulderDoMomentoName');
     const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
@@ -407,11 +500,12 @@
     const btnClearSelection = document.getElementById('btnClearSelection');
     const recentList = document.getElementById('recentList');
 
-    // Live overlay
+    // Live overlay + confetti
     const liveOverlay = document.getElementById('liveOverlay');
     const liveName = document.getElementById('liveName');
-    theLiveFix: {}
     const liveCode = document.getElementById('liveCode');
+    const liveRolling = document.getElementById('liveRolling');
+    const confettiLayer = document.getElementById('confetti');
     const btnRaffle = document.getElementById('btnRaffle');
     const btnEndLive = document.getElementById('btnEndLive');
 
@@ -449,26 +543,26 @@
     let unsubScores = null;
     let unsubLive = null;
 
-    // Helpers
+    // ===== Debounce de UI (ranking + telão) =====
+    let uiTimer = null;
+    function queueUIRedraw(reason=''){
+      if (uiTimer) clearTimeout(uiTimer);
+      uiTimer = setTimeout(()=>{
+        refreshRanking(true);
+        if (telaoMode) renderTelaoFrame(telaoIndex); // não avança quadro
+      }, 700); // janela de consolidação
+    }
+
+    // ===== Helpers =====
     const displayCategory = (cat) => {
       const c = (cat||'').toLowerCase();
       return {
-        'kids':'Kids',
-        'juvenil':'Juvenil',
-        'masters':'Masters',
-        'trans-nao-binario':'Trans / Não Binários',
-        'geral':'Geral',
-        'pro':'PRO'
+        'kids':'Kids','juvenil':'Juvenil','masters':'Masters','trans-nao-binario':'Trans / Não Binários','geral':'Geral','pro':'PRO'
       }[c] || cat || '';
     };
     const displayGender = (g) => {
       const x = (g||'').toLowerCase();
-      return {
-        'masculino':'Masculino',
-        'feminino':'Feminino',
-        'trans-nao-binario':'Trans / Não Binário',
-        'outro':'Outro'
-      }[x] || g || '';
+      return {'masculino':'Masculino','feminino':'Feminino','trans-nao-binario':'Trans / Não Binário','outro':'Outro'}[x] || g || '';
     };
     const normalizeGender = (g) => {
       const x = (g||'').toString().trim().toLowerCase();
@@ -489,10 +583,20 @@
       return 'geral';
     }
     function showToast(msg){ alert(msg); }
-    function populateTeamSelector(){}
 
-    // Login
-    btnOpenLogin.addEventListener('click', ()=> { inputPassword.focus(); });
+    /** Cor por categoria (para nome no ticker) */
+    function categoryColor(cat){
+      const c=(cat||'').toLowerCase();
+      if (c==='kids') return 'var(--kids)';
+      if (c==='juvenil') return 'var(--juvenil)';
+      if (c==='masters') return 'var(--masters)';
+      if (c==='pro') return 'var(--pro)';
+      if (c==='trans-nao-binario') return 'var(--tnb)';
+      return 'var(--geral)';
+    }
+
+    // ===== Login
+    btnOpenLogin.addEventListener('click', ()=> inputPassword.focus());
     btnLogin.addEventListener('click', ()=> {
       const pass = inputPassword.value.trim();
       if (pass === ADMIN_PASS) {
@@ -511,25 +615,28 @@
       btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
     });
 
-    // ===== Abrir/Fechar Telão (só via botão Admin)
+    // ===== Telão
     btnOpenTelao.addEventListener('click', startTelao);
-    document.addEventListener('keydown', (e)=>{
-      if (e.key === 'Escape' && telaoMode) stopTelao();
-    });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && telaoMode) stopTelao(); });
     function startTelao(){
       if (telaoMode) return;
       telaoMode = true;
       telaoContainer.classList.add('show');
-      renderTelao(true);
-      telaoInterval = setInterval(()=>renderTelao(false), 10000); // alterna a cada 10s
+      renderTelaoFrame(telaoIndex); // desenha o quadro atual
+      if (telaoInterval) clearInterval(telaoInterval);
+      telaoInterval = setInterval(()=>{
+        telaoIndex = (telaoIndex + 1) % 2;
+        renderTelaoFrame(telaoIndex);
+      }, 10000);
     }
     function stopTelao(){
       telaoMode = false;
       telaoContainer.classList.remove('show');
       if (telaoInterval) clearInterval(telaoInterval);
+      telaoInterval = null;
     }
 
-    // ===== Snapshots
+    // ===== Snapshots (usando debounce)
     (async function tryClearLocalPersistence(){
       try { await clearIndexedDbPersistence(db); } catch (e) {}
       registerSnapshots();
@@ -551,10 +658,8 @@
           climbersCache.push({ id:d.id, data:c, meta:d.metadata });
         });
         populateAdminClimbers();
-        populateTeamSelector();
-        refreshRanking();
-        if (telaoMode) renderTelao(true);
         loadSelectorsForJudge();
+        queueUIRedraw('climbers');
       });
 
       unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
@@ -562,7 +667,7 @@
         snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminRoutes();
         loadSelectorsForJudge();
-        refreshRanking();
+        queueUIRedraw('routes');
       });
 
       unsubTeams = onSnapshot(collection(db,'teams'), snap => {
@@ -570,8 +675,7 @@
         snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminTeams();
         loadSelectorsForJudge();
-        refreshRanking();
-        if (telaoMode) renderTelao(true);
+        queueUIRedraw('teams');
       });
 
       unsubScores = onSnapshot(collection(db,'scores'), snap => {
@@ -581,22 +685,23 @@
           scoresCache.push({ id:d.id, data:d.data(), meta:d.metadata });
         });
         populateRecent();
-        if (telaoMode) renderTelao(true);
+        updateBoulderDoMomento();
+        queueUIRedraw('scores'); // NÃO avança telão; só redesenha o quadro atual
       });
 
-      // Live listener (broadcast ao vivo)
+      // Live listener (broadcast ao vivo + vinheta)
       unsubLive = onSnapshot(doc(db,'live','announcement'), (dsnap) => {
         if (!dsnap.exists()) { hideLive(); return; }
         const data = dsnap.data();
         if (data.active) {
-          showLive(data.name || '', data.code || '');
+          playRaffleSequence(data.name || '', data.code || '');
         } else {
           hideLive();
         }
       }, (err)=>console.error('live listener error', err));
     }
 
-    // ===== ADMIN: CRUD =====
+    // ===== ADMIN: CRUD
     btnAddClimber.addEventListener('click', async () => {
       try {
         const name = newClimberName.value.trim();
@@ -604,36 +709,22 @@
         const age = parseInt(newClimberAge.value || '0',10);
         const gender = normalizeGender(newClimberGender.value);
         const isPro = !!newClimberPro.checked;
-
         if (!name) return showToast('Nome obrigatório.');
         const category = computeCategory(age, gender, isPro);
-
-        await addDoc(collection(db,'climbers'), {
-          name, code, age, gender, isPro, category,
-          points:0, done:[], doneTeam:[]
-        });
-
+        await addDoc(collection(db,'climbers'), { name, code, age, gender, isPro, category, points:0, done:[], doneTeam:[] });
         newClimberName.value=''; newClimberCode.value=''; newClimberAge.value='';
         newClimberGender.value='masculino'; newClimberPro.checked=false;
         showToast('Escalador adicionado.');
-      } catch (err) {
-        console.error(err); showToast('Erro ao adicionar escalador: '+(err.message||err));
-      }
+      } catch (err) { console.error(err); showToast('Erro ao adicionar escalador: '+(err.message||err)); }
     });
 
-    // Salvar pontos manuais do escalador
     btnSaveClimberPoints.addEventListener('click', async ()=>{
       const sel = selectClimbersAdmin.value;
       if (!sel) return showToast('Selecione um escalador na lista.');
       const val = Number(editClimberPoints.value);
       if (!Number.isFinite(val) || val < 0) return showToast('Informe um número de pontos válido (≥ 0).');
-      try {
-        await updateDoc(doc(db,'climbers', sel), { points: Math.floor(val) });
-        showToast('Pontos atualizados com sucesso.');
-        editClimberPoints.value = '';
-      } catch (e) {
-        console.error(e); showToast('Erro ao salvar pontos: '+(e.message||e));
-      }
+      try { await updateDoc(doc(db,'climbers', sel), { points: Math.floor(val) }); showToast('Pontos atualizados.'); editClimberPoints.value=''; }
+      catch (e){ console.error(e); showToast('Erro ao salvar pontos: '+(e.message||e)); }
     });
 
     btnDeleteClimber.addEventListener('click', async () => {
@@ -641,28 +732,20 @@
       if (!sel) return showToast('Selecione um escalador para excluir.');
       if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
       try {
-        const scoresSnap = await getDocs(query(collection(db,'scores'),
-          where('actorType','==','climber'), where('actorId','==', sel)));
-        for (const s of scoresSnap.docs) { await deleteDoc(doc(db,'scores', s.id)); }
-
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','climber'), where('actorId','==', sel)));
+        for (const s of scoresSnap.docs) await deleteDoc(doc(db,'scores', s.id));
         const teamsSnap = await getDocs(collection(db,'teams'));
         for (const t of teamsSnap.docs) {
           const data = t.data();
           if (Array.isArray(data.members) && data.members.includes(sel)) {
             const newMembers = data.members.filter(m => m !== sel);
-            if (newMembers.length < 3) {
-              await deleteDoc(doc(db,'teams', t.id));
-            } else {
-              await updateDoc(doc(db,'teams', t.id), { members: newMembers });
-            }
+            if (newMembers.length < 3) await deleteDoc(doc(db,'teams', t.id));
+            else await updateDoc(doc(db,'teams', t.id), { members: newMembers });
           }
         }
         await deleteDoc(doc(db,'climbers', sel));
         showToast('Escalador e referências excluídos.');
-      } catch (err) {
-        console.error('Erro ao excluir escalador:', err);
-        showToast('Erro ao excluir escalador: '+(err.message||err));
-      }
+      } catch (err) { console.error('Erro ao excluir escalador:', err); showToast('Erro ao excluir escalador: '+(err.message||err)); }
     });
 
     btnAddRoute.addEventListener('click', async () => {
@@ -680,34 +763,25 @@
     btnDeleteRoute.addEventListener('click', async () => {
       const sel = selectRoutesAdmin.value;
       if (!sel) return showToast('Selecione um desafio para excluir.');
-      if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos de escaladores e times.')) return;
-
+      if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos.')) return;
       try {
         const scoresSnap = await getDocs(query(collection(db,'scores'), where('routeId','==', sel)));
         const scoresDocs = scoresSnap.docs.map(d => ({ id: d.id, data: d.data() }));
-
         for (const s of scoresDocs) {
-          const sc = s.data;
-          const pts = sc.points || 0;
-
+          const sc = s.data, pts = sc.points || 0;
           if (sc.actorType === 'climber') {
             const cRef = doc(db,'climbers', sc.actorId);
             const cSnap = await getDoc(cRef);
             if (cSnap.exists()) {
               const cdata = cSnap.data();
-              const newPoints = Math.max(0, (cdata.points||0) - pts);
-              const newDone = Array.isArray(cdata.done) ? cdata.done.filter(x => x !== sel) : [];
-              await updateDoc(cRef, { points: newPoints, done: newDone });
+              await updateDoc(cRef, { points: Math.max(0,(cdata.points||0)-pts), done: (Array.isArray(cdata.done)? cdata.done.filter(x=>x!==sel):[]) });
             }
           } else if (sc.actorType === 'team') {
             const tRef = doc(db,'teams', sc.actorId);
             const tSnap = await getDoc(tRef);
             if (tSnap.exists()) {
               const tdata = tSnap.data();
-              const newPoints = Math.max(0, (tdata.points||0) - pts);
-              const newDone = Array.isArray(tdata.done) ? tdata.done.filter(x => x !== sel) : [];
-              await updateDoc(tRef, { points:newPoints, done:newDone });
-
+              await updateDoc(tRef, { points: Math.max(0,(tdata.points||0)-pts), done: (Array.isArray(tdata.done)? tdata.done.filter(x=>x!==sel):[]) });
               if (Array.isArray(tdata.members)) {
                 for (const mid of tdata.members) {
                   try {
@@ -725,44 +799,30 @@
           }
           try { await deleteDoc(doc(db,'scores', s.id)); } catch {}
         }
-
         const cSnapAll = await getDocs(collection(db,'climbers'));
         for (const cdoc of cSnapAll.docs) {
           const cdata = cdoc.data();
-          if (Array.isArray(cdata.done) && cdata.done.includes(sel)) {
-            const newDone = cdata.done.filter(x => x !== sel);
-            await updateDoc(doc(db,'climbers', cdoc.id), { done: newDone });
-          }
-          if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel)) {
-            const newDoneTeam = cdata.doneTeam.filter(x => x !== sel);
-            await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: newDoneTeam });
-          }
+          if (Array.isArray(cdata.done) && cdata.done.includes(sel))
+            await updateDoc(doc(db,'climbers', cdoc.id), { done: cdata.done.filter(x=>x!==sel) });
+          if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel))
+            await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: cdata.doneTeam.filter(x=>x!==sel) });
         }
-
         const tSnapAll = await getDocs(collection(db,'teams'));
         for (const tdoc of tSnapAll.docs) {
           const tdata = tdoc.data();
-          if (Array.isArray(tdata.done) && tdata.done.includes(sel)) {
-            const newDone = tdata.done.filter(x => x !== sel);
-            await updateDoc(doc(db,'teams', tdoc.id), { done: newDone });
-          }
+          if (Array.isArray(tdata.done) && tdata.done.includes(sel))
+            await updateDoc(doc(db,'teams', tdoc.id), { done: tdata.done.filter(x=>x!==sel) });
         }
-
         await deleteDoc(doc(db,'routes', sel));
-        showToast('Rota excluída, scores removidos e pontos ajustados.');
-      } catch (err) {
-        console.error('Erro ao excluir rota com ajuste de pontos:', err);
-        showToast('Erro ao excluir rota: ' + (err.message || err));
-      }
+        showToast('Rota excluída e pontos ajustados.');
+      } catch (err) { console.error('Erro ao excluir rota com ajuste de pontos:', err); showToast('Erro ao excluir rota: ' + (err.message || err)); }
     });
 
     btnCreateTeam.addEventListener('click', async () => {
       const selected = Array.from(selectClimbersForTeam.selectedOptions).map(o=>o.value);
       if (selected.length !== 3) return showToast('Selecione exatamente 3 escaladores para o time.');
       const name = (teamNameInput.value.trim() || `Team ${Date.now()}`);
-
       try {
-        // verifica kids
         let hasKids = false;
         for (const id of selected) {
           const c = climbersCache.find(x=>x.id===id);
@@ -770,11 +830,7 @@
         }
         const basePoints = hasKids ? 900 : 0;
         const bonusReason = hasKids ? 'Bônus +900: time com pelo menos um atleta Kids' : '';
-
-        await addDoc(collection(db,'teams'), {
-          name, members: selected, points: basePoints, done: [], bonus: basePoints, bonusReason
-        });
-
+        await addDoc(collection(db,'teams'), { name, members: selected, points: basePoints, done: [], bonus: basePoints, bonusReason });
         teamNameInput.value='';
         showToast(`Time criado${hasKids ? ' (com +900 de bônus Kids)' : ''}.`);
       } catch (err) { console.error(err); showToast('Erro ao criar time: '+(err.message||err)); }
@@ -786,8 +842,7 @@
       if (!confirm('Excluir time? Isso removerá scores do time.')) return;
       try {
         const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','team'), where('actorId','==', sel)));
-        for (const s of scoresSnap.docs) { await deleteDoc(doc(db,'scores', s.id)); }
-
+        for (const s of scoresSnap.docs) await deleteDoc(doc(db,'scores', s.id));
         const tdoc = await getDoc(doc(db,'teams', sel));
         if (tdoc.exists()) {
           const tdata = tdoc.data();
@@ -810,7 +865,7 @@
       } catch (err) { console.error('Erro ao excluir time:', err); showToast('Erro ao excluir time: '+(err.message||err)); }
     });
 
-    // ===== JUIZ: registrar score =====
+    // ===== JUIZ: registrar score
     btnRegister.addEventListener('click', async () => {
       try {
         const category = judgeCategory.value;
@@ -829,7 +884,7 @@
           const newPoints = (c.points || 0) + points;
           const newDone = Array.isArray(c.done) ? [...c.done, routeId] : [routeId];
           await updateDoc(cRef,{ points:newPoints, done:newDone });
-          await addDoc(collection(db,'scores'), { actorType:'climber', actorId, actorName:c.name, routeId, sendType, points, timestamp: serverTimestamp() });
+          await addDoc(collection(db,'scores'), { actorType:'climber', actorId, actorName:c.name, actorCategory:c.category||'geral', routeId, sendType, points, timestamp: serverTimestamp() });
           showToast(`Registrado ${points} pts para ${c.name}`);
         } else {
           const tRef = doc(db,'teams',actorId);
@@ -841,15 +896,13 @@
           const newDone = Array.isArray(t.done) ? [...t.done, routeId] : [routeId];
           await updateDoc(tRef,{ points:newPoints, done:newDone });
           await addDoc(collection(db,'scores'), {
-            actorType:'team', actorId, actorName:t.name, routeId, sendType, points, timestamp: serverTimestamp(),
+            actorType:'team', actorId, actorName:t.name, actorCategory:'team',
+            routeId, sendType, points, timestamp: serverTimestamp(),
             note: t.bonus ? (t.bonusReason || 'Bônus inicial de time') : ''
           });
           if (Array.isArray(t.members)) {
             for (const memberId of t.members) {
-              try {
-                const mRef = doc(db,'climbers',memberId);
-                await updateDoc(mRef, { doneTeam: arrayUnion(routeId) });
-              } catch(e) {}
+              try { const mRef = doc(db,'climbers',memberId); await updateDoc(mRef, { doneTeam: arrayUnion(routeId) }); } catch(e){}
             }
           }
           showToast(`Registrado ${points} pts para o time ${t.name}`);
@@ -860,7 +913,7 @@
     });
     btnClearSelection.addEventListener('click', ()=> { judgeActorSelect.selectedIndex = 0; judgeRouteSelect.selectedIndex=0; });
 
-    // ===== EXPORT CSV =====
+    // ===== EXPORT CSV
     btnExportCSV.addEventListener('click', async () => {
       try {
         const cat = selectCategoryTop.value;
@@ -886,7 +939,7 @@
       } catch (err) { console.error('Erro export CSV', err); showToast('Erro ao exportar CSV: '+(err.message||err)); }
     });
 
-    // ===== Populate selects (Admin) =====
+    // ===== Populate selects (Admin)
     function populateAdminClimbers(){
       selectClimbersAdmin.innerHTML = '';
       selectClimbersForTeam.innerHTML = '';
@@ -911,7 +964,7 @@
       });
     }
 
-    // ===== Judge selectors =====
+    // ===== Judge selectors
     async function loadSelectorsForJudge(){
       const cat = judgeCategory.value;
       judgeActorSelect.innerHTML = '';
@@ -935,7 +988,7 @@
     }
     judgeCategory.addEventListener('change', loadSelectorsForJudge);
 
-    // ===== Recent list (painel juiz) =====
+    // ===== Recent list (painel juiz) + Boulder do Momento (página)
     function populateRecent(){
       recentList.innerHTML = '';
       const sorted = scoresCache.slice().sort((a,b)=>{
@@ -954,16 +1007,10 @@
         li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
         recentList.appendChild(li);
       });
-      updateBoulderDoMomento();
     }
 
-    // ===== Boulder do Momento (painel público) =====
     function updateBoulderDoMomento(){
-      if (selectCategoryTop.value !== 'boulder') {
-        boulderDoMomentoCard.classList.add('hidden');
-        return;
-      }
-
+      if (selectCategoryTop.value !== 'boulder') { boulderDoMomentoCard.classList.add('hidden'); return; }
       const recent = scoresCache
         .filter(s => s.data.routeId && s.data.actorType === 'climber')
         .sort((a,b)=>{
@@ -971,8 +1018,7 @@
           const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
           return tb - ta;
         })
-        .slice(0,30);
-
+        .slice(0,50);
       if (!recent.length) { boulderDoMomentoCard.classList.add('hidden'); return; }
 
       const counts = {};
@@ -982,35 +1028,31 @@
         if (r.data.type !== 'boulder') return;
         counts[r.id] = (counts[r.id]||0) + 1;
       });
-
       const entries = Object.entries(counts);
       if (!entries.length) { boulderDoMomentoCard.classList.add('hidden'); return; }
-
       entries.sort((a,b)=> b[1] - a[1]);
-      const bestId = entries[0][0];
-      const bestCount = entries[0][1];
-
+      const bestId = entries[0][0], bestCount = entries[0][1];
       const bestRoute = routesCache.find(r=>r.id===bestId);
       if (!bestRoute) { boulderDoMomentoCard.classList.add('hidden'); return; }
-
       boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
       boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
       boulderDoMomentoCard.classList.remove('hidden');
     }
 
-    // ===== Ranking público =====
-    selectCategoryTop.addEventListener('change', refreshRanking);
-    filterCategory.addEventListener('change', refreshRanking);
+    // ===== Ranking público com destaque (1)
+    const prevOrder = { boulder:[], routes:[] }; // ids na ordem atual por modo
+    selectCategoryTop.addEventListener('change', ()=>refreshRanking(true));
+    filterCategory.addEventListener('change', ()=>refreshRanking(true));
 
-    function refreshRanking(){
+    function refreshRanking(fromSnapshot=false){
       const cat = selectCategoryTop.value;
       rankingTitle.textContent = (cat === 'boulder') ? 'Boulder — Ranking' : 'Vias / Desafios — Ranking';
+      const oldOrder = prevOrder[cat].slice();
       rankingBody.innerHTML = '';
 
       if (cat === 'boulder') {
         let rows = climbersCache.map(c => ({ id:c.id, ...c.data }));
         const filt = (filterCategory.value||'all').toLowerCase();
-
         if (filt === 'juvenil-m') rows = rows.filter(r => r.category==='juvenil' && r.gender==='masculino');
         else if (filt === 'juvenil-f') rows = rows.filter(r => r.category==='juvenil' && r.gender==='feminino');
         else if (filt === 'geral-m') rows = rows.filter(r => r.category==='geral' && r.gender==='masculino');
@@ -1018,62 +1060,67 @@
         else if (filt !== 'all') rows = rows.filter(r => r.category === filt);
 
         rows.sort((a,b)=> (b.points||0) - (a.points||0));
+        const newOrder = rows.map(r=>r.id);
         rows.forEach((r,i)=>{
           const tr = document.createElement('tr');
           tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${displayCategory(r.category)}</td><td>${displayGender(r.gender)}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showClimberDetails(r.id));
+
+          // destaque up/down
+          const oldPos = oldOrder.indexOf(r.id);
+          if (oldOrder.length && oldPos !== -1){
+            if (i < oldPos) tr.classList.add('rise');
+            else if (i > oldPos) tr.classList.add('fall');
+          }
           rankingBody.appendChild(tr);
         });
+        prevOrder.boulder = newOrder;
       } else {
         let rows = teamsCache.map(t => ({ id:t.id, ...t.data }));
         rows.sort((a,b)=> (b.points||0) - (a.points||0));
+        const newOrder = rows.map(r=>r.id);
         rows.forEach((r,i)=>{
           const names = (r.members||[]).map(id => { const c=climbersCache.find(x=>x.id===id); return c?c.data.name:id; }).join(' | ');
           const bonus = r.bonus ? ` (+${r.bonus})` : '';
           const tr = document.createElement('tr');
           tr.innerHTML = `<td>${i+1}</td><td>${r.name}${bonus}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showTeamDetails(r.id));
+          const oldPos = oldOrder.indexOf(r.id);
+          if (oldOrder.length && oldPos !== -1){
+            if (i < oldPos) tr.classList.add('rise'); else if (i > oldPos) tr.classList.add('fall');
+          }
           rankingBody.appendChild(tr);
         });
+        prevOrder.routes = newOrder;
       }
-      updateBoulderDoMomento();
+      if (!fromSnapshot) updateBoulderDoMomento();
     }
 
-    // ===== Telão render =====
-    function renderTelao(force=false){
-      if (!telaoMode || !telaoContainer.classList.contains('show')) return;
-
-      // 1) Ranking principal alternado
-      if (telaoIndex === 0){
-        telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
-        const list = climbersCache.slice()
-          .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
-          .slice(0,10);
-        renderRankList(list, 'boulder');
-      } else {
-        telaoMainTitle.textContent = "🏆 Times — TOP 10";
-        const list = teamsCache.slice()
-          .sort((a,b)=>(b.data.points||0)-(a.data.points||0))
-          .slice(0,10);
-        renderRankList(list, 'team');
-      }
-
-      // 2) Boulder do momento (últimos 30 envios)
-      renderMoment();
-
-      // 3) Ticker tipo chat
-      renderTicker();
-
-      if (!force) telaoIndex = (telaoIndex + 1) % 2;
-    }
-
+    // ===== Telão render helpers =====
     function haveDifferentOrder(a,b){
       if (a.length !== b.length) return true;
       for (let i=0;i<a.length;i++) if (a[i]!==b[i]) return true;
       return false;
     }
 
-    function renderRankList(list, kind){
+    function renderTelaoFrame(indexToShow){
+      if (!telaoMode || !telaoContainer.classList.contains('show')) return;
+
+      if (indexToShow === 0){
+        telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
+        const list = climbersCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
+        renderRankListTelao(list, 'boulder');
+      } else {
+        telaoMainTitle.textContent = "🏆 Times — TOP 10";
+        const list = teamsCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
+        renderRankListTelao(list, 'team');
+      }
+      renderMoment();
+      renderTicker();
+      // não altera telaoIndex aqui
+    }
+
+    function renderRankListTelao(list, kind){
       const currentIds = list.map(x => x.id);
       const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
       const changed = haveDifferentOrder(prevArr, currentIds);
@@ -1082,9 +1129,13 @@
       list.forEach((item, i) => {
         const li = document.createElement('li');
         li.className = 'telao-item';
-        if (changed && (!prevArr.length || prevArr[i] !== currentIds[i])) {
-          li.classList.add('pop');
-        } else if (changed) {
+        if (prevArr.length){
+          const oldPos = prevArr.indexOf(item.id);
+          if (oldPos !== -1){
+            if (i < oldPos) li.classList.add('rise');
+            else if (i > oldPos) li.classList.add('fall');
+          }
+        } else if (changed){
           li.classList.add('flash');
         }
         const name = item.data.name;
@@ -1098,7 +1149,6 @@
 
       if (kind==='boulder') prevTopBoulder = currentIds;
       else prevTopTeams = currentIds;
-
       telaoMainSub.textContent = 'Atualiza automaticamente';
     }
 
@@ -1110,7 +1160,7 @@
           const tb = b.data.timestamp ? (b.data.timestamp.seconds||b.data.timestamp) : 0;
           return tb - ta;
         })
-        .slice(0,30);
+        .slice(0,50);
 
       if (!recent.length){ momentName.textContent = '—'; momentCount.textContent=''; return; }
 
@@ -1137,6 +1187,13 @@
       prevMomentId = bestId;
     }
 
+    // ===== Ticker (3)
+    function routeLabelById(id){
+      const r = routesCache.find(x=>x.id===id);
+      if (!r) return id || '—';
+      return `${r.data.code || ''} ${r.data.name}`.trim();
+    }
+
     function renderTicker(){
       const sorted = scoresCache.slice().sort((a,b)=>{
         const ta = a.data.timestamp ? (a.data.timestamp.seconds||a.data.timestamp) : 0;
@@ -1146,30 +1203,28 @@
 
       sorted.forEach(s=>{
         if (tickerSeenIds.has(s.id)) return;
-        const route = routesCache.find(r=>r.id===s.data.routeId);
-        const routeName = route ? `${route.data.code || ''} ${route.data.name}` : s.data.routeId;
+        const routeName = routeLabelById(s.data.routeId);
         const who = s.data.actorName || s.data.actorId || '—';
         const pts = s.data.points || 0;
-        const type = s.data.sendType || '';
+        const type = (s.data.sendType || '').toLowerCase();
+        const icon = type==='flash' ? '💥' : '✅';
+        const iconClass = type==='flash' ? 'flash' : 'cadena';
         const when = 'agora';
+        const cat = (s.data.actorCategory||'geral');
 
         const div = document.createElement('div');
         div.className = 'ticker-msg';
         div.innerHTML = `
-          <div class="ticker-meta">${when} • ${type} • ${pts} pts</div>
-          <div class="ticker-text"><strong>${who}</strong> em <em>${routeName}</em></div>
+          <div class="ticker-meta"><span class="tick-icon ${iconClass}">${icon}</span>${when} • ${type || 'envio'} • <span class="tick-pts">+${pts}</span></div>
+          <div class="ticker-text"><span class="tick-name" style="color:${categoryColor(cat)}">${who}</span> mandou <span class="tick-route"><b>${routeName}</b></span></div>
         `;
-        // como a coluna é column-reverse, prepend mantém a ordem visual
         tickerBody.prepend(div);
         tickerSeenIds.add(s.id);
-
-        while (tickerBody.children.length > 30) {
-          tickerBody.removeChild(tickerBody.lastElementChild);
-        }
+        while (tickerBody.children.length > 30) tickerBody.removeChild(tickerBody.lastElementChild);
       });
     }
 
-    // ===== Details =====
+    // ===== Details
     async function showClimberDetails(docId){
       try {
         const snap = await getDoc(doc(db,'climbers',docId));
@@ -1243,13 +1298,10 @@ ${lines.join('\n') || '(nenhuma)'}`;
       alert(msg);
     }
 
-    // ===== Admin helpers =====
-    function loadAllForAdmin(){
-      populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams();
-      refreshRanking();
-    }
+    // ===== Admin helpers
+    function loadAllForAdmin(){ populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams(); refreshRanking(true); }
 
-    // ======== SORTEIO AO VIVO (Admin) =========
+    // ===== Vinheta de Sorteio (5) =====
     btnRaffle.addEventListener('click', async ()=>{
       if (!climbersCache.length) return showToast('Não há escaladores.');
       const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
@@ -1257,35 +1309,77 @@ ${lines.join('\n') || '(nenhuma)'}`;
       const code = pick.data.code || pick.id;
       try {
         await setDoc(doc(db,'live','announcement'), {
-          active: true,
-          kind: 'raffle',
-          name,
-          code,
-          climberId: pick.id,
-          nonce: Date.now(),
-          timestamp: serverTimestamp()
+          active: true, kind: 'raffle', name, code, climberId: pick.id,
+          nonce: Date.now(), timestamp: serverTimestamp()
         });
-        setTimeout(async ()=>{
-          try { await updateDoc(doc(db,'live','announcement'), { active:false }); } catch(e){}
-        }, 5200);
-      } catch (e) {
-        console.error('Erro ao iniciar anúncio ao vivo:', e);
-        showToast('Erro ao iniciar o anúncio ao vivo.');
-      }
+        // encerrado pelo próprio cliente após vinheta
+      } catch (e) { console.error('Erro ao iniciar anúncio ao vivo:', e); showToast('Erro ao iniciar o anúncio ao vivo.'); }
     });
 
-    btnEndLive.addEventListener('click', async ()=>{
-      try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); }
-      catch(e){ console.error(e); }
-    });
+    btnEndLive.addEventListener('click', async ()=>{ try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){ console.error(e); } });
 
-    function showLive(name, code){
-      liveName.textContent = name;
-      liveCode.textContent = `CÓDIGO: ${code}`;
-      liveOverlay.classList.add('show');
-    }
+    function showLive(){ liveOverlay.classList.add('show'); }
     function hideLive(){
       liveOverlay.classList.remove('show');
+      stopConfetti();
+      liveRolling.textContent = '';
+    }
+
+    function playRaffleSequence(finalName, finalCode){
+      showLive();
+      liveName.textContent = '—';
+      liveCode.textContent = '';
+      liveRolling.textContent = 'Preparando sorteio…';
+
+      // 8–14 nomes rolando
+      const rounds = 8 + Math.floor(Math.random()*7);
+      const pool = climbersCache.map(c => c.data.name || c.id);
+      let i=0, delay=90, timer=null;
+
+      const tick = ()=>{
+        if (i < rounds){
+          const rname = pool[Math.floor(Math.random()*pool.length)] || '—';
+          liveRolling.textContent = rname;
+          i++; delay = Math.min(300, delay + 20); // desacelera levemente
+          timer = setTimeout(tick, delay);
+        } else {
+          // batida final
+          liveRolling.textContent = '';
+          liveName.textContent = finalName;
+          liveCode.textContent = `CÓDIGO: ${finalCode}`;
+          liveName.style.textShadow = '0 0 18px rgba(57,243,255,.35), 0 0 36px rgba(37,255,178,.22)';
+          liveName.classList.add('pop');
+          startConfetti();
+          setTimeout(async ()=>{
+            stopConfetti();
+            liveName.classList.remove('pop');
+            // encerra anúncio para todos
+            try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){}
+          }, 5000);
+        }
+      };
+      setTimeout(tick, 250); // pequena preparação
+    }
+
+    function startConfetti(){
+      confettiLayer.classList.remove('hidden');
+      confettiLayer.innerHTML = '';
+      const colors = ['#39f3ff','#25ffb2','#f9ff53','#ff3d6e','#c07dff'];
+      const amount = 60;
+      for (let i=0;i<amount;i++){
+        const p = document.createElement('i');
+        p.style.left = Math.random()*100 + 'vw';
+        p.style.background = colors[Math.floor(Math.random()*colors.length)];
+        p.style.animationDuration = (1.2 + Math.random()*1.5) + 's';
+        p.style.transform = `translateY(-10px) rotate(${Math.random()*180}deg)`;
+        p.style.width = (4 + Math.random()*6) + 'px';
+        p.style.height = (8 + Math.random()*10) + 'px';
+        confettiLayer.appendChild(p);
+      }
+    }
+    function stopConfetti(){
+      confettiLayer.classList.add('hidden');
+      confettiLayer.innerHTML = '';
     }
   </script>
 </body>
