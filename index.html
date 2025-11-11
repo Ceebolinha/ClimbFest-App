@@ -108,19 +108,13 @@
     /* ===== Destaques Ranking (Arcade neon) — reforçado ===== */
     .rise, .fall{ will-change: transform, background, box-shadow, filter; }
     .rise{
-      /* Glow verde mais demorado + segurar halo */
       animation: riseGlow 1.4s ease, holdGreen 1.2s ease 1.4s forwards;
     }
     .fall{
-      /* Vermelho mais perceptível e durando mais */
       animation: fallFade 1.4s ease;
     }
     @keyframes riseGlow{
-      0%{
-        transform:scale(0.98);
-        background: rgba(37,255,178,0.12);
-        box-shadow: 0 0 0 rgba(0,0,0,0);
-      }
+      0%{ transform:scale(0.98); background: rgba(37,255,178,0.12); box-shadow: 0 0 0 rgba(0,0,0,0); }
       30%{
         transform:scale(1.02);
         background: rgba(37,255,178,0.28);
@@ -146,10 +140,7 @@
           0 0 24px rgba(37,255,178,.18),
           inset 0 0 0 1px rgba(37,255,178,.32);
       }
-      100%{
-        background: transparent;
-        box-shadow: none;
-      }
+      100%{ background: transparent; box-shadow: none; }
     }
     @keyframes fallFade{
       0%{
@@ -159,14 +150,8 @@
           0 0 12px rgba(255,61,110,.30),
           inset 0 0 0 1px rgba(255,61,110,.38);
       }
-      70%{
-        background: rgba(255,61,110,.16);
-      }
-      100%{
-        background: transparent;
-        filter: brightness(1);
-        box-shadow: none;
-      }
+      70%{ background: rgba(255,61,110,.16); }
+      100%{ background: transparent; filter: brightness(1); box-shadow: none; }
     }
 
     /* Pop/flash gerais */
@@ -186,47 +171,40 @@
       position:absolute; top:-10px; width:6px; height:10px; border-radius:2px;
       animation: drop linear forwards; opacity:.9;
     }
-    @keyframes drop{
-      to { transform: translateY(110vh) rotate(360deg); opacity:.95 }
-    }
+    @keyframes drop{ to { transform: translateY(110vh) rotate(360deg); opacity:.95 } }
 
     /* --- Troca suave do ranking no Telão --- */
-.swapHost{ position:relative; min-height:420px; }
-.pane{ position:absolute; inset:0; }
-.pane-current{ position:relative; }
+    .swapHost{ position:relative; min-height:420px; }
+    .pane{ position:absolute; inset:0; }
+    .pane-current{ position:relative; }
 
-/* novas listas entram e saem com crossfade + leve slide */
-.swap-in{ animation: telaoIn .50s ease forwards; }
-.swap-out{ animation: telaoOut .50s ease forwards; }
+    .swap-in{ animation: telaoIn .50s ease forwards; }
+    .swap-out{ animation: telaoOut .50s ease forwards; }
 
-@keyframes telaoIn{
-  from{ opacity:0; transform:translateY(8px) scale(.98); filter:blur(1px) }
-  to  { opacity:1; transform:none;                 filter:blur(0)   }
-}
-@keyframes telaoOut{
-  from{ opacity:1; transform:none;                 filter:blur(0)   }
-  to  { opacity:0; transform:translateY(-6px) scale(.995); filter:blur(1px) }
-}
+    @keyframes telaoIn{
+      from{ opacity:0; transform:translateY(8px) scale(.98); filter:blur(1px) }
+      to  { opacity:1; transform:none;                 filter:blur(0)   }
+    }
+    @keyframes telaoOut{
+      from{ opacity:1; transform:none;                 filter:blur(0)   }
+      to  { opacity:0; transform:translateY(-6px) scale(.995); filter:blur(1px) }
+    }
 
-/* ===== Telão: barra de progressão ===== */
-.telao-progress{
-  position:absolute; left:0; right:0; top:0; height:6px;
-  background: rgba(255,255,255,.07); overflow:hidden; z-index:9999;
-}
-.telao-progress .bar{
-  height:100%; width:0;
-  background: linear-gradient(90deg, var(--up), var(--neon), var(--down));
-  box-shadow: 0 0 12px rgba(57,243,255,.35);
-  transform-origin: left;
-}
-.telao-progress .bar.play{
-  animation: telaoProgress var(--slide-ms, 10s) linear forwards;
-}
-@keyframes telaoProgress{
-  from{ width:0% } to{ width:100% }
-}
-
-
+    /* ===== Telão: barra de progressão ===== */
+    .telao-progress{
+      position:absolute; left:0; right:0; top:0; height:6px;
+      background: rgba(255,255,255,.07); overflow:hidden; z-index:9999;
+    }
+    .telao-progress .bar{
+      height:100%; width:0;
+      background: linear-gradient(90deg, var(--up), var(--neon), var(--down));
+      box-shadow: 0 0 12px rgba(57,243,255,.35);
+      transform-origin: left;
+    }
+    .telao-progress .bar.play{
+      animation: telaoProgress var(--slide-ms, 10s) linear forwards;
+    }
+    @keyframes telaoProgress{ from{ width:0% } to{ width:100% } }
   </style>
 </head>
 <body>
@@ -438,9 +416,10 @@
       <div class="telao-col">
         <div id="telaoMainTitle" class="telao-title">Boulder — TOP 10</div>
         <div id="telaoMainSub" class="telao-sub">Atualiza automaticamente</div>
+
         <div id="telaoListHost" class="swapHost">
-  <ul id="telaoMainList" class="telao-list pane pane-current"></ul>
-</div>
+          <ul id="telaoMainList" class="telao-list pane pane-current"></ul>
+        </div>
       </div>
 
       <div class="telao-col">
@@ -550,34 +529,39 @@
     const btnRaffle = document.getElementById('btnRaffle');
     const btnEndLive = document.getElementById('btnEndLive');
 
-    // ===== TELÃO (novo)
+    // ===== TELÃO =====
     let telaoMode = false;
     let telaoIndex = 0; // 0 = Boulder TOP10, 1 = Times TOP10
-    let telaoInterval = null;
+    let telaoTimer = null;
     let tickerSeenIds = new Set();
     let prevTopBoulder = []; // ids na ordem
     let prevTopTeams = [];
     let prevMomentId = null;
-    const SLIDE_MS = 10000;
+
+    const DURATION_BOULDER = 12000; // ranking individual por mais tempo
+    const DURATION_TEAMS   = 7000;  // times por menos tempo
 
     const telaoContainer = document.getElementById('telaoContainer');
     const telaoMainTitle = document.getElementById('telaoMainTitle');
     const telaoMainSub = document.getElementById('telaoMainSub');
-    const telaoMainList = document.getElementById('telaoMainList');
     const progressBar = document.getElementById('telaoProgressBar');
-    
-    function restartProgressBar(){
-  if (!progressBar) return;
-  progressBar.style.setProperty('--slide-ms', SLIDE_MS+'ms');
-  progressBar.classList.remove('play');
-  void progressBar.offsetWidth;           // força reflow p/ reiniciar animação
-  progressBar.classList.add('play');
-}
-function stopProgressBar(){
-  if (!progressBar) return;
-  progressBar.classList.remove('play');
-  progressBar.style.removeProperty('--slide-ms');
-}
+
+    // Barra de progresso sincronizada com o slide atual
+    function playProgress(ms){
+      if (!progressBar) return;
+      progressBar.style.setProperty('--slide-ms', ms+'ms');
+      progressBar.classList.remove('play'); // reset
+      void progressBar.offsetWidth;        // força reflow
+      progressBar.classList.add('play');   // toca de novo
+    }
+    function stopProgress(){
+      if (!progressBar) return;
+      progressBar.classList.remove('play');
+      progressBar.style.removeProperty('--slide-ms');
+    }
+    function currentDuration(){
+      return (telaoIndex === 0) ? DURATION_BOULDER : DURATION_TEAMS;
+    }
 
     const momentCard = document.getElementById('momentCard');
     const momentName = document.getElementById('momentName');
@@ -601,12 +585,12 @@ function stopProgressBar(){
 
     // ===== Debounce de UI (ranking + telão) =====
     let uiTimer = null;
-    function queueUIRedraw(reason=''){
+    function queueUIRedraw(){
       if (uiTimer) clearTimeout(uiTimer);
       uiTimer = setTimeout(()=>{
         refreshRanking(true);
-        if (telaoMode) renderTelaoFrame(telaoIndex); // não avança quadro
-      }, 700); // janela de consolidação
+        if (telaoMode) renderTelaoFrame(telaoIndex); // redesenha sem avançar
+      }, 700);
     }
 
     // ===== Helpers =====
@@ -639,8 +623,6 @@ function stopProgressBar(){
       return 'geral';
     }
     function showToast(msg){ alert(msg); }
-
-    /** Cor por categoria (para nome no ticker) */
     function categoryColor(cat){
       const c=(cat||'').toLowerCase();
       if (c==='kids') return 'var(--kids)';
@@ -674,28 +656,40 @@ function stopProgressBar(){
     // ===== Telão
     btnOpenTelao.addEventListener('click', startTelao);
     document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && telaoMode) stopTelao(); });
+
     function startTelao(){
       if (telaoMode) return;
       telaoMode = true;
       telaoContainer.classList.add('show');
-      renderTelaoFrame(telaoIndex); // desenha o quadro atual
-      restartProgressBar();
-      if (telaoInterval) clearInterval(telaoInterval);
-      telaoInterval = setInterval(()=>{
-        telaoIndex = (telaoIndex + 1) % 2;
-        renderTelaoFrame(telaoIndex);
-        restartProgressBar();
-      }, 10000, SLIDE_MS);
+
+      // comece sempre do quadro atual (telaoIndex mantém estado)
+      renderTelaoFrame(telaoIndex);
+      playProgress(currentDuration());
+      scheduleNextTelaoTick();
     }
+
     function stopTelao(){
       telaoMode = false;
       telaoContainer.classList.remove('show');
-      if (telaoInterval) clearInterval(telaoInterval);
-      telaoInterval = null;
-      stopProgressBar();
+      if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
+      stopProgress();
     }
 
-    // ===== Snapshots (usando debounce)
+    function scheduleNextTelaoTick(){
+      if (!telaoMode) return;
+      if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
+
+      const delay = currentDuration();
+      telaoTimer = setTimeout(() => {
+        // avança
+        telaoIndex = (telaoIndex + 1) % 2;
+        renderTelaoFrame(telaoIndex);
+        playProgress(currentDuration());
+        scheduleNextTelaoTick(); // agenda a próxima rolagem
+      }, delay);
+    }
+
+    // ===== Snapshots
     (async function tryClearLocalPersistence(){
       try { await clearIndexedDbPersistence(db); } catch (e) {}
       registerSnapshots();
@@ -718,7 +712,7 @@ function stopProgressBar(){
         });
         populateAdminClimbers();
         loadSelectorsForJudge();
-        queueUIRedraw('climbers');
+        queueUIRedraw();
       });
 
       unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
@@ -726,7 +720,7 @@ function stopProgressBar(){
         snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminRoutes();
         loadSelectorsForJudge();
-        queueUIRedraw('routes');
+        queueUIRedraw();
       });
 
       unsubTeams = onSnapshot(collection(db,'teams'), snap => {
@@ -734,7 +728,7 @@ function stopProgressBar(){
         snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminTeams();
         loadSelectorsForJudge();
-        queueUIRedraw('teams');
+        queueUIRedraw();
       });
 
       unsubScores = onSnapshot(collection(db,'scores'), snap => {
@@ -745,7 +739,7 @@ function stopProgressBar(){
         });
         populateRecent();
         updateBoulderDoMomento();
-        queueUIRedraw('scores'); // NÃO avança telão; só redesenha o quadro atual
+        queueUIRedraw(); // redesenha sem mexer no timer do telão
       });
 
       // Live listener (broadcast ao vivo + vinheta)
@@ -1098,8 +1092,8 @@ function stopProgressBar(){
       boulderDoMomentoCard.classList.remove('hidden');
     }
 
-    // ===== Ranking público com destaque (1)
-    const prevOrder = { boulder:[], routes:[] }; // ids na ordem atual por modo
+    // ===== Ranking público com destaque
+    const prevOrder = { boulder:[], routes:[] };
     selectCategoryTop.addEventListener('change', ()=>refreshRanking(true));
     filterCategory.addEventListener('change', ()=>refreshRanking(true));
 
@@ -1125,7 +1119,6 @@ function stopProgressBar(){
           tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${displayCategory(r.category)}</td><td>${displayGender(r.gender)}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showClimberDetails(r.id));
 
-          // destaque up/down
           const oldPos = oldOrder.indexOf(r.id);
           if (oldOrder.length && oldPos !== -1){
             if (i < oldPos) tr.classList.add('rise');
@@ -1155,7 +1148,7 @@ function stopProgressBar(){
       if (!fromSnapshot) updateBoulderDoMomento();
     }
 
-    // ===== Telão render helpers =====
+    // ===== Telão render helpers
     function haveDifferentOrder(a,b){
       if (a.length !== b.length) return true;
       for (let i=0;i<a.length;i++) if (a[i]!==b[i]) return true;
@@ -1176,72 +1169,60 @@ function stopProgressBar(){
       }
       renderMoment();
       renderTicker();
-      // não altera telaoIndex aqui
     }
 
     function renderRankListTelao(list, kind){
-  const host = document.getElementById('telaoListHost');
-  const current = host.querySelector('.pane-current');
+      const host = document.getElementById('telaoListHost');
+      const current = host.querySelector('.pane-current');
 
-  // gera a nova UL em memória
-  const incoming = document.createElement('ul');
-  incoming.className = 'telao-list pane swap-in';
+      const incoming = document.createElement('ul');
+      incoming.className = 'telao-list pane swap-in';
 
-  const currentIds = list.map(x => x.id);
-  const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
-  const changed = haveDifferentOrder(prevArr, currentIds);
+      const currentIds = list.map(x => x.id);
+      const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
+      const changed = haveDifferentOrder(prevArr, currentIds);
 
-  list.forEach((item, i) => {
-    const li = document.createElement('li');
-    li.className = 'telao-item';
+      list.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.className = 'telao-item';
 
-    // destaca subida/queda comparando com a ordem anterior
-    if (prevArr.length){
-      const oldPos = prevArr.indexOf(item.id);
-      if (oldPos !== -1){
-        if (i < oldPos) li.classList.add('rise');
-        else if (i > oldPos) li.classList.add('fall');
+        if (prevArr.length){
+          const oldPos = prevArr.indexOf(item.id);
+          if (oldPos !== -1){
+            if (i < oldPos) li.classList.add('rise');
+            else if (i > oldPos) li.classList.add('fall');
+          }
+        } else if (changed){
+          li.classList.add('flash');
+        }
+
+        li.innerHTML = `
+          <div class="telao-pos">${i+1}º</div>
+          <div class="telao-name">${item.data.name}</div>
+          <div class="telao-points">${(item.data.points||0)} pts</div>
+        `;
+        incoming.appendChild(li);
+      });
+
+      host.style.height = host.offsetHeight + 'px';
+      host.appendChild(incoming);
+
+      if (current){
+        current.classList.add('swap-out');
+        current.addEventListener('animationend', () => { current.remove(); }, { once:true });
       }
-    } else if (changed){
-      li.classList.add('flash');
+
+      incoming.addEventListener('animationend', () => {
+        incoming.classList.remove('swap-in');
+        incoming.classList.add('pane-current');
+        host.style.height = '';
+      }, { once:true });
+
+      if (kind==='boulder') prevTopBoulder = currentIds;
+      else prevTopTeams = currentIds;
+
+      telaoMainSub.textContent = 'Atualiza automaticamente';
     }
-
-    li.innerHTML = `
-      <div class="telao-pos">${i+1}º</div>
-      <div class="telao-name">${item.data.name}</div>
-      <div class="telao-points">${(item.data.points||0)} pts</div>
-    `;
-    incoming.appendChild(li);
-  });
-
-  // trava a altura do host pra evitar "salto" durante a troca
-  host.style.height = host.offsetHeight + 'px';
-
-  // coloca a nova lista por cima com animação de entrada
-  host.appendChild(incoming);
-
-  // anima e remove a antiga, se houver
-  if (current){
-    current.classList.add('swap-out');
-    current.addEventListener('animationend', () => {
-      current.remove();
-    }, { once:true });
-  }
-
-  // quando a nova terminar a entrada, vira "current"
-  incoming.addEventListener('animationend', () => {
-    incoming.classList.remove('swap-in');
-    incoming.classList.add('pane-current');
-    host.style.height = ''; // libera a altura
-  }, { once:true });
-
-  // salva ordem pra próxima comparação
-  if (kind==='boulder') prevTopBoulder = currentIds;
-  else prevTopTeams = currentIds;
-
-  telaoMainSub.textContent = 'Atualiza automaticamente';
-}
-
 
     function renderMoment(){
       const recent = scoresCache
@@ -1278,7 +1259,7 @@ function stopProgressBar(){
       prevMomentId = bestId;
     }
 
-    // ===== Ticker (3)
+    // ===== Ticker
     function routeLabelById(id){
       const r = routesCache.find(x=>x.id===id);
       if (!r) return id || '—';
@@ -1287,8 +1268,8 @@ function stopProgressBar(){
 
     function renderTicker(){
       const sorted = scoresCache.slice().sort((a,b)=>{
-        const ta = a.data.timestamp ? (a.data.timestamp.seconds||a.data.timestamp) : 0;
-        const tb = b.data.timestamp ? (b.data.timestamp.seconds||b.data.timestamp) : 0;
+        const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+        const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
         return tb - ta;
       }).slice(0,20);
 
@@ -1392,7 +1373,7 @@ ${lines.join('\n') || '(nenhuma)'}`;
     // ===== Admin helpers
     function loadAllForAdmin(){ populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams(); refreshRanking(true); }
 
-    // ===== Vinheta de Sorteio (5) =====
+    // ===== Vinheta de Sorteio
     btnRaffle.addEventListener('click', async ()=>{
       if (!climbersCache.length) return showToast('Não há escaladores.');
       const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
@@ -1403,7 +1384,6 @@ ${lines.join('\n') || '(nenhuma)'}`;
           active: true, kind: 'raffle', name, code, climberId: pick.id,
           nonce: Date.now(), timestamp: serverTimestamp()
         });
-        // encerrado pelo próprio cliente após vinheta
       } catch (e) { console.error('Erro ao iniciar anúncio ao vivo:', e); showToast('Erro ao iniciar o anúncio ao vivo.'); }
     });
 
@@ -1422,7 +1402,6 @@ ${lines.join('\n') || '(nenhuma)'}`;
       liveCode.textContent = '';
       liveRolling.textContent = 'Preparando sorteio…';
 
-      // 8–14 nomes rolando
       const rounds = 8 + Math.floor(Math.random()*7);
       const pool = climbersCache.map(c => c.data.name || c.id);
       let i=0, delay=90, timer=null;
@@ -1431,10 +1410,9 @@ ${lines.join('\n') || '(nenhuma)'}`;
         if (i < rounds){
           const rname = pool[Math.floor(Math.random()*pool.length)] || '—';
           liveRolling.textContent = rname;
-          i++; delay = Math.min(300, delay + 20); // desacelera levemente
+          i++; delay = Math.min(300, delay + 20);
           timer = setTimeout(tick, delay);
         } else {
-          // batida final
           liveRolling.textContent = '';
           liveName.textContent = finalName;
           liveCode.textContent = `CÓDIGO: ${finalCode}`;
@@ -1444,12 +1422,11 @@ ${lines.join('\n') || '(nenhuma)'}`;
           setTimeout(async ()=>{
             stopConfetti();
             liveName.classList.remove('pop');
-            // encerra anúncio para todos
             try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){}
           }, 5000);
         }
       };
-      setTimeout(tick, 250); // pequena preparação
+      setTimeout(tick, 250);
     }
 
     function startConfetti(){
