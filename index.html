@@ -189,6 +189,44 @@
     @keyframes drop{
       to { transform: translateY(110vh) rotate(360deg); opacity:.95 }
     }
+
+    /* --- Troca suave do ranking no Telão --- */
+.swapHost{ position:relative; min-height:420px; }
+.pane{ position:absolute; inset:0; }
+.pane-current{ position:relative; }
+
+/* novas listas entram e saem com crossfade + leve slide */
+.swap-in{ animation: telaoIn .50s ease forwards; }
+.swap-out{ animation: telaoOut .50s ease forwards; }
+
+@keyframes telaoIn{
+  from{ opacity:0; transform:translateY(8px) scale(.98); filter:blur(1px) }
+  to  { opacity:1; transform:none;                 filter:blur(0)   }
+}
+@keyframes telaoOut{
+  from{ opacity:1; transform:none;                 filter:blur(0)   }
+  to  { opacity:0; transform:translateY(-6px) scale(.995); filter:blur(1px) }
+}
+
+/* ===== Telão: barra de progressão ===== */
+.telao-progress{
+  position:absolute; left:0; right:0; top:0; height:6px;
+  background: rgba(255,255,255,.07); overflow:hidden; z-index:9999;
+}
+.telao-progress .bar{
+  height:100%; width:0;
+  background: linear-gradient(90deg, var(--up), var(--neon), var(--down));
+  box-shadow: 0 0 12px rgba(57,243,255,.35);
+  transform-origin: left;
+}
+.telao-progress .bar.play{
+  animation: telaoProgress var(--slide-ms, 10s) linear forwards;
+}
+@keyframes telaoProgress{
+  from{ width:0% } to{ width:100% }
+}
+
+
   </style>
 </head>
 <body>
@@ -395,11 +433,14 @@
 
   <!-- Telão -->
   <div id="telaoContainer">
+    <div class="telao-progress"><div id="telaoProgressBar" class="bar"></div></div>
     <div class="telao-grid">
       <div class="telao-col">
         <div id="telaoMainTitle" class="telao-title">Boulder — TOP 10</div>
         <div id="telaoMainSub" class="telao-sub">Atualiza automaticamente</div>
-        <ul id="telaoMainList" class="telao-list"></ul>
+        <div id="telaoListHost" class="swapHost">
+  <ul id="telaoMainList" class="telao-list pane pane-current"></ul>
+</div>
       </div>
 
       <div class="telao-col">
@@ -517,11 +558,26 @@
     let prevTopBoulder = []; // ids na ordem
     let prevTopTeams = [];
     let prevMomentId = null;
+    const SLIDE_MS = 10000;
 
     const telaoContainer = document.getElementById('telaoContainer');
     const telaoMainTitle = document.getElementById('telaoMainTitle');
     const telaoMainSub = document.getElementById('telaoMainSub');
     const telaoMainList = document.getElementById('telaoMainList');
+    const progressBar = document.getElementById('telaoProgressBar');
+    
+    function restartProgressBar(){
+  if (!progressBar) return;
+  progressBar.style.setProperty('--slide-ms', SLIDE_MS+'ms');
+  progressBar.classList.remove('play');
+  void progressBar.offsetWidth;           // força reflow p/ reiniciar animação
+  progressBar.classList.add('play');
+}
+function stopProgressBar(){
+  if (!progressBar) return;
+  progressBar.classList.remove('play');
+  progressBar.style.removeProperty('--slide-ms');
+}
 
     const momentCard = document.getElementById('momentCard');
     const momentName = document.getElementById('momentName');
@@ -623,17 +679,20 @@
       telaoMode = true;
       telaoContainer.classList.add('show');
       renderTelaoFrame(telaoIndex); // desenha o quadro atual
+      restartProgressBar();
       if (telaoInterval) clearInterval(telaoInterval);
       telaoInterval = setInterval(()=>{
         telaoIndex = (telaoIndex + 1) % 2;
         renderTelaoFrame(telaoIndex);
-      }, 10000);
+        restartProgressBar();
+      }, 10000, SLIDE_MS);
     }
     function stopTelao(){
       telaoMode = false;
       telaoContainer.classList.remove('show');
       if (telaoInterval) clearInterval(telaoInterval);
       telaoInterval = null;
+      stopProgressBar();
     }
 
     // ===== Snapshots (usando debounce)
@@ -1121,36 +1180,68 @@
     }
 
     function renderRankListTelao(list, kind){
-      const currentIds = list.map(x => x.id);
-      const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
-      const changed = haveDifferentOrder(prevArr, currentIds);
+  const host = document.getElementById('telaoListHost');
+  const current = host.querySelector('.pane-current');
 
-      telaoMainList.innerHTML = '';
-      list.forEach((item, i) => {
-        const li = document.createElement('li');
-        li.className = 'telao-item';
-        if (prevArr.length){
-          const oldPos = prevArr.indexOf(item.id);
-          if (oldPos !== -1){
-            if (i < oldPos) li.classList.add('rise');
-            else if (i > oldPos) li.classList.add('fall');
-          }
-        } else if (changed){
-          li.classList.add('flash');
-        }
-        const name = item.data.name;
-        const pts  = (item.data.points||0);
-        li.innerHTML = `
-          <div class="telao-pos">${i+1}º</div>
-          <div class="telao-name">${name}</div>
-          <div class="telao-points">${pts} pts</div>`;
-        telaoMainList.appendChild(li);
-      });
+  // gera a nova UL em memória
+  const incoming = document.createElement('ul');
+  incoming.className = 'telao-list pane swap-in';
 
-      if (kind==='boulder') prevTopBoulder = currentIds;
-      else prevTopTeams = currentIds;
-      telaoMainSub.textContent = 'Atualiza automaticamente';
+  const currentIds = list.map(x => x.id);
+  const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
+  const changed = haveDifferentOrder(prevArr, currentIds);
+
+  list.forEach((item, i) => {
+    const li = document.createElement('li');
+    li.className = 'telao-item';
+
+    // destaca subida/queda comparando com a ordem anterior
+    if (prevArr.length){
+      const oldPos = prevArr.indexOf(item.id);
+      if (oldPos !== -1){
+        if (i < oldPos) li.classList.add('rise');
+        else if (i > oldPos) li.classList.add('fall');
+      }
+    } else if (changed){
+      li.classList.add('flash');
     }
+
+    li.innerHTML = `
+      <div class="telao-pos">${i+1}º</div>
+      <div class="telao-name">${item.data.name}</div>
+      <div class="telao-points">${(item.data.points||0)} pts</div>
+    `;
+    incoming.appendChild(li);
+  });
+
+  // trava a altura do host pra evitar "salto" durante a troca
+  host.style.height = host.offsetHeight + 'px';
+
+  // coloca a nova lista por cima com animação de entrada
+  host.appendChild(incoming);
+
+  // anima e remove a antiga, se houver
+  if (current){
+    current.classList.add('swap-out');
+    current.addEventListener('animationend', () => {
+      current.remove();
+    }, { once:true });
+  }
+
+  // quando a nova terminar a entrada, vira "current"
+  incoming.addEventListener('animationend', () => {
+    incoming.classList.remove('swap-in');
+    incoming.classList.add('pane-current');
+    host.style.height = ''; // libera a altura
+  }, { once:true });
+
+  // salva ordem pra próxima comparação
+  if (kind==='boulder') prevTopBoulder = currentIds;
+  else prevTopTeams = currentIds;
+
+  telaoMainSub.textContent = 'Atualiza automaticamente';
+}
+
 
     function renderMoment(){
       const recent = scoresCache
