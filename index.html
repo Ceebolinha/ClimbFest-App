@@ -353,34 +353,33 @@
           <div class="muted small">Exibe o ranking automaticamente no telão.</div>
           <button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
 
-          <!-- >>>>>>> MODO PÓDIO (agora DENTRO do Admin) <<<<<<< -->
+          <!-- >>>>>>> MODO PÓDIO (DENTRO do Admin) <<<<<<< -->
           <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-<strong>Modo Pódio</strong>
-<div class="muted small">Exibe o top 3 ao vivo para todos online.</div>
+          <strong>Modo Pódio</strong>
+          <div class="muted small">Exibe o top 3 ao vivo para todos online.</div>
 
-<div class="row" style="margin-top:8px">
-  <select id="podiumType">
-    <option value="boulder">Boulder (individual)</option>
-    <option value="team">Times (geral)</option>
-  </select>
-  <select id="podiumCategory">
-    <option value="all">Geral</option>
-    <option value="kids">Kids (≤12)</option>
-    <option value="juvenil">Juvenil (13–15)</option>
-    <option value="juvenil-m">Juvenil Masculino</option>
-    <option value="juvenil-f">Juvenil Feminino</option>
-    <option value="masters">Masters (≥40)</option>
-    <option value="trans-nao-binario">Trans / Não binários</option>
-    <option value="geral-m">Geral Masculino</option>
-    <option value="geral-f">Geral Feminino</option>
-    <option value="pro">PRO</option>
-  </select>
-</div>
-<div class="flex" style="margin-top:8px">
-  <button id="btnShowPodium" class="btn btn-primary">Mostrar Pódio</button>
-  <button id="btnHidePodium" class="btn btn-ghost">Encerrar Pódio</button>
-</div>
-
+          <div class="row" style="margin-top:8px">
+            <select id="podiumType">
+              <option value="boulder">Boulder (individual)</option>
+              <option value="team">Times (geral)</option>
+            </select>
+            <select id="podiumCategory">
+              <option value="all">Geral</option>
+              <option value="kids">Kids (≤12)</option>
+              <option value="juvenil">Juvenil (13–15)</option>
+              <option value="juvenil-m">Juvenil Masculino</option>
+              <option value="juvenil-f">Juvenil Feminino</option>
+              <option value="masters">Masters (≥40)</option>
+              <option value="trans-nao-binario">Trans / Não binários</option>
+              <option value="geral-m">Geral Masculino</option>
+              <option value="geral-f">Geral Feminino</option>
+              <option value="pro">PRO</option>
+            </select>
+          </div>
+          <div class="flex" style="margin-top:8px">
+            <button id="btnShowPodium" class="btn btn-primary">Mostrar Pódio</button>
+            <button id="btnHidePodium" class="btn btn-ghost">Encerrar Pódio</button>
+          </div>
         </div>
 
         <!-- Judge panel -->
@@ -520,7 +519,41 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ===== Podium refs
+    /* =======================
+       CONFIGURÁVEIS / UTILS
+       ======================= */
+    // Quantidade de envios recentes considerados no "Boulder do Momento"
+    const MOMENTO_RECENT_LIMIT = 100; // altere aqui (ex.: 50, 100, 200)
+
+    // Pódio: tempo de validade (ex.: 10 minutos)
+    const PODIUM_TTL_MS = 10 * 60 * 1000;
+
+    // Natural compare (ordenação "humana" para códigos tipo 1,2,10,20 e também A1, A10, B2...)
+    function chunkify(str){
+      return String(str ?? '').trim().match(/\d+|\D+/g) || [String(str ?? '')];
+    }
+    function naturalCompare(a, b){
+      const ac = chunkify(a), bc = chunkify(b);
+      const n = Math.min(ac.length, bc.length);
+      for (let i=0;i<n;i++){
+        const x = ac[i], y = bc[i];
+        const xd = /^\d+$/.test(x), yd = /^\d+$/.test(y);
+        if (xd && yd){
+          const xi = parseInt(x,10), yi = parseInt(y,10);
+          if (xi !== yi) return xi - yi;
+        } else {
+          const cmp = x.localeCompare(y, undefined, { sensitivity:'base', numeric:false });
+          if (cmp !== 0) return cmp;
+        }
+      }
+      if (ac.length !== bc.length) return ac.length - bc.length;
+      return String(a).localeCompare(String(b), undefined, { sensitivity:'base' });
+    }
+    const byCode = (get)=> (a,b)=> naturalCompare(get(a), get(b));
+
+    /* =======================
+       PODIUM REFS
+       ======================= */
     const podiumOverlay = document.getElementById('podiumOverlay');
     const podiumTitle   = document.getElementById('podiumTitle');
     const podiumSub     = document.getElementById('podiumSub');
@@ -543,7 +576,6 @@
     const btnHidePodium  = document.getElementById('btnHidePodium');
 
     let unsubPodium = null;
-    let currentPodiumNonce = null;
 
     // Boulder do momento refs (página)
     const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
@@ -568,54 +600,6 @@
     const btnLogout = document.getElementById('btnLogout');
     const adminCard = document.getElementById('adminCard');
     const judgeCard = document.getElementById('judgeCard');
-    // Pódio: tempo de validade (ex.: 10 minutos)
-const PODIUM_TTL_MS = 10 * 60 * 1000;
-
-
-    // Admin inputs
-    const newClimberName = document.getElementById('newClimberName');
-    const newClimberCode = document.getElementById('newClimberCode');
-    const newClimberAge = document.getElementById('newClimberAge');
-    const newClimberGender = document.getElementById('newClimberGender');
-    const newClimberPro = document.getElementById('newClimberPro');
-    const btnAddClimber = document.getElementById('btnAddClimber');
-    const selectClimbersAdmin = document.getElementById('selectClimbersAdmin');
-    const btnDeleteClimber = document.getElementById('btnDeleteClimber');
-
-    const newRouteCode = document.getElementById('newRouteCode');
-    const newRouteName = document.getElementById('newRouteName');
-    const newRouteType = document.getElementById('newRouteType');
-    const btnAddRoute = document.getElementById('btnAddRoute');
-    const selectRoutesAdmin = document.getElementById('selectRoutesAdmin');
-    const btnDeleteRoute = document.getElementById('btnDeleteRoute');
-
-    const selectClimbersForTeam = document.getElementById('selectClimbersForTeam');
-    const btnCreateTeam = document.getElementById('btnCreateTeam');
-    const selectTeamsAdmin = document.getElementById('selectTeamsAdmin');
-    const teamNameInput = document.getElementById('teamNameInput');
-    const btnDeleteTeam = document.getElementById('btnDeleteTeam');
-
-    // Editor manual de pontos
-    const editClimberPoints = document.getElementById('editClimberPoints');
-    const btnSaveClimberPoints = document.getElementById('btnSaveClimberPoints');
-
-    // Judge inputs
-    const judgeCategory = document.getElementById('judgeCategory');
-    const judgeActorSelect = document.getElementById('judgeActorSelect');
-    const judgeRouteSelect = document.getElementById('judgeRouteSelect');
-    const judgeSendType = document.getElementById('judgeSendType');
-    const btnRegister = document.getElementById('btnRegister');
-    const btnClearSelection = document.getElementById('btnClearSelection');
-    const recentList = document.getElementById('recentList');
-
-    // Live overlay + confetti
-    const liveOverlay = document.getElementById('liveOverlay');
-    const liveName = document.getElementById('liveName');
-    const liveCode = document.getElementById('liveCode');
-    const liveRolling = document.getElementById('liveRolling');
-    const confettiLayer = document.getElementById('confetti');
-    const btnRaffle = document.getElementById('btnRaffle');
-    const btnEndLive = document.getElementById('btnEndLive');
 
     // ===== TELÃO =====
     let telaoMode = false;
@@ -664,45 +648,47 @@ const PODIUM_TTL_MS = 10 * 60 * 1000;
     }
 
     function showPodiumOverlay(payload){
-  if (!payload || !payload.active){ hidePodiumOverlay(); return; }
+      if (!payload || !payload.active){ hidePodiumOverlay(); return; }
 
-  // guarda o nonce atual e memoriza para não reexibir em próximas aberturas
-  currentPodiumNonce = payload.nonce || null;
-  if (payload.nonce) {
-    try { localStorage.setItem('lastPodiumNonce', String(payload.nonce)); } catch(e){}
-  }
+      podiumTitle.textContent = payload.title || 'Pódio';
+      podiumSub.textContent   = payload.sub || '';
 
-  podiumTitle.textContent = payload.title || 'Pódio';
-  podiumSub.textContent   = payload.sub || '';
+      const top = payload.top || [];
+      const safe = (i)=> top[i] || { name:'—', code:'', points:'' };
 
-  const top = payload.top || [];
-  const safe = (i)=> top[i] || { name:'—', code:'', points:'' };
+      const t1 = safe(0), t2 = safe(1), t3 = safe(2);
+      s1Name.textContent = t1.name || '—';
+      s1Code.textContent = t1.code ? `(${t1.code})` : '';
+      s1Pts.textContent  = t1.points!=='' ? `${t1.points} pts` : '';
 
-  const t1 = safe(0), t2 = safe(1), t3 = safe(2);
-  s1Name.textContent = t1.name || '—';
-  s1Code.textContent = t1.code ? `(${t1.code})` : '';
-  s1Pts.textContent  = t1.points!=='' ? `${t1.points} pts` : '';
+      s2Name.textContent = t2.name || '—';
+      s2Code.textContent = t2.code ? `(${t2.code})` : '';
+      s2Pts.textContent  = t2.points!=='' ? `${t2.points} pts` : '';
 
-  s2Name.textContent = t2.name || '—';
-  s2Code.textContent = t2.code ? `(${t2.code})` : '';
-  s2Pts.textContent  = t2.points!=='' ? `${t2.points} pts` : '';
+      s3Name.textContent = t3.name || '—';
+      s3Code.textContent = t3.code ? `(${t3.code})` : '';
+      s3Pts.textContent  = t3.points!=='' ? `${t3.points} pts` : '';
 
-  s3Name.textContent = t3.name || '—';
-  s3Code.textContent = t3.code ? `(${t3.code})` : '';
-  s3Pts.textContent  = t3.points!=='' ? `${t3.points} pts` : '';
+      // reset animação dos slots
+      ['slot1','slot2','slot3'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+      });
 
-  ['slot1','slot2','slot3'].forEach(id => {
-    const el = document.getElementById(id);
-    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-  });
-
-  podiumOverlay.classList.add('show');
-}
-
+      podiumOverlay.classList.add('show');
+    }
     function hidePodiumOverlay(){
       podiumOverlay.classList.remove('show');
     }
-    podiumClose.addEventListener('click', hidePodiumOverlay);
+    podiumClose.addEventListener('click', async () => {
+  hidePodiumOverlay();
+  try {
+    await setDoc(doc(db,'live','podium'), { active:false }, { merge:true });
+  } catch (e) {
+    console.error('Erro ao encerrar pódio pelo X:', e);
+  }
+});
+
 
     // Barra de progresso sincronizada com o slide atual
     function playProgress(ms){
@@ -774,7 +760,7 @@ const PODIUM_TTL_MS = 10 * 60 * 1000;
       if (a >= 40) return 'masters';
       return 'geral';
     }
-    function showToast(msg){ alert(msg); } // (mantido para outros fluxos)
+    function showToast(msg){ alert(msg); } // (mantido)
 
     // Login
     btnOpenLogin.addEventListener('click', ()=> inputPassword.focus());
@@ -841,41 +827,21 @@ const PODIUM_TTL_MS = 10 * 60 * 1000;
       if (typeof unsubLive === 'function') { try { unsubLive(); } catch(e){}; unsubLive = null; }
 
       // ---- Listener do PÓDIO com TTL anti-pódio antigo
-      // ---- Listener do PÓDIO (anti-reaparição + anti-flicker)
-unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
-  if (!dsnap.exists()){ hidePodiumOverlay(); return; }
+      unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
+        if (!dsnap.exists()){ hidePodiumOverlay(); return; }
+        const data = dsnap.data();
 
-  // Evita piscar: ignora “local echo” (hasPendingWrites)
-  if (dsnap.metadata && dsnap.metadata.hasPendingWrites) return;
+        // checa validade
+        const now = Date.now();
+        const exp = typeof data.expiresAtMs === 'number' ? data.expiresAtMs : 0;
+        const stillValid = exp === 0 ? true : (now <= exp);
 
-  const data = dsnap.data();
-  const now  = Date.now();
-
-  // TTL opcional (mantém seu campo expiresAtMs se quiser)
-  const exp = typeof data.expiresAtMs === 'number' ? data.expiresAtMs : 0;
-  const stillValid = exp === 0 ? true : (now <= exp);
-
-  if (!data.active || !stillValid){
-    hidePodiumOverlay();
-    return;
-  }
-
-  // ANTI-REAPARIÇÃO: se estamos abrindo o app e já vimos esse mesmo nonce, não mostra de novo
-  try {
-    const lastSeen = localStorage.getItem('lastPodiumNonce');
-    const sameNonce = data.nonce && lastSeen && String(data.nonce) === String(lastSeen);
-    const isVisible = podiumOverlay.classList.contains('show');
-
-    // se não está visível e é o mesmo nonce já visto neste device, ignora
-    if (!isVisible && sameNonce) return;
-  } catch(e){}
-
-  // Exibe (e marca lastPodiumNonce dentro do showPodiumOverlay)
-  showPodiumOverlay(data);
-
-}, (err)=>console.error('podium listener error', err));
-
-
+        if (data.active && stillValid) {
+          showPodiumOverlay(data);
+        } else {
+          hidePodiumOverlay();
+        }
+      }, (err)=>console.error('podium listener error', err));
 
       unsubClimbers = onSnapshot(collection(db,'climbers'), snap => {
         climbersCache = [];
@@ -917,7 +883,7 @@ unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
         queueUIRedraw();
       });
 
-      // Live listener (broadcast ao vivo + vinheta)
+      // Live listener (sorteio)
       unsubLive = onSnapshot(doc(db,'live','announcement'), (dsnap) => {
         if (!dsnap.exists()) { hideLive(); return; }
         const data = dsnap.data();
@@ -929,7 +895,43 @@ unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
       }, (err)=>console.error('live listener error', err));
     }
 
-    // ADMIN: CRUD (igual ao seu)
+    // ADMIN: CRUD (inalterado)
+    const newClimberName = document.getElementById('newClimberName');
+    const newClimberCode = document.getElementById('newClimberCode');
+    const newClimberAge = document.getElementById('newClimberAge');
+    const newClimberGender = document.getElementById('newClimberGender');
+    const newClimberPro = document.getElementById('newClimberPro');
+    const btnAddClimber = document.getElementById('btnAddClimber');
+    const selectClimbersAdmin = document.getElementById('selectClimbersAdmin');
+    const btnDeleteClimber = document.getElementById('btnDeleteClimber');
+
+    const newRouteCode = document.getElementById('newRouteCode');
+    const newRouteName = document.getElementById('newRouteName');
+    const newRouteType = document.getElementById('newRouteType');
+    const btnAddRoute = document.getElementById('btnAddRoute');
+    const selectRoutesAdmin = document.getElementById('selectRoutesAdmin');
+    const btnDeleteRoute = document.getElementById('btnDeleteRoute');
+
+    const selectClimbersForTeam = document.getElementById('selectClimbersForTeam');
+    const btnCreateTeam = document.getElementById('btnCreateTeam');
+    const selectTeamsAdmin = document.getElementById('selectTeamsAdmin');
+    const teamNameInput = document.getElementById('teamNameInput');
+    const btnDeleteTeam = document.getElementById('btnDeleteTeam');
+
+    // Editor manual de pontos
+    const editClimberPoints = document.getElementById('editClimberPoints');
+    const btnSaveClimberPoints = document.getElementById('btnSaveClimberPoints');
+
+    // JUIZ inputs
+    const judgeCategory = document.getElementById('judgeCategory');
+    const judgeActorSelect = document.getElementById('judgeActorSelect');
+    const judgeRouteSelect = document.getElementById('judgeRouteSelect');
+    const judgeSendType = document.getElementById('judgeSendType');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnClearSelection = document.getElementById('btnClearSelection');
+    const recentList = document.getElementById('recentList');
+
+    // ===== Admin: ações
     btnAddClimber.addEventListener('click', async () => {
       try {
         const name = newClimberName.value.trim();
@@ -1167,11 +1169,14 @@ unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
       } catch (err) { console.error('Erro export CSV', err); showToast('Erro ao exportar CSV: '+(err.message||err)); }
     });
 
-    // Populate selects (Admin)
+    /* =======================
+       SELECTS ORDENADOS (NATURAL)
+       ======================= */
     function populateAdminClimbers(){
       selectClimbersAdmin.innerHTML = '';
       selectClimbersForTeam.innerHTML = '';
-      climbersCache.forEach(c => {
+      const ordered = climbersCache.slice().sort(byCode(c => c.data.code || c.id));
+      ordered.forEach(c => {
         const label = `${c.data.code || c.id} — ${c.data.name} (${displayCategory(c.data.category)}, ${displayGender(c.data.gender)}${c.data.isPro?' · PRO':''})`;
         const o = document.createElement('option'); o.value = c.id; o.textContent = label; selectClimbersAdmin.appendChild(o);
         const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = label; selectClimbersForTeam.appendChild(o2);
@@ -1179,37 +1184,47 @@ unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
     }
     function populateAdminRoutes(){
       selectRoutesAdmin.innerHTML = '';
-      routesCache.forEach(r => {
+      const ordered = routesCache.slice().sort(byCode(r => r.data.code || r.id));
+      ordered.forEach(r => {
         const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; selectRoutesAdmin.appendChild(o);
       });
     }
     function populateAdminTeams(){
       selectTeamsAdmin.innerHTML = '';
-      teamsCache.forEach(t => {
+      const ordered = teamsCache.slice().sort(byCode(t => t.data.name || t.id)); // times por nome
+      ordered.forEach(t => {
         const membersNames = (t.data.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
         const extra = t.data.bonus ? ` · Bônus ${t.data.bonus}` : '';
         const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${membersNames} — ${t.data.points || 0} pts${extra}`; selectTeamsAdmin.appendChild(o);
       });
     }
 
-    // Judge selectors
+    // Judge selectors (ordenados por código)
     async function loadSelectorsForJudge(){
       const cat = judgeCategory.value;
       judgeActorSelect.innerHTML = '';
       judgeRouteSelect.innerHTML = '';
+
       if (cat === 'boulder') {
-        climbersCache.forEach(c => {
+        const orderedClimbers = climbersCache.slice().sort(byCode(c => c.data.code || c.id));
+        orderedClimbers.forEach(c => {
           const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.data.code || c.id} — ${c.data.name}`; judgeActorSelect.appendChild(o);
         });
-        routesCache.filter(r=>r.data.type==='boulder').forEach(r=>{
+        const orderedBoulders = routesCache.filter(r=>r.data.type==='boulder')
+          .slice().sort(byCode(r => r.data.code || r.id));
+        orderedBoulders.forEach(r=>{
           const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name}`; judgeRouteSelect.appendChild(o);
         });
       } else {
-        teamsCache.forEach(t => {
+        // times: ordenar por nome (ou por um "code" se existisse)
+        const orderedTeams = teamsCache.slice().sort(byCode(t => t.data.name || t.id));
+        orderedTeams.forEach(t => {
           const bonus = t.data.bonus ? ` (+${t.data.bonus})` : '';
           const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${t.data.points || 0} pts${bonus}`; judgeActorSelect.appendChild(o);
         });
-        routesCache.filter(r=>r.data.type==='via' || r.data.type==='desafio').forEach(r=>{
+        const orderedRoutes = routesCache.filter(r=>r.data.type==='via' || r.data.type==='desafio')
+          .slice().sort(byCode(r => r.data.code || r.id));
+        orderedRoutes.forEach(r=>{
           const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; judgeRouteSelect.appendChild(o);
         });
       }
@@ -1246,7 +1261,8 @@ unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
           const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
           return tb - ta;
         })
-        .slice(0,50);
+        .slice(0, MOMENTO_RECENT_LIMIT); // <<<<<< AQUI
+
       if (!recent.length) { boulderDoMomentoCard.classList.add('hidden'); return; }
 
       const counts = {};
@@ -1407,7 +1423,7 @@ unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
           const tb = b.data.timestamp ? (b.data.timestamp.seconds||b.data.timestamp) : 0;
           return tb - ta;
         })
-        .slice(0,50);
+        .slice(0, MOMENTO_RECENT_LIMIT); // <<<<<< AQUI TAMBÉM
 
       if (!recent.length){ momentName.textContent = '—'; momentCount.textContent=''; return; }
 
@@ -1556,7 +1572,15 @@ ${lines.join('\n') || '(nenhuma)'}`;
     // Admin helpers
     function loadAllForAdmin(){ populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams(); refreshRanking(true); }
 
-    // Vinheta de Sorteio
+    // Sorteio
+    const liveOverlay = document.getElementById('liveOverlay');
+    const liveName = document.getElementById('liveName');
+    const liveCode = document.getElementById('liveCode');
+    const liveRolling = document.getElementById('liveRolling');
+    const confettiLayer = document.getElementById('confetti');
+    const btnRaffle = document.getElementById('btnRaffle');
+    const btnEndLive = document.getElementById('btnEndLive');
+
     btnRaffle.addEventListener('click', async ()=>{
       if (!climbersCache.length) return showToast('Não há escaladores.');
       const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
@@ -1633,53 +1657,51 @@ ${lines.join('\n') || '(nenhuma)'}`;
       confettiLayer.innerHTML = '';
     }
 
-    // ===== Modo PÓDIO (handlers) =====
+    // ===== Modo PÓDIO (handlers)
     podiumType.addEventListener('change', ()=>{
       podiumCategory.disabled = (podiumType.value === 'team');
     });
 
     btnShowPodium.addEventListener('click', async ()=>{
-  try{
-    const kind = podiumType.value;     // 'boulder' | 'team'
-    const cat  = podiumCategory.value; // 'all' ou categoria
-    const top  = computeTop3(kind, cat);
+      try{
+        const kind = podiumType.value;     // 'boulder' | 'team'
+        const cat  = podiumCategory.value; // 'all' ou categoria
+        const top  = computeTop3(kind, cat);
 
-    const catLabelMap = {
-      'all':'Geral','kids':'Kids','juvenil':'Juvenil','masters':'Masters',
-      'trans-nao-binario':'Trans / Não Binários','geral-m':'Geral Masculino','geral-f':'Geral Feminino',
-      'juvenil-m':'Juvenil Masculino','juvenil-f':'Juvenil Feminino','pro':'PRO'
-    };
-    const title = (kind==='team') ? 'Times — Pódio Geral' : `Boulder — Pódio ${catLabelMap[cat]||cat}`;
-    const sub   = (kind==='team') ? 'Top 3 times por pontuação' : 'Top 3 individuais por pontuação';
+        const catLabelMap = {
+          'all':'Geral','kids':'Kids','juvenil':'Juvenil','masters':'Masters',
+          'trans-nao-binario':'Trans / Não Binários','geral-m':'Geral Masculino','geral-f':'Geral Feminino',
+          'juvenil-m':'Juvenil Masculino','juvenil-f':'Juvenil Feminino','pro':'PRO'
+        };
+        const title = (kind==='team') ? 'Times — Pódio Geral' : `Boulder — Pódio ${catLabelMap[cat]||cat}`;
+        const sub   = (kind==='team') ? 'Top 3 times por pontuação' : 'Top 3 individuais por pontuação';
 
-    const now = Date.now();
-    const payload = {
-      active: true,
-      kind,
-      category: (kind==='team') ? 'team' : cat,
-      title, sub,
-      top: top.map(t => ({ name:t.name, code:t.code||'', points:t.points||0 })),
-      nonce: now,
-      timestamp: serverTimestamp(),
-      expiresAtMs: now + PODIUM_TTL_MS // << validade local (epoch ms)
-    };
+        const now = Date.now();
+        const payload = {
+          active: true,
+          kind,
+          category: (kind==='team') ? 'team' : cat,
+          title, sub,
+          top: top.map(t => ({ name:t.name, code:t.code||'', points:t.points||0 })),
+          nonce: now,
+          timestamp: serverTimestamp(),
+          expiresAtMs: now + PODIUM_TTL_MS
+        };
 
-    await setDoc(doc(db,'live','podium'), payload);
-    // sem alert/toast aqui
-  }catch(e){
-    console.error(e);
-  }
-});
-
+        await setDoc(doc(db,'live','podium'), payload);
+        // sem alert aqui
+      }catch(e){
+        console.error(e);
+      }
+    });
 
     btnHidePodium.addEventListener('click', async ()=>{
-  try{
-    await setDoc(doc(db,'live','podium'), { active:false }, { merge:true });
-  }catch(e){
-    console.error(e);
-  }
-});
-
+      try{
+        await setDoc(doc(db,'live','podium'), { active:false }, { merge:true });
+      }catch(e){
+        console.error(e);
+      }
+    });
 
     // Garante overlay pódio escondido ao carregar (defensivo)
     hidePodiumOverlay();
