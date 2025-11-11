@@ -7,7 +7,8 @@
   <style>
     :root{
       --bg:#0f1724;--card:#0b1220;--muted:#9aa6bb;--accent:#00c77f;
-      --up:#25ffb2;--down:#ff3d6e;--neon:#39f3ff;--lime:#f9ff53;--blue-soft:#7fb3ff;--pts:#4dff7a;
+      /* Arcade neon (C) */
+      --up:#25ffb2; --down:#ff3d6e; --neon:#39f3ff; --lime:#f9ff53; --blue-soft:#7fb3ff; --pts:#4dff7a;
       --kids:#f6d365; --juvenil:#cbb2ff; --masters:#7ef9a0; --geral:#9aa6bb; --pro:#c07dff; --tnb:#ffb3d6;
     }
     *{box-sizing:border-box}
@@ -36,103 +37,167 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     @media(max-width:420px){ .row{grid-template-columns:1fr} }
 
-    /* Overlay sorteio */
-    .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(3px);z-index:9999;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .4s ease,visibility .4s ease}
-    .overlay.show{opacity:1;visibility:visible;pointer-events:auto}
-    .overlay-card{background:#0b1220;border:1px solid #1b2a44;border-radius:16px;padding:28px 32px;text-align:center;width:min(92vw,860px);transform:translateY(12px);transition:transform .35s ease,box-shadow .35s ease;box-shadow:0 10px 40px rgba(0,0,0,.35)}
-    .overlay.show .overlay-card{transform:translateY(0)}
-    .overlay-title{color:#9aa6bb;font-size:1rem;letter-spacing:.06em;margin-bottom:10px}
-    .overlay-name{font-size:clamp(28px,6.5vw,64px);font-weight:900;line-height:1.05}
-    .overlay-code{margin-top:6px;font-size:clamp(18px,3.6vw,28px);color:var(--accent);font-weight:800}
-    .roll{font-family:ui-monospace,Menlo,Consolas,monospace;color:#d9e6ff;opacity:.9}
+    /* ===== Overlay ao vivo (sorteio) ===== */
+    .overlay {
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(3px);
+      z-index: 9999; opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity .4s ease, visibility .4s ease;
+    }
+    .overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
+    .overlay-card {
+      background: #0b1220; border:1px solid #1b2a44; border-radius:16px;
+      padding:28px 32px; text-align:center; width:min(92vw, 860px);
+      transform: translateY(12px); transition: transform .35s ease, box-shadow .35s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    .overlay.show .overlay-card { transform: translateY(0); }
+    .overlay-title { color:#9aa6bb; font-size:1rem; letter-spacing:.06em; margin-bottom:10px }
+    .overlay-name { font-size: clamp(28px, 6.5vw, 64px); font-weight:900; line-height:1.05 }
+    .overlay-code { margin-top:6px; font-size: clamp(18px, 3.6vw, 28px); color:var(--accent); font-weight:800 }
+    .roll { font-family: ui-monospace, Menlo, Consolas, monospace; color:#d9e6ff; opacity:.9 }
 
-    /* Telão */
-    #telaoContainer{display:none}
-    #telaoContainer.show{display:flex}
-    #telaoContainer{position:fixed;inset:0;background:#07101a;color:white;align-items:center;justify-content:center;font-family:Inter,system-ui,Arial;z-index:9998;padding:28px}
-    .telao-grid{width:min(1200px,96vw);display:grid;grid-template-columns:1.4fr .8fr;gap:24px}
-    .telao-col{background:#0b1220;border:1px solid #122233;border-radius:16px;padding:18px}
-    .telao-title{font-size:2.2rem;font-weight:800;color:#00c77f;margin-bottom:8px;text-shadow:0 0 12px rgba(0,199,127,.35)}
-    .telao-sub{color:#9aa6bb;margin-bottom:14px}
-    .telao-list{list-style:none;padding:0;margin:0}
-    .telao-item{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
-    .telao-pos{width:42px;text-align:right;opacity:.7;font-variant-numeric:tabular-nums}
-    .telao-name{font-weight:800;letter-spacing:.2px}
-    .telao-points{font-variant-numeric:tabular-nums;font-weight:700}
+    /* ===== TELÃO ===== */
+    #telaoContainer { display:none; }
+    #telaoContainer.show { display:flex; }
+    #telaoContainer{
+      position:fixed; inset:0; background:#07101a; color:white;
+      align-items:center; justify-content:center;
+      font-family:Inter, system-ui, Arial; z-index:9998; padding:28px;
+    }
 
-    .moment-card{background:#0e1524;border:1px solid #1b2a44;border-radius:14px;padding:14px;margin-bottom:16px}
-    .moment-title{color:#00c77f;font-weight:800;margin-bottom:6px;text-shadow:0 0 10px rgba(0,199,127,.25)}
-    .moment-name{font-size:1.25rem;font-weight:800}
-    .moment-count{color:#9aa6bb}
+    .telao-grid{ width:min(1200px, 96vw); display:grid; grid-template-columns: 1.4fr .8fr; gap:24px; }
+    .telao-col{ background:#0b1220; border:1px solid #122233; border-radius:16px; padding:18px; }
+    .telao-title{ font-size:2.2rem; font-weight:800; color:#00c77f; margin-bottom:8px; text-shadow: 0 0 12px rgba(0,199,127,.35); }
+    .telao-sub{ color:#9aa6bb; margin-bottom:14px; }
 
-    .ticker{background:#0e1524;border:1px solid #1b2a44;border-radius:14px;padding:12px;height:360px;display:flex;flex-direction:column}
-    .ticker-head{font-weight:800;margin-bottom:8px}
-    .ticker-body{flex:1;overflow:auto;display:flex;flex-direction:column-reverse;gap:8px}
-    .ticker-msg{background:#0b1220;border:1px solid #162033;border-radius:10px;padding:8px 10px;opacity:0;transform:translateY(8px);animation:tickIn .28s ease forwards;box-shadow:0 0 0 rgba(0,0,0,0)}
-    .ticker-meta{color:#9aa6bb;font-size:.85rem;margin-bottom:2px;display:flex;align-items:center;gap:6px}
-    .tick-icon{font-weight:900;filter:drop-shadow(0 0 6px rgba(255,255,255,.15))}
-    .tick-icon.flash{color:var(--lime)}
-    .tick-icon.cadena{color:var(--blue-soft)}
-    .tick-name{font-weight:800}
-    .tick-route{font-weight:900}
-    .tick-pts{color:var(--pts);font-weight:900}
+    .telao-list{ list-style:none; padding:0; margin:0; }
+    .telao-item{ display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); }
+    .telao-pos{ width:42px; text-align:right; opacity:.7; font-variant-numeric:tabular-nums }
+    .telao-name{ font-weight:800; letter-spacing:.2px }
+    .telao-points{ font-variant-numeric:tabular-nums; font-weight:700 }
 
-    .rise,.fall{will-change:transform,background,box-shadow,filter}
-    .rise{animation:riseGlow 1.4s ease,holdGreen 1.2s ease 1.4s forwards}
-    .fall{animation:fallFade 1.4s ease}
-    @keyframes riseGlow{0%{transform:scale(.98);background:rgba(37,255,178,.12);box-shadow:0 0 0 rgba(0,0,0,0)}30%{transform:scale(1.02);background:rgba(37,255,178,.28);box-shadow:0 0 26px rgba(57,243,255,.32),0 0 52px rgba(37,255,178,.28),inset 0 0 0 2px rgba(37,255,178,.5)}100%{transform:scale(1);background:rgba(37,255,178,.22);box-shadow:0 0 14px rgba(57,243,255,.22),0 0 28px rgba(37,255,178,.2),inset 0 0 0 1px rgba(37,255,178,.36)}}
-    @keyframes holdGreen{0%{background:rgba(37,255,178,.22);box-shadow:0 0 12px rgba(57,243,255,.2),0 0 24px rgba(37,255,178,.18),inset 0 0 0 1px rgba(37,255,178,.32)}100%{background:transparent;box-shadow:none}}
-    @keyframes fallFade{0%{background:rgba(255,61,110,.30);filter:brightness(1.1);box-shadow:0 0 12px rgba(255,61,110,.30),inset 0 0 0 1px rgba(255,61,110,.38)}70%{background:rgba(255,61,110,.16)}100%{background:transparent;filter:brightness(1);box-shadow:none}}
-    .pop{animation:pop .7s ease}
-    .flash{animation:flash .8s ease}
-    @keyframes pop{0%{transform:scale(.97);box-shadow:0 0 0 rgba(0,0,0,0)}40%{transform:scale(1.02);box-shadow:0 12px 30px rgba(0,0,0,.35)}100%{transform:scale(1);box-shadow:0 0 0 rgba(0,0,0,0)}}
-    @keyframes flash{0%{background:#06231a}100%{background:transparent}}
-    @keyframes tickIn{to{opacity:1;transform:none}}
+    /* Boulder do momento (lado direito) */
+    .moment-card{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:14px; margin-bottom:16px; }
+    .moment-title{ color:#00c77f; font-weight:800; margin-bottom:6px; text-shadow:0 0 10px rgba(0,199,127,.25) }
+    .moment-name{ font-size:1.25rem; font-weight:800; }
+    .moment-count{ color:#9aa6bb; }
 
-    /* PODIUM OVERLAY */
-    .podium-overlay{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s ease}
-    .podium-overlay.show{opacity:1;visibility:visible}
-    .podium-card{width:min(1100px,94vw);background:#0b1220;border:1px solid #1b2a44;border-radius:20px;padding:28px;box-shadow:0 18px 60px rgba(0,0,0,.45);transform:translateY(8px) scale(.98);animation:podiumIn .45s ease forwards}
-    @keyframes podiumIn{to{transform:none}}
-    .podium-head{text-align:center;margin-bottom:18px}
-    .podium-kicker{color:#9aa6bb;letter-spacing:.1em;font-weight:800;font-size:.85rem}
-    .podium-title{margin-top:6px;font-weight:900;line-height:1.05;font-size:clamp(22px,5.2vw,44px);text-shadow:0 0 14px rgba(57,243,255,.25),0 0 28px rgba(0,199,127,.18)}
-    .podium-sub{color:#9aa6bb;margin-top:6px}
-    .podium-grid{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;align-items:end}
-    .podium-slot{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));border:1px solid #1b2a44;border-radius:16px;padding:16px 14px;text-align:center;position:relative;overflow:hidden;transform:translateY(10px);opacity:0}
-    .podium-slot.show{animation:slotIn .5s ease forwards}
-    .podium-slot.s1{box-shadow:0 0 32px rgba(37,255,178,.15)}
-    .podium-slot.s2{box-shadow:0 0 24px rgba(127,179,255,.12)}
-    .podium-slot.s3{box-shadow:0 0 24px rgba(255,61,110,.12)}
-    @keyframes slotIn{from{transform:translateY(10px) scale(.98);opacity:0;filter:blur(1px)}to{transform:none;opacity:1;filter:none}}
-    .medal{font-size:clamp(22px,4vw,36px)}
-    .place{font-weight:900;margin-top:6px;font-size:clamp(16px,3.2vw,22px)}
-    .name{font-weight:900;margin-top:4px;font-size:clamp(18px,3.6vw,28px)}
-    .code{color:#9aa6bb;font-variant-numeric:tabular-nums}
-    .points{margin-top:6px;font-weight:900;color:var(--pts);font-variant-numeric:tabular-nums}
-    .ribbon{position:absolute;inset:auto -30px -12px -30px;height:6px;background:linear-gradient(90deg,var(--up),var(--neon),var(--down));filter:blur(6px);opacity:.5}
-    .s2.show{animation-delay:.10s}.s1.show{animation-delay:.20s}.s3.show{animation-delay:.30s}
-    .podium-close{position:absolute;top:10px;right:12px;background:transparent;border:0;color:#9aa6bb;cursor:pointer;font-size:20px}
+    /* Ticker tipo chat */
+    .ticker{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:12px; height:360px; display:flex; flex-direction:column; }
+    .ticker-head{ font-weight:800; margin-bottom:8px; }
+    .ticker-body{ flex:1; overflow:auto; display:flex; flex-direction:column-reverse; gap:8px; }
+    .ticker-msg{
+      background:#0b1220; border:1px solid #162033; border-radius:10px; padding:8px 10px;
+      opacity:0; transform:translateY(8px); animation: tickIn .28s ease forwards;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+    }
+    .ticker-meta{ color:#9aa6bb; font-size:.85rem; margin-bottom:2px; display:flex; align-items:center; gap:6px }
+    .tick-icon{ font-weight:900; filter: drop-shadow(0 0 6px rgba(255,255,255,.15)); }
+    .tick-icon.flash{ color:var(--lime) }
+    .tick-icon.cadena{ color:var(--blue-soft) }
+    .tick-name{ font-weight:800 }
+    .tick-route{ font-weight:900 }
+    .tick-pts{ color:var(--pts); font-weight:900 }
+
+    /* Destaques Ranking */
+    .rise,.fall{ will-change: transform, background, box-shadow, filter; }
+    .rise{ animation: riseGlow 1.4s ease, holdGreen 1.2s ease 1.4s forwards; }
+    .fall{ animation: fallFade 1.4s ease; }
+    @keyframes riseGlow{
+      0%{ transform:scale(0.98); background: rgba(37,255,178,0.12); box-shadow: 0 0 0 rgba(0,0,0,0); }
+      30%{
+        transform:scale(1.02);
+        background: rgba(37,255,178,0.28);
+        box-shadow: 0 0 26px rgba(57,243,255,.32), 0 0 52px rgba(37,255,178,.28), inset 0 0 0 2px rgba(37,255,178,.50);
+      }
+      100%{
+        transform:scale(1);
+        background: rgba(37,255,178,0.22);
+        box-shadow: 0 0 14px rgba(57,243,255,.22), 0 0 28px rgba(37,255,178,.20), inset 0 0 0 1px rgba(37,255,178,.36);
+      }
+    }
+    @keyframes holdGreen{
+      0%{ background: rgba(37,255,178,0.22); box-shadow: 0 0 12px rgba(57,243,255,.20), 0 0 24px rgba(37,255,178,.18), inset 0 0 0 1px rgba(37,255,178,.32); }
+      100%{ background: transparent; box-shadow: none; }
+    }
+    @keyframes fallFade{
+      0%{
+        background: rgba(255,61,110,.30); filter: brightness(1.1);
+        box-shadow: 0 0 12px rgba(255,61,110,.30), inset 0 0 0 1px rgba(255,61,110,.38);
+      }
+      70%{ background: rgba(255,61,110,.16); }
+      100%{ background: transparent; filter: brightness(1); box-shadow: none; }
+    }
+
+    .pop{ animation: pop .7s ease; }
+    .flash{ animation: flash .8s ease; }
+    @keyframes pop { 0%{ transform:scale(0.97) } 40%{ transform:scale(1.02) } 100%{ transform:scale(1) } }
+    @keyframes flash { 0%{ background:#06231a } 100%{ background:transparent } }
+    @keyframes tickIn{ to{ opacity:1; transform:none; } }
+
+    /* === PODIUM OVERLAY === */
+    .podium-overlay{
+      position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+      opacity:0; visibility:hidden; transition: opacity .35s ease, visibility .35s ease;
+    }
+    .podium-overlay.show{ opacity:1; visibility:visible; }
+    .podium-card{
+      width:min(1100px, 94vw);
+      background:#0b1220; border:1px solid #1b2a44; border-radius:20px; padding:28px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      transform: translateY(8px) scale(.98); animation: podiumIn .45s ease forwards;
+    }
+    @keyframes podiumIn{ to { transform:none; } }
+    .podium-head{ text-align:center; margin-bottom:18px; }
+    .podium-kicker{ color:#9aa6bb; letter-spacing:.1em; font-weight:800; font-size:.85rem; }
+    .podium-title{ margin-top:6px; font-weight:900; line-height:1.05; font-size: clamp(22px, 5.2vw, 44px);
+      text-shadow: 0 0 14px rgba(57,243,255,.25), 0 0 28px rgba(0,199,127,.18); }
+    .podium-sub{ color:#9aa6bb; margin-top:6px; }
+    .podium-grid{ display:grid; grid-template-columns: 1fr 1.2fr 1fr; gap:14px; align-items:end; }
+    .podium-slot{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00));
+      border:1px solid #1b2a44; border-radius:16px; padding:16px 14px; text-align:center; position:relative; overflow:hidden;
+      transform: translateY(10px); opacity:0;
+    }
+    .podium-slot.show{ animation: slotIn .5s ease forwards; }
+    .podium-slot.s1{ box-shadow: 0 0 32px rgba(37,255,178,.15); }
+    .podium-slot.s2{ box-shadow: 0 0 24px rgba(127,179,255,.12); }
+    .podium-slot.s3{ box-shadow: 0 0 24px rgba(255,61,110,.12); }
+    @keyframes slotIn{ from{ transform: translateY(10px) scale(.98); opacity:0; filter: blur(1px); } to{ transform:none; opacity:1; filter:none; } }
+    .medal{ font-size: clamp(22px, 4vw, 36px); }
+    .place{ font-weight:900; margin-top:6px; font-size: clamp(16px, 3.2vw, 22px); }
+    .name { font-weight:900; margin-top:4px; font-size: clamp(18px, 3.6vw, 28px); }
+    .code { color:#9aa6bb; font-variant-numeric: tabular-nums; }
+    .points{ margin-top:6px; font-weight:900; color:var(--pts); font-variant-numeric: tabular-nums; }
+    .ribbon{
+      position:absolute; inset:auto -30px -12px -30px; height:6px;
+      background: linear-gradient(90deg, var(--up), var(--neon), var(--down));
+      filter: blur(6px); opacity:.5;
+    }
+    .s2.show{ animation-delay:.10s } .s1.show{ animation-delay:.20s } .s3.show{ animation-delay:.30s }
+    .podium-close{ position:absolute; top:10px; right:12px; background:transparent; border:0; color:#9aa6bb; cursor:pointer; font-size:20px; }
 
     /* Confete */
-    .confetti{position:fixed;inset:0;pointer-events:none;z-index:10000;overflow:hidden}
-    .confetti i{position:absolute;top:-10px;width:6px;height:10px;border-radius:2px;animation:drop linear forwards;opacity:.9}
-    @keyframes drop{to{transform:translateY(110vh) rotate(360deg);opacity:.95}}
+    .confetti{ position:fixed; inset:0; pointer-events:none; z-index:10000; overflow:hidden }
+    .confetti i{ position:absolute; top:-10px; width:6px; height:10px; border-radius:2px; animation: drop linear forwards; opacity:.9; }
+    @keyframes drop{ to { transform: translateY(110vh) rotate(360deg); opacity:.95 } }
 
-    /* Swap ranking Telão */
-    .swapHost{position:relative;min-height:420px}
-    .pane{position:absolute;inset:0}
-    .pane-current{position:relative}
-    .swap-in{animation:telaoIn .50s ease forwards}
-    .swap-out{animation:telaoOut .50s ease forwards}
-    @keyframes telaoIn{from{opacity:0;transform:translateY(8px) scale(.98);filter:blur(1px)}to{opacity:1;transform:none;filter:blur(0)}}
-    @keyframes telaoOut{from{opacity:1;transform:none;filter:blur(0)}to{opacity:0;transform:translateY(-6px) scale(.995);filter:blur(1px)}}
+    /* Troca suave do ranking no Telão */
+    .swapHost{ position:relative; min-height:420px; }
+    .pane{ position:absolute; inset:0; }
+    .pane-current{ position:relative; }
+    .swap-in{ animation: telaoIn .50s ease forwards; }
+    .swap-out{ animation: telaoOut .50s ease forwards; }
+    @keyframes telaoIn{ from{ opacity:0; transform:translateY(8px) scale(.98); filter:blur(1px) } to{ opacity:1; transform:none; filter:blur(0) } }
+    @keyframes telaoOut{ from{ opacity:1; transform:none; filter:blur(0) } to{ opacity:0; transform:translateY(-6px) scale(.995); filter:blur(1px) } }
 
-    /* Barra de progresso do Telão */
-    .telao-progress{position:absolute;left:0;right:0;top:0;height:6px;background:rgba(255,255,255,.07);overflow:hidden;z-index:9999}
-    .telao-progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--up),var(--neon),var(--down));box-shadow:0 0 12px rgba(57,243,255,.35);transform-origin:left}
-    .telao-progress .bar.play{animation:telaoProgress var(--slide-ms,10s) linear forwards}
-    @keyframes telaoProgress{from{width:0%}to{width:100%}}
+    /* Barra de progressão do telão */
+    .telao-progress{ position:absolute; left:0; right:0; top:0; height:6px; background: rgba(255,255,255,.07); overflow:hidden; z-index:9999; }
+    .telao-progress .bar{ height:100%; width:0; background: linear-gradient(90deg, var(--up), var(--neon), var(--down)); box-shadow: 0 0 12px rgba(57,243,255,.35); transform-origin: left; }
+    .telao-progress .bar.play{ animation: telaoProgress var(--slide-ms, 10s) linear forwards; }
+    @keyframes telaoProgress{ from{ width:0% } to{ width:100% } }
   </style>
 </head>
 <body>
@@ -240,6 +305,7 @@
           </div>
           <select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
 
+          <!-- Editor manual de pontos do escalador -->
           <div class="row" style="margin-top:8px">
             <input id="editClimberPoints" type="number" placeholder="Pontos (override)"/>
             <button id="btnSaveClimberPoints" class="btn btn-ghost">Salvar pontos do selecionado</button>
@@ -287,32 +353,34 @@
           <div class="muted small">Exibe o ranking automaticamente no telão.</div>
           <button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
 
-          <!-- >>> MODO PÓDIO (agora DENTRO do Admin) <<< -->
+          <!-- >>>>>>> MODO PÓDIO (agora DENTRO do Admin) <<<<<<< -->
           <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-          <strong>Modo Pódio</strong>
-          <div class="muted small">Exibe o top 3 ao vivo para todos online.</div>
-          <div class="row" style="margin-top:8px">
-            <select id="podiumType">
-              <option value="boulder">Boulder (individual)</option>
-              <option value="team">Times (geral)</option>
-            </select>
-            <select id="podiumCategory">
-              <option value="all">Geral</option>
-              <option value="kids">Kids (≤12)</option>
-              <option value="juvenil">Juvenil (13–15)</option>
-              <option value="juvenil-m">Juvenil Masculino</option>
-              <option value="juvenil-f">Juvenil Feminino</option>
-              <option value="masters">Masters (≥40)</option>
-              <option value="trans-nao-binario">Trans / Não binários</option>
-              <option value="geral-m">Geral Masculino</option>
-              <option value="geral-f">Geral Feminino</option>
-              <option value="pro">PRO</option>
-            </select>
-          </div>
-          <div class="flex" style="margin-top:8px">
-            <button id="btnShowPodium" class="btn btn-primary">Mostrar Pódio</button>
-            <button id="btnHidePodium" class="btn btn-ghost">Encerrar Pódio</button>
-          </div>
+<strong>Modo Pódio</strong>
+<div class="muted small">Exibe o top 3 ao vivo para todos online.</div>
+
+<div class="row" style="margin-top:8px">
+  <select id="podiumType">
+    <option value="boulder">Boulder (individual)</option>
+    <option value="team">Times (geral)</option>
+  </select>
+  <select id="podiumCategory">
+    <option value="all">Geral</option>
+    <option value="kids">Kids (≤12)</option>
+    <option value="juvenil">Juvenil (13–15)</option>
+    <option value="juvenil-m">Juvenil Masculino</option>
+    <option value="juvenil-f">Juvenil Feminino</option>
+    <option value="masters">Masters (≥40)</option>
+    <option value="trans-nao-binario">Trans / Não binários</option>
+    <option value="geral-m">Geral Masculino</option>
+    <option value="geral-f">Geral Feminino</option>
+    <option value="pro">PRO</option>
+  </select>
+</div>
+<div class="flex" style="margin-top:8px">
+  <button id="btnShowPodium" class="btn btn-primary">Mostrar Pódio</button>
+  <button id="btnHidePodium" class="btn btn-ghost">Encerrar Pódio</button>
+</div>
+
         </div>
 
         <!-- Judge panel -->
@@ -352,7 +420,7 @@
     </main>
   </div>
 
-  <!-- Overlay Live -->
+  <!-- Overlay global do Live (usada na vinheta) -->
   <div id="liveOverlay" class="overlay">
     <div class="overlay-card">
       <div class="overlay-title">SORTEIO — CLIMBFEST</div>
@@ -363,7 +431,7 @@
   </div>
   <div id="confetti" class="confetti hidden"></div>
 
-  <!-- Overlay do Pódio -->
+  <!-- Overlay do Pódio (broadcast) -->
   <div id="podiumOverlay" class="podium-overlay">
     <div class="podium-card">
       <button id="podiumClose" class="podium-close" title="Fechar">✕</button>
@@ -413,12 +481,14 @@
           <ul id="telaoMainList" class="telao-list pane pane-current"></ul>
         </div>
       </div>
+
       <div class="telao-col">
         <div class="moment-card" id="momentCard">
           <div class="moment-title">🔥 Boulder do Momento</div>
           <div id="momentName" class="moment-name">—</div>
           <div id="momentCount" class="moment-count">—</div>
         </div>
+
         <div class="ticker">
           <div class="ticker-head">📡 Últimos envios (ao vivo)</div>
           <div id="tickerBody" class="ticker-body"></div>
@@ -428,7 +498,7 @@
     <div style="position:absolute; bottom:12px; left:0; right:0; text-align:center; opacity:.45">Pressione ESC para sair</div>
   </div>
 
-  <!-- Firebase -->
+  <!-- Firebase (modular v11) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import {
@@ -437,6 +507,7 @@
       clearIndexedDbPersistence
     } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+    // >>> FIREBASE CONFIG
     const firebaseConfig = {
       apiKey: "AIzaSyB-CnTOLGSfC_cDCEv_vp14r8lQyyXgImM",
       authDomain: "climbfest-224ed.firebaseapp.com",
@@ -449,7 +520,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Podium refs
+    // ===== Podium refs
     const podiumOverlay = document.getElementById('podiumOverlay');
     const podiumTitle   = document.getElementById('podiumTitle');
     const podiumSub     = document.getElementById('podiumSub');
@@ -465,11 +536,14 @@
     const s3Code = document.getElementById('s3Code');
     const s3Pts  = document.getElementById('s3Pts');
 
+    // Admin – controles do pódio
     const podiumType     = document.getElementById('podiumType');
     const podiumCategory = document.getElementById('podiumCategory');
     const btnShowPodium  = document.getElementById('btnShowPodium');
     const btnHidePodium  = document.getElementById('btnHidePodium');
+
     let unsubPodium = null;
+    let currentPodiumNonce = null;
 
     // Boulder do momento refs (página)
     const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
@@ -494,6 +568,9 @@
     const btnLogout = document.getElementById('btnLogout');
     const adminCard = document.getElementById('adminCard');
     const judgeCard = document.getElementById('judgeCard');
+    // Pódio: tempo de validade (ex.: 10 minutos)
+const PODIUM_TTL_MS = 10 * 60 * 1000;
+
 
     // Admin inputs
     const newClimberName = document.getElementById('newClimberName');
@@ -540,17 +617,17 @@
     const btnRaffle = document.getElementById('btnRaffle');
     const btnEndLive = document.getElementById('btnEndLive');
 
-    // Telão
+    // ===== TELÃO =====
     let telaoMode = false;
     let telaoIndex = 0; // 0 = Boulder TOP10, 1 = Times TOP10
     let telaoTimer = null;
     let tickerSeenIds = new Set();
-    let prevTopBoulder = [];
+    let prevTopBoulder = []; // ids na ordem
     let prevTopTeams = [];
     let prevMomentId = null;
 
-    const DURATION_BOULDER = 12000;
-    const DURATION_TEAMS   = 7000;
+    const DURATION_BOULDER = 12000; // ranking individual por mais tempo
+    const DURATION_TEAMS   = 7000;  // times por menos tempo
 
     const telaoContainer = document.getElementById('telaoContainer');
     const telaoMainTitle = document.getElementById('telaoMainTitle');
@@ -570,7 +647,7 @@
     function computeTop3(kind, cat='all'){
       if (kind === 'team'){
         const rows = teamsCache
-          .map(t => ({ id:t.id, name:t.data.name, points:t.data.points||0, code:'' }))
+          .map(t => ({ id:t.id, name:t.data.name, points: t.data.points||0, code: '' }))
           .sort((a,b)=> (b.points)-(a.points))
           .slice(0,3);
         return rows;
@@ -579,42 +656,55 @@
           id:c.id, name:c.data.name, code:(c.data.code||c.id), points:c.data.points||0,
           category:(c.data.category||'').toLowerCase(), gender:(c.data.gender||'').toLowerCase()
         }));
-        return filterBoulderByCategory(rowsAll, cat).sort((a,b)=> (b.points)-(a.points)).slice(0,3);
+        const rows = filterBoulderByCategory(rowsAll, cat)
+          .sort((a,b)=> (b.points)-(a.points))
+          .slice(0,3);
+        return rows;
       }
     }
 
     function showPodiumOverlay(payload){
-      if (!payload || !payload.active){ hidePodiumOverlay(); return; }
-      podiumTitle.textContent = payload.title || 'Pódio';
-      podiumSub.textContent   = payload.sub || '';
+  if (!payload || !payload.active){ hidePodiumOverlay(); return; }
 
-      const top = payload.top || [];
-      const safe = (i)=> top[i] || { name:'—', code:'', points:'' };
+  // guarda o nonce atual e memoriza para não reexibir em próximas aberturas
+  currentPodiumNonce = payload.nonce || null;
+  if (payload.nonce) {
+    try { localStorage.setItem('lastPodiumNonce', String(payload.nonce)); } catch(e){}
+  }
 
-      const t1 = safe(0), t2 = safe(1), t3 = safe(2);
-      s1Name.textContent = t1.name || '—';
-      s1Code.textContent = t1.code ? `(${t1.code})` : '';
-      s1Pts.textContent  = t1.points!=='' ? `${t1.points} pts` : '';
+  podiumTitle.textContent = payload.title || 'Pódio';
+  podiumSub.textContent   = payload.sub || '';
 
-      s2Name.textContent = t2.name || '—';
-      s2Code.textContent = t2.code ? `(${t2.code})` : '';
-      s2Pts.textContent  = t2.points!=='' ? `${t2.points} pts` : '';
+  const top = payload.top || [];
+  const safe = (i)=> top[i] || { name:'—', code:'', points:'' };
 
-      s3Name.textContent = t3.name || '—';
-      s3Code.textContent = t3.code ? `(${t3.code})` : '';
-      s3Pts.textContent  = t3.points!=='' ? `${t3.points} pts` : '';
+  const t1 = safe(0), t2 = safe(1), t3 = safe(2);
+  s1Name.textContent = t1.name || '—';
+  s1Code.textContent = t1.code ? `(${t1.code})` : '';
+  s1Pts.textContent  = t1.points!=='' ? `${t1.points} pts` : '';
 
-      ['slot1','slot2','slot3'].forEach(id=>{
-        const el=document.getElementById(id);
-        el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-      });
+  s2Name.textContent = t2.name || '—';
+  s2Code.textContent = t2.code ? `(${t2.code})` : '';
+  s2Pts.textContent  = t2.points!=='' ? `${t2.points} pts` : '';
 
-      podiumOverlay.classList.add('show');
+  s3Name.textContent = t3.name || '—';
+  s3Code.textContent = t3.code ? `(${t3.code})` : '';
+  s3Pts.textContent  = t3.points!=='' ? `${t3.points} pts` : '';
+
+  ['slot1','slot2','slot3'].forEach(id => {
+    const el = document.getElementById(id);
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  });
+
+  podiumOverlay.classList.add('show');
+}
+
+    function hidePodiumOverlay(){
+      podiumOverlay.classList.remove('show');
     }
-    function hidePodiumOverlay(){ podiumOverlay.classList.remove('show'); }
     podiumClose.addEventListener('click', hidePodiumOverlay);
 
-    // Barra de progresso do Telão
+    // Barra de progresso sincronizada com o slide atual
     function playProgress(ms){
       if (!progressBar) return;
       progressBar.style.setProperty('--slide-ms', ms+'ms');
@@ -625,7 +715,7 @@
       progressBar.classList.remove('play');
       progressBar.style.removeProperty('--slide-ms');
     }
-    function currentDuration(){ return (telaoIndex===0)?DURATION_BOULDER:DURATION_TEAMS; }
+    function currentDuration(){ return (telaoIndex === 0) ? DURATION_BOULDER : DURATION_TEAMS; }
 
     const momentCard = document.getElementById('momentCard');
     const momentName = document.getElementById('momentName');
@@ -654,7 +744,7 @@
       uiTimer = setTimeout(()=>{
         refreshRanking(true);
         if (telaoMode) renderTelaoFrame(telaoIndex);
-      },700);
+      }, 700);
     }
 
     // Helpers
@@ -684,7 +774,7 @@
       if (a >= 40) return 'masters';
       return 'geral';
     }
-    function showToast(msg){ alert(msg); } // usado em outras áreas; não chamado no pódio
+    function showToast(msg){ alert(msg); } // (mantido para outros fluxos)
 
     // Login
     btnOpenLogin.addEventListener('click', ()=> inputPassword.focus());
@@ -708,7 +798,7 @@
 
     // Telão
     btnOpenTelao.addEventListener('click', startTelao);
-    document.addEventListener('keydown', (e)=>{ if (e.key==='Escape' && telaoMode) stopTelao(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && telaoMode) stopTelao(); });
 
     function startTelao(){
       if (telaoMode) return;
@@ -721,14 +811,14 @@
     function stopTelao(){
       telaoMode = false;
       telaoContainer.classList.remove('show');
-      if (telaoTimer){ clearTimeout(telaoTimer); telaoTimer=null; }
+      if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
       stopProgress();
     }
     function scheduleNextTelaoTick(){
       if (!telaoMode) return;
-      if (telaoTimer){ clearTimeout(telaoTimer); telaoTimer=null; }
+      if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
       const delay = currentDuration();
-      telaoTimer = setTimeout(()=>{
+      telaoTimer = setTimeout(() => {
         telaoIndex = (telaoIndex + 1) % 2;
         renderTelaoFrame(telaoIndex);
         playProgress(currentDuration());
@@ -743,23 +833,54 @@
     })();
 
     function registerSnapshots(){
-      if (typeof unsubPodium === 'function') { try{unsubPodium();}catch(e){}; unsubPodium=null; }
-      if (typeof unsubClimbers === 'function') { try{unsubClimbers();}catch(e){}; unsubClimbers=null; }
-      if (typeof unsubRoutes === 'function') { try{unsubRoutes();}catch(e){}; unsubRoutes=null; }
-      if (typeof unsubTeams === 'function') { try{unsubTeams();}catch(e){}; unsubTeams=null; }
-      if (typeof unsubScores === 'function') { try{unsubScores();}catch(e){}; unsubScores=null; }
-      if (typeof unsubLive === 'function') { try{unsubLive();}catch(e){}; unsubLive=null; }
+      if (typeof unsubPodium === 'function') { try{unsubPodium();}catch(e){}; unsubPodium = null; }
+      if (typeof unsubClimbers === 'function') { try { unsubClimbers(); } catch(e){}; unsubClimbers = null; }
+      if (typeof unsubRoutes === 'function') { try { unsubRoutes(); } catch(e){}; unsubRoutes = null; }
+      if (typeof unsubTeams === 'function') { try { unsubTeams(); } catch(e){}; unsubTeams = null; }
+      if (typeof unsubScores === 'function') { try { unsubScores(); } catch(e){}; unsubScores = null; }
+      if (typeof unsubLive === 'function') { try { unsubLive(); } catch(e){}; unsubLive = null; }
 
-      unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap)=>{
-        if (!dsnap.exists()){ hidePodiumOverlay(); return; }
-        const data = dsnap.data();
-        if (data.active) showPodiumOverlay(data); else hidePodiumOverlay();
-      }, (err)=>console.error('podium listener error', err));
+      // ---- Listener do PÓDIO com TTL anti-pódio antigo
+      // ---- Listener do PÓDIO (anti-reaparição + anti-flicker)
+unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
+  if (!dsnap.exists()){ hidePodiumOverlay(); return; }
+
+  // Evita piscar: ignora “local echo” (hasPendingWrites)
+  if (dsnap.metadata && dsnap.metadata.hasPendingWrites) return;
+
+  const data = dsnap.data();
+  const now  = Date.now();
+
+  // TTL opcional (mantém seu campo expiresAtMs se quiser)
+  const exp = typeof data.expiresAtMs === 'number' ? data.expiresAtMs : 0;
+  const stillValid = exp === 0 ? true : (now <= exp);
+
+  if (!data.active || !stillValid){
+    hidePodiumOverlay();
+    return;
+  }
+
+  // ANTI-REAPARIÇÃO: se estamos abrindo o app e já vimos esse mesmo nonce, não mostra de novo
+  try {
+    const lastSeen = localStorage.getItem('lastPodiumNonce');
+    const sameNonce = data.nonce && lastSeen && String(data.nonce) === String(lastSeen);
+    const isVisible = podiumOverlay.classList.contains('show');
+
+    // se não está visível e é o mesmo nonce já visto neste device, ignora
+    if (!isVisible && sameNonce) return;
+  } catch(e){}
+
+  // Exibe (e marca lastPodiumNonce dentro do showPodiumOverlay)
+  showPodiumOverlay(data);
+
+}, (err)=>console.error('podium listener error', err));
+
+
 
       unsubClimbers = onSnapshot(collection(db,'climbers'), snap => {
         climbersCache = [];
-        snap.docs.forEach(d=>{
-          const c=d.data();
+        snap.docs.forEach(d => {
+          const c = d.data();
           c.gender = normalizeGender(c.gender);
           c.category = (c.category||'').toLowerCase();
           climbersCache.push({ id:d.id, data:c, meta:d.metadata });
@@ -771,7 +892,7 @@
 
       unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
         routesCache = [];
-        snap.docs.forEach(d=>routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
+        snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminRoutes();
         loadSelectorsForJudge();
         queueUIRedraw();
@@ -779,7 +900,7 @@
 
       unsubTeams = onSnapshot(collection(db,'teams'), snap => {
         teamsCache = [];
-        snap.docs.forEach(d=>teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
+        snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
         populateAdminTeams();
         loadSelectorsForJudge();
         queueUIRedraw();
@@ -787,7 +908,7 @@
 
       unsubScores = onSnapshot(collection(db,'scores'), snap => {
         scoresCache = [];
-        snap.docs.forEach(d=>{
+        snap.docs.forEach(d => {
           if (d.metadata && d.metadata.hasPendingWrites) return;
           scoresCache.push({ id:d.id, data:d.data(), meta:d.metadata });
         });
@@ -796,38 +917,19 @@
         queueUIRedraw();
       });
 
-      unsubLive = onSnapshot(doc(db,'live','announcement'), (dsnap)=>{
+      // Live listener (broadcast ao vivo + vinheta)
+      unsubLive = onSnapshot(doc(db,'live','announcement'), (dsnap) => {
         if (!dsnap.exists()) { hideLive(); return; }
         const data = dsnap.data();
-        if (data.active) playRaffleSequence(data.name||'', data.code||''); else hideLive();
+        if (data.active) {
+          playRaffleSequence(data.name || '', data.code || '');
+        } else {
+          hideLive();
+        }
       }, (err)=>console.error('live listener error', err));
     }
 
-    // ADMIN: Podium controls (sem alert)
-    podiumType.addEventListener('change', ()=>{ podiumCategory.disabled = (podiumType.value === 'team'); });
-    btnShowPodium.addEventListener('click', async ()=>{
-      try{
-        const kind = podiumType.value;
-        const cat  = podiumCategory.value;
-        const top  = computeTop3(kind, cat);
-        const catLabelMap = {'all':'Geral','kids':'Kids','juvenil':'Juvenil','masters':'Masters','trans-nao-binario':'Trans / Não Binários','geral-m':'Geral Masculino','geral-f':'Geral Feminino','juvenil-m':'Juvenil Masculino','juvenil-f':'Juvenil Feminino','pro':'PRO'};
-        const title = (kind==='team') ? 'Times — Pódio Geral' : `Boulder — Pódio ${catLabelMap[cat]||cat}`;
-        const sub   = (kind==='team') ? 'Top 3 times por pontuação' : 'Top 3 individuais por pontuação';
-        const payload = {
-          active:true, kind, category:(kind==='team')?'team':cat,
-          title, sub, top: top.map(t => ({ name:t.name, code:t.code||'', points:t.points||0 })),
-          nonce: Date.now(), timestamp: serverTimestamp()
-        };
-        await setDoc(doc(db,'live','podium'), payload);
-        // sem toast/alert
-      }catch(e){ console.error('Erro ao enviar pódio:', e); }
-    });
-    btnHidePodium.addEventListener('click', async ()=>{
-      try{ await setDoc(doc(db,'live','podium'), { active:false }, { merge:true }); }
-      catch(e){ console.error('Erro ao encerrar pódio:', e); }
-    });
-
-    // ADMIN: CRUD (resto)
+    // ADMIN: CRUD (igual ao seu)
     btnAddClimber.addEventListener('click', async () => {
       try {
         const name = newClimberName.value.trim();
@@ -991,7 +1093,7 @@
       } catch (err) { console.error('Erro ao excluir time:', err); showToast('Erro ao excluir time: '+(err.message||err)); }
     });
 
-    // JUIZ
+    // JUIZ: registrar score
     btnRegister.addEventListener('click', async () => {
       try {
         const category = judgeCategory.value;
@@ -1021,7 +1123,11 @@
           const newPoints = (t.points || 0) + points;
           const newDone = Array.isArray(t.done) ? [...t.done, routeId] : [routeId];
           await updateDoc(tRef,{ points:newPoints, done:newDone });
-          await addDoc(collection(db,'scores'), { actorType:'team', actorId, actorName:t.name, actorCategory:'team', routeId, sendType, points, timestamp: serverTimestamp(), note: t.bonus ? (t.bonusReason || 'Bônus inicial de time') : '' });
+          await addDoc(collection(db,'scores'), {
+            actorType:'team', actorId, actorName:t.name, actorCategory:'team',
+            routeId, sendType, points, timestamp: serverTimestamp(),
+            note: t.bonus ? (t.bonusReason || 'Bônus inicial de time') : ''
+          });
           if (Array.isArray(t.members)) {
             for (const memberId of t.members) {
               try { const mRef = doc(db,'climbers',memberId); await updateDoc(mRef, { doneTeam: arrayUnion(routeId) }); } catch(e){}
@@ -1029,7 +1135,9 @@
           }
           showToast(`Registrado ${points} pts para o time ${t.name}`);
         }
-      } catch (err) { console.error(err); showToast('Erro ao registrar pontuação: '+(err.message||err)); }
+      } catch (err) {
+        console.error(err); showToast('Erro ao registrar pontuação: '+(err.message||err));
+      }
     });
     btnClearSelection.addEventListener('click', ()=> { judgeActorSelect.selectedIndex = 0; judgeRouteSelect.selectedIndex=0; });
 
@@ -1108,7 +1216,7 @@
     }
     judgeCategory.addEventListener('change', loadSelectorsForJudge);
 
-    // Recent + Boulder do Momento
+    // Recent list + Boulder do Momento
     function populateRecent(){
       recentList.innerHTML = '';
       const sorted = scoresCache.slice().sort((a,b)=>{
@@ -1128,6 +1236,7 @@
         recentList.appendChild(li);
       });
     }
+
     function updateBoulderDoMomento(){
       if (selectCategoryTop.value !== 'boulder') { boulderDoMomentoCard.classList.add('hidden'); return; }
       const recent = scoresCache
@@ -1185,7 +1294,10 @@
           tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${displayCategory(r.category)}</td><td>${displayGender(r.gender)}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showClimberDetails(r.id));
           const oldPos = oldOrder.indexOf(r.id);
-          if (oldOrder.length && oldPos !== -1){ if (i < oldPos) tr.classList.add('rise'); else if (i > oldPos) tr.classList.add('fall'); }
+          if (oldOrder.length && oldPos !== -1){
+            if (i < oldPos) tr.classList.add('rise');
+            else if (i > oldPos) tr.classList.add('fall');
+          }
           rankingBody.appendChild(tr);
         });
         prevOrder.boulder = newOrder;
@@ -1200,7 +1312,9 @@
           tr.innerHTML = `<td>${i+1}</td><td>${r.name}${bonus}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
           tr.addEventListener('click', ()=> showTeamDetails(r.id));
           const oldPos = oldOrder.indexOf(r.id);
-          if (oldOrder.length && oldPos !== -1){ if (i < oldPos) tr.classList.add('rise'); else if (i > oldPos) tr.classList.add('fall'); }
+          if (oldOrder.length && oldPos !== -1){
+            if (i < oldPos) tr.classList.add('rise'); else if (i > oldPos) tr.classList.add('fall');
+          }
           rankingBody.appendChild(tr);
         });
         prevOrder.routes = newOrder;
@@ -1209,25 +1323,30 @@
     }
 
     // Telão helpers
-    function haveDifferentOrder(a,b){ if (a.length!==b.length) return true; for (let i=0;i<a.length;i++) if (a[i]!==b[i]) return true; return false; }
+    function haveDifferentOrder(a,b){
+      if (a.length !== b.length) return true;
+      for (let i=0;i<a.length;i++) if (a[i]!==b[i]) return true;
+      return false;
+    }
 
     function renderTelaoFrame(indexToShow){
       if (!telaoMode || !telaoContainer.classList.contains('show')) return;
+      const host = document.getElementById('telaoListHost');
+
       if (indexToShow === 0){
         telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
         const list = climbersCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
-        renderRankListTelao(list, 'boulder');
+        renderRankListTelao(list, 'boulder', host);
       } else {
         telaoMainTitle.textContent = "🏆 Times — TOP 10";
         const list = teamsCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
-        renderRankListTelao(list, 'team');
+        renderRankListTelao(list, 'team', host);
       }
       renderMoment();
       renderTicker();
     }
 
-    function renderRankListTelao(list, kind){
-      const host = document.getElementById('telaoListHost');
+    function renderRankListTelao(list, kind, host){
       const current = host.querySelector('.pane-current');
 
       const incoming = document.createElement('ul');
@@ -1243,8 +1362,13 @@
 
         if (prevArr.length){
           const oldPos = prevArr.indexOf(item.id);
-          if (oldPos !== -1){ if (i < oldPos) li.classList.add('rise'); else if (i > oldPos) li.classList.add('fall'); }
-        } else if (changed){ li.classList.add('flash'); }
+          if (oldPos !== -1){
+            if (i < oldPos) li.classList.add('rise');
+            else if (i > oldPos) li.classList.add('fall');
+          }
+        } else if (changed){
+          li.classList.add('flash');
+        }
 
         li.innerHTML = `
           <div class="telao-pos">${i+1}º</div>
@@ -1268,10 +1392,13 @@
         host.style.height = '';
       }, { once:true });
 
-      if (kind==='boulder') prevTopBoulder = currentIds; else prevTopTeams = currentIds;
+      if (kind==='boulder') prevTopBoulder = currentIds;
+      else prevTopTeams = currentIds;
+
       telaoMainSub.textContent = 'Atualiza automaticamente';
     }
 
+    // Moment / Ticker
     function renderMoment(){
       const recent = scoresCache
         .filter(s => s.data.actorType==='climber' && !!s.data.routeId)
@@ -1307,7 +1434,6 @@
       prevMomentId = bestId;
     }
 
-    // Ticker
     function routeLabelById(id){
       const r = routesCache.find(x=>x.id===id);
       if (!r) return id || '—';
@@ -1343,7 +1469,6 @@
         while (tickerBody.children.length > 30) tickerBody.removeChild(tickerBody.lastElementChild);
       });
     }
-
     function categoryColor(cat){
       const c=(cat||'').toLowerCase();
       if (c==='kids') return 'var(--kids)';
@@ -1428,31 +1553,42 @@ ${lines.join('\n') || '(nenhuma)'}`;
       alert(msg);
     }
 
+    // Admin helpers
     function loadAllForAdmin(){ populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams(); refreshRanking(true); }
 
-    // Sorteio
+    // Vinheta de Sorteio
     btnRaffle.addEventListener('click', async ()=>{
       if (!climbersCache.length) return showToast('Não há escaladores.');
       const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
       const name = pick.data.name || '(sem nome)';
       const code = pick.data.code || pick.id;
       try {
-        await setDoc(doc(db,'live','announcement'), { active:true, kind:'raffle', name, code, climberId: pick.id, nonce: Date.now(), timestamp: serverTimestamp() });
+        await setDoc(doc(db,'live','announcement'), {
+          active: true, kind: 'raffle', name, code, climberId: pick.id,
+          nonce: Date.now(), timestamp: serverTimestamp()
+        });
       } catch (e) { console.error('Erro ao iniciar anúncio ao vivo:', e); showToast('Erro ao iniciar o anúncio ao vivo.'); }
     });
+
     btnEndLive.addEventListener('click', async ()=>{ try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){ console.error(e); } });
 
     function showLive(){ liveOverlay.classList.add('show'); }
-    function hideLive(){ liveOverlay.classList.remove('show'); stopConfetti(); liveRolling.textContent=''; }
+    function hideLive(){
+      liveOverlay.classList.remove('show');
+      stopConfetti();
+      liveRolling.textContent = '';
+    }
 
     function playRaffleSequence(finalName, finalCode){
       showLive();
       liveName.textContent = '—';
       liveCode.textContent = '';
       liveRolling.textContent = 'Preparando sorteio…';
+
       const rounds = 8 + Math.floor(Math.random()*7);
       const pool = climbersCache.map(c => c.data.name || c.id);
       let i=0, delay=90, timer=null;
+
       const tick = ()=>{
         if (i < rounds){
           const rname = pool[Math.floor(Math.random()*pool.length)] || '—';
@@ -1492,7 +1628,61 @@ ${lines.join('\n') || '(nenhuma)'}`;
         confettiLayer.appendChild(p);
       }
     }
-    function stopConfetti(){ confettiLayer.classList.add('hidden'); confettiLayer.innerHTML=''; }
+    function stopConfetti(){
+      confettiLayer.classList.add('hidden');
+      confettiLayer.innerHTML = '';
+    }
+
+    // ===== Modo PÓDIO (handlers) =====
+    podiumType.addEventListener('change', ()=>{
+      podiumCategory.disabled = (podiumType.value === 'team');
+    });
+
+    btnShowPodium.addEventListener('click', async ()=>{
+  try{
+    const kind = podiumType.value;     // 'boulder' | 'team'
+    const cat  = podiumCategory.value; // 'all' ou categoria
+    const top  = computeTop3(kind, cat);
+
+    const catLabelMap = {
+      'all':'Geral','kids':'Kids','juvenil':'Juvenil','masters':'Masters',
+      'trans-nao-binario':'Trans / Não Binários','geral-m':'Geral Masculino','geral-f':'Geral Feminino',
+      'juvenil-m':'Juvenil Masculino','juvenil-f':'Juvenil Feminino','pro':'PRO'
+    };
+    const title = (kind==='team') ? 'Times — Pódio Geral' : `Boulder — Pódio ${catLabelMap[cat]||cat}`;
+    const sub   = (kind==='team') ? 'Top 3 times por pontuação' : 'Top 3 individuais por pontuação';
+
+    const now = Date.now();
+    const payload = {
+      active: true,
+      kind,
+      category: (kind==='team') ? 'team' : cat,
+      title, sub,
+      top: top.map(t => ({ name:t.name, code:t.code||'', points:t.points||0 })),
+      nonce: now,
+      timestamp: serverTimestamp(),
+      expiresAtMs: now + PODIUM_TTL_MS // << validade local (epoch ms)
+    };
+
+    await setDoc(doc(db,'live','podium'), payload);
+    // sem alert/toast aqui
+  }catch(e){
+    console.error(e);
+  }
+});
+
+
+    btnHidePodium.addEventListener('click', async ()=>{
+  try{
+    await setDoc(doc(db,'live','podium'), { active:false }, { merge:true });
+  }catch(e){
+    console.error(e);
+  }
+});
+
+
+    // Garante overlay pódio escondido ao carregar (defensivo)
+    hidePodiumOverlay();
   </script>
 </body>
 </html>
