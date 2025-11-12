@@ -1,1576 +1,1525 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>ClimbFest 2025</title>
-  <style>
-    :root{
-      --bg:#0f1724;--card:#0b1220;--muted:#9aa6bb;--accent:#00c77f;
-      /* Arcade neon (C) */
-      --up:#25ffb2; --down:#ff3d6e; --neon:#39f3ff; --lime:#f9ff53; --blue-soft:#7fb3ff; --pts:#4dff7a;
-      --kids:#f6d365; --juvenil:#cbb2ff; --masters:#7ef9a0; --geral:#9aa6bb; --pro:#c07dff; --tnb:#ffb3d6;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#eaf2fb}
-    .wrap{max-width:1100px;margin:18px auto;padding:12px}
-    header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-    .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
-    .btn-ghost{background:transparent;border:1px solid #203040;color:var(--muted)}
-    .btn-primary{background:var(--accent);color:#022}
-    .card{background:var(--card);border-radius:10px;padding:12px;border:1px solid #162033}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:12px}
-    @media(max-width:960px){ .grid{grid-template-columns:1fr} }
-    h1{margin:0 0 6px}
-    .muted{color:var(--muted);font-size:.9rem}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:8px 6px;text-align:left}
-    thead th{color:var(--muted);font-size:.85rem;border-bottom:1px solid #122233}
-    tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:filter .2s ease}
-    tbody tr:hover{filter:brightness(1.05)}
-    select,input{width:100%;padding:8px;border-radius:8px;border:1px solid #203040;background:#07101a;color:#eaf2fb;margin-top:8px}
-    .small{font-size:.9rem}
-    .hidden{display:none !important}
-    .topbar-controls{display:flex;gap:8px;align-items:center}
-    .section-title{display:flex;justify-content:space-between;align-items:center}
-    .flex{display:flex;gap:8px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    @media(max-width:420px){ .row{grid-template-columns:1fr} }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ClimbFest 2025</title>
+<style>
+:root{
+--bg:#0f1724;--card:#0b1220;--muted:#9aa6bb;--accent:#00c77f;
+/* Arcade neon (C) */
+--up:#25ffb2; --down:#ff3d6e; --neon:#39f3ff; --lime:#f9ff53; --blue-soft:#7fb3ff; --pts:#4dff7a;
+--kids:#f6d365; --juvenil:#cbb2ff; --masters:#7ef9a0; --geral:#9aa6bb; --pro:#c07dff; --tnb:#ffb3d6;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#eaf2fb}
+.wrap{max-width:1100px;margin:18px auto;padding:12px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+.btn-ghost{background:transparent;border:1px solid #203040;color:var(--muted)}
+.btn-primary{background:var(--accent);color:#022}
+.card{background:var(--card);border-radius:10px;padding:12px;border:1px solid #162033}
+.grid{display:grid;grid-template-columns:1fr 360px;gap:12px}
+@media(max-width:960px){ .grid{grid-template-columns:1fr} }
+h1{margin:0 0 6px}
+.muted{color:var(--muted);font-size:.9rem}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px 6px;text-align:left}
+thead th{color:var(--muted);font-size:.85rem;border-bottom:1px solid #122233}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:filter .2s ease}
+tbody tr:hover{filter:brightness(1.05)}
+select,input{width:100%;padding:8px;border-radius:8px;border:1px solid #203040;background:#07101a;color:#eaf2fb;margin-top:8px}
+.small{font-size:.9rem}
+.hidden{display:none !important}
+.topbar-controls{display:flex;gap:8px;align-items:center}
+.section-title{display:flex;justify-content:space-between;align-items:center}
+.flex{display:flex;gap:8px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:420px){ .row{grid-template-columns:1fr} }
 
-    /* ===== Overlay ao vivo (sorteio) ===== */
-    .overlay {
-      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.75); backdrop-filter: blur(3px);
-      z-index: 9999; opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity .4s ease, visibility .4s ease;
-    }
-    .overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
-    .overlay-card {
-      background: #0b1220; border:1px solid #1b2a44; border-radius:16px;
-      padding:28px 32px; text-align:center; width:min(92vw, 860px);
-      transform: translateY(12px); transition: transform .35s ease, box-shadow .35s ease;
-      box-shadow: 0 10px 40px rgba(0,0,0,.35);
-    }
-    .overlay.show .overlay-card { transform: translateY(0); }
-    .overlay-title { color:#9aa6bb; font-size:1rem; letter-spacing:.06em; margin-bottom:10px }
-    .overlay-name { font-size: clamp(28px, 6.5vw, 64px); font-weight:900; line-height:1.05 }
-    .overlay-code { margin-top:6px; font-size: clamp(18px, 3.6vw, 28px); color:var(--accent); font-weight:800 }
-    .roll { font-family: ui-monospace, Menlo, Consolas, monospace; color:#d9e6ff; opacity:.9 }
+/* ===== Overlay ao vivo (sorteio) ===== */
+.overlay {
+position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+background: rgba(0,0,0,0.75); backdrop-filter: blur(3px);
+z-index: 9999; opacity: 0; visibility: hidden; pointer-events: none;
+transition: opacity .4s ease, visibility .4s ease;
+}
+.overlay.show { opacity: 1; visibility: visible; pointer-events: auto; }
+.overlay-card {
+background: #0b1220; border:1px solid #1b2a44; border-radius:16px;
+padding:28px 32px; text-align:center; width:min(92vw, 860px);
+transform: translateY(12px); transition: transform .35s ease, box-shadow .35s ease;
+box-shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+.overlay.show .overlay-card { transform: translateY(0); }
+.overlay-title { color:#9aa6bb; font-size:1rem; letter-spacing:.06em; margin-bottom:10px }
+.overlay-name { font-size: clamp(28px, 6.5vw, 64px); font-weight:900; line-height:1.05 }
+.overlay-code { margin-top:6px; font-size: clamp(18px, 3.6vw, 28px); color:var(--accent); font-weight:800 }
+.roll { font-family: ui-monospace, Menlo, Consolas, monospace; color:#d9e6ff; opacity:.9 }
 
-    /* ===== TELÃO ===== */
-    #telaoContainer { display:none; }
-    #telaoContainer.show { display:flex; }
-    #telaoContainer{
-      position:fixed; inset:0; background:#07101a; color:white;
-      align-items:center; justify-content:center;
-      font-family:Inter, system-ui, Arial; z-index:9998; padding:28px;
-    }
+/* ===== TELÃO ===== */
+#telaoContainer { display:none; }
+#telaoContainer.show { display:flex; }
+#telaoContainer{
+position:fixed; inset:0; background:#07101a; color:white;
+align-items:center; justify-content:center;
+font-family:Inter, system-ui, Arial; z-index:9998; padding:28px;
+}
 
-    .telao-grid{ width:min(1200px, 96vw); display:grid; grid-template-columns: 1.4fr .8fr; gap:24px; }
-    .telao-col{ background:#0b1220; border:1px solid #122233; border-radius:16px; padding:18px; }
-    .telao-title{ font-size:2.2rem; font-weight:800; color:#00c77f; margin-bottom:8px; text-shadow: 0 0 12px rgba(0,199,127,.35); }
-    .telao-sub{ color:#9aa6bb; margin-bottom:14px; }
+.telao-grid{ width:min(1200px, 96vw); display:grid; grid-template-columns: 1.4fr .8fr; gap:24px; }
+.telao-col{ background:#0b1220; border:1px solid #122233; border-radius:16px; padding:18px; }
+.telao-title{ font-size:2.2rem; font-weight:800; color:#00c77f; margin-bottom:8px; text-shadow: 0 0 12px rgba(0,199,127,.35); }
+.telao-sub{ color:#9aa6bb; margin-bottom:14px; }
 
-    .telao-list{ list-style:none; padding:0; margin:0; }
-    .telao-item{ display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); }
-    .telao-pos{ width:42px; text-align:right; opacity:.7; font-variant-numeric:tabular-nums }
-    .telao-name{ font-weight:800; letter-spacing:.2px }
-    .telao-points{ font-variant-numeric:tabular-nums; font-weight:700 }
+.telao-list{ list-style:none; padding:0; margin:0; }
+.telao-item{ display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.06); }
+.telao-pos{ width:42px; text-align:right; opacity:.7; font-variant-numeric:tabular-nums }
+.telao-name{ font-weight:800; letter-spacing:.2px }
+.telao-points{ font-variant-numeric:tabular-nums; font-weight:700 }
 
-    /* Boulder do momento (lado direito) */
-    .moment-card{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:14px; margin-bottom:16px; }
-    .moment-title{ color:#00c77f; font-weight:800; margin-bottom:6px; text-shadow:0 0 10px rgba(0,199,127,.25) }
-    .moment-name{ font-size:1.25rem; font-weight:800; }
-    .moment-count{ color:#9aa6bb; }
+/* Boulder do momento (lado direito) */
+.moment-card{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:14px; margin-bottom:16px; }
+.moment-title{ color:#00c77f; font-weight:800; margin-bottom:6px; text-shadow:0 0 10px rgba(0,199,127,.25) }
+.moment-name{ font-size:1.25rem; font-weight:800; }
+.moment-count{ color:#9aa6bb; }
 
-    /* Ticker tipo chat */
-    .ticker{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:12px; height:360px; display:flex; flex-direction:column; }
-    .ticker-head{ font-weight:800; margin-bottom:8px; }
-    .ticker-body{ flex:1; overflow:auto; display:flex; flex-direction:column-reverse; gap:8px; }
-    .ticker-msg{
-      background:#0b1220; border:1px solid #162033; border-radius:10px; padding:8px 10px;
-      opacity:0; transform:translateY(8px); animation: tickIn .28s ease forwards;
-      box-shadow: 0 0 0 rgba(0,0,0,0);
-    }
-    .ticker-meta{ color:#9aa6bb; font-size:.85rem; margin-bottom:2px; display:flex; align-items:center; gap:6px }
-    .tick-icon{ font-weight:900; filter: drop-shadow(0 0 6px rgba(255,255,255,.15)); }
-    .tick-icon.flash{ color:var(--lime) }
-    .tick-icon.cadena{ color:var(--blue-soft) }
-    .tick-name{ font-weight:800 }
-    .tick-route{ font-weight:900 }
-    .tick-pts{ color:var(--pts); font-weight:900 }
+/* Ticker tipo chat */
+.ticker{ background:#0e1524; border:1px solid #1b2a44; border-radius:14px; padding:12px; height:360px; display:flex; flex-direction:column; }
+.ticker-head{ font-weight:800; margin-bottom:8px; }
+.ticker-body{ flex:1; overflow:auto; display:flex; flex-direction:column-reverse; gap:8px; }
+.ticker-msg{
+background:#0b1220; border:1px solid #162033; border-radius:10px; padding:8px 10px;
+opacity:0; transform:translateY(8px); animation: tickIn .28s ease forwards;
+box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+.ticker-meta{ color:#9aa6bb; font-size:.85rem; margin-bottom:2px; display:flex; align-items:center; gap:6px }
+.tick-icon{ font-weight:900; filter: drop-shadow(0 0 6px rgba(255,255,255,.15)); }
+.tick-icon.flash{ color:var(--lime) }
+.tick-icon.cadena{ color:var(--blue-soft) }
+.tick-name{ font-weight:800 }
+.tick-route{ font-weight:900 }
+.tick-pts{ color:var(--pts); font-weight:900 }
 
-    /* Destaques Ranking */
-    .rise,.fall{ will-change: transform, background, box-shadow, filter; }
-    .rise{ animation: riseGlow 1.4s ease, holdGreen 1.2s ease 1.4s forwards; }
-    .fall{ animation: fallFade 1.4s ease; }
-    @keyframes riseGlow{
-      0%{ transform:scale(0.98); background: rgba(37,255,178,0.12); box-shadow: 0 0 0 rgba(0,0,0,0); }
-      30%{
-        transform:scale(1.02);
-        background: rgba(37,255,178,0.28);
-        box-shadow: 0 0 26px rgba(57,243,255,.32), 0 0 52px rgba(37,255,178,.28), inset 0 0 0 2px rgba(37,255,178,.50);
-      }
-      100%{
-        transform:scale(1);
-        background: rgba(37,255,178,0.22);
-        box-shadow: 0 0 14px rgba(57,243,255,.22), 0 0 28px rgba(37,255,178,.20), inset 0 0 0 1px rgba(37,255,178,.36);
-      }
-    }
-    @keyframes holdGreen{
-      0%{ background: rgba(37,255,178,0.22); box-shadow: 0 0 12px rgba(57,243,255,.20), 0 0 24px rgba(37,255,178,.18), inset 0 0 0 1px rgba(37,255,178,.32); }
-      100%{ background: transparent; box-shadow: none; }
-    }
-    @keyframes fallFade{
-      0%{
-        background: rgba(255,61,110,.30); filter: brightness(1.1);
-        box-shadow: 0 0 12px rgba(255,61,110,.30), inset 0 0 0 1px rgba(255,61,110,.38);
-      }
-      70%{ background: rgba(255,61,110,.16); }
-      100%{ background: transparent; filter: brightness(1); box-shadow: none; }
-    }
+/* Destaques Ranking */
+.rise,.fall{ will-change: transform, background, box-shadow, filter; }
+.rise{ animation: riseGlow 1.4s ease, holdGreen 1.2s ease 1.4s forwards; }
+.fall{ animation: fallFade 1.4s ease; }
+@keyframes riseGlow{
+0%{ transform:scale(0.98); background: rgba(37,255,178,0.12); box-shadow: 0 0 0 rgba(0,0,0,0); }
+30%{
+transform:scale(1.02);
+background: rgba(37,255,178,0.28);
+box-shadow: 0 0 26px rgba(57,243,255,.32), 0 0 52px rgba(37,255,178,.28), inset 0 0 0 2px rgba(37,255,178,.50);
+}
+100%{
+transform:scale(1);
+background: rgba(37,255,178,0.22);
+box-shadow: 0 0 14px rgba(57,243,255,.22), 0 0 28px rgba(37,255,178,.20), inset 0 0 0 1px rgba(37,255,178,.36);
+}
+}
+@keyframes holdGreen{
+0%{ background: rgba(37,255,178,0.22); box-shadow: 0 0 12px rgba(57,243,255,.20), 0 0 24px rgba(37,255,178,.18), inset 0 0 0 1px rgba(37,255,178,.32); }
+100%{ background: transparent; box-shadow: none; }
+}
+@keyframes fallFade{
+0%{
+background: rgba(255,61,110,.30); filter: brightness(1.1);
+box-shadow: 0 0 12px rgba(255,61,110,.30), inset 0 0 0 1px rgba(255,61,110,.38);
+}
+70%{ background: rgba(255,61,110,.16); }
+100%{ background: transparent; filter: brightness(1); box-shadow: none; }
+}
 
-    .pop{ animation: pop .7s ease; }
-    .flash{ animation: flash .8s ease; }
-    @keyframes pop { 0%{ transform:scale(0.97) } 40%{ transform:scale(1.02) } 100%{ transform:scale(1) } }
-    @keyframes flash { 0%{ background:#06231a } 100%{ background:transparent } }
-    @keyframes tickIn{ to{ opacity:1; transform:none; } }
+.pop{ animation: pop .7s ease; }
+.flash{ animation: flash .8s ease; }
+@keyframes pop { 0%{ transform:scale(0.97) } 40%{ transform:scale(1.02) } 100%{ transform:scale(1) } }
+@keyframes flash { 0%{ background:#06231a } 100%{ background:transparent } }
+@keyframes tickIn{ to{ opacity:1; transform:none; } }
 
-    /* === PODIUM OVERLAY === */
-    .podium-overlay{
-      position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center;
-      background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
-      opacity:0; visibility:hidden; transition: opacity .35s ease, visibility .35s ease;
-    }
-    .podium-overlay.show{ opacity:1; visibility:visible; }
-    .podium-card{
-      width:min(1100px, 94vw);
-      background:#0b1220; border:1px solid #1b2a44; border-radius:20px; padding:28px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      transform: translateY(8px) scale(.98); animation: podiumIn .45s ease forwards;
-    }
-    @keyframes podiumIn{ to { transform:none; } }
-    .podium-head{ text-align:center; margin-bottom:18px; }
-    .podium-kicker{ color:#9aa6bb; letter-spacing:.1em; font-weight:800; font-size:.85rem; }
-    .podium-title{ margin-top:6px; font-weight:900; line-height:1.05; font-size: clamp(22px, 5.2vw, 44px);
-      text-shadow: 0 0 14px rgba(57,243,255,.25), 0 0 28px rgba(0,199,127,.18); }
-    .podium-sub{ color:#9aa6bb; margin-top:6px; }
-    .podium-grid{ display:grid; grid-template-columns: 1fr 1.2fr 1fr; gap:14px; align-items:end; }
-    .podium-slot{
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00));
-      border:1px solid #1b2a44; border-radius:16px; padding:16px 14px; text-align:center; position:relative; overflow:hidden;
-      transform: translateY(10px); opacity:0;
-    }
-    .podium-slot.show{ animation: slotIn .5s ease forwards; }
-    .podium-slot.s1{ box-shadow: 0 0 32px rgba(37,255,178,.15); }
-    .podium-slot.s2{ box-shadow: 0 0 24px rgba(127,179,255,.12); }
-    .podium-slot.s3{ box-shadow: 0 0 24px rgba(255,61,110,.12); }
-    @keyframes slotIn{ from{ transform: translateY(10px) scale(.98); opacity:0; filter: blur(1px); } to{ transform:none; opacity:1; filter:none; } }
-    .medal{ font-size: clamp(22px, 4vw, 36px); }
-    .place{ font-weight:900; margin-top:6px; font-size: clamp(16px, 3.2vw, 22px); }
-    .name { font-weight:900; margin-top:4px; font-size: clamp(18px, 3.6vw, 28px); }
-    .code { color:#9aa6bb; font-variant-numeric: tabular-nums; }
-    .points{ margin-top:6px; font-weight:900; color:var(--pts); font-variant-numeric: tabular-nums; }
-    .ribbon{
-      position:absolute; inset:auto -30px -12px -30px; height:6px;
-      background: linear-gradient(90deg, var(--up), var(--neon), var(--down));
-      filter: blur(6px); opacity:.5;
-    }
-    .s2.show{ animation-delay:.10s } .s1.show{ animation-delay:.20s } .s3.show{ animation-delay:.30s }
-    .podium-close{ position:absolute; top:10px; right:12px; background:transparent; border:0; color:#9aa6bb; cursor:pointer; font-size:20px; }
+/* === PODIUM OVERLAY === */
+.podium-overlay{
+position:fixed; inset:0; z-index:10000; display:flex; align-items:center; justify-content:center;
+background: rgba(0,0,0,.75); backdrop-filter: blur(4px);
+opacity:0; visibility:hidden; transition: opacity .35s ease, visibility .35s ease;
+}
+.podium-overlay.show{ opacity:1; visibility:visible; }
+.podium-card{
+width:min(1100px, 94vw);
+background:#0b1220; border:1px solid #1b2a44; border-radius:20px; padding:28px;
+box-shadow: 0 18px 60px rgba(0,0,0,.45);
+transform: translateY(8px) scale(.98); animation: podiumIn .45s ease forwards;
+}
+@keyframes podiumIn{ to { transform:none; } }
+.podium-head{ text-align:center; margin-bottom:18px; }
+.podium-kicker{ color:#9aa6bb; letter-spacing:.1em; font-weight:800; font-size:.85rem; }
+.podium-title{ margin-top:6px; font-weight:900; line-height:1.05; font-size: clamp(22px, 5.2vw, 44px);
+text-shadow: 0 0 14px rgba(57,243,255,.25), 0 0 28px rgba(0,199,127,.18); }
+.podium-sub{ color:#9aa6bb; margin-top:6px; }
+.podium-grid{ display:grid; grid-template-columns: 1fr 1.2fr 1fr; gap:14px; align-items:end; }
+.podium-slot{
+background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00));
+border:1px solid #1b2a44; border-radius:16px; padding:16px 14px; text-align:center; position:relative; overflow:hidden;
+transform: translateY(10px); opacity:0;
+}
+.podium-slot.show{ animation: slotIn .5s ease forwards; }
+.podium-slot.s1{ box-shadow: 0 0 32px rgba(37,255,178,.15); }
+.podium-slot.s2{ box-shadow: 0 0 24px rgba(127,179,255,.12); }
+.podium-slot.s3{ box-shadow: 0 0 24px rgba(255,61,110,.12); }
+@keyframes slotIn{ from{ transform: translateY(10px) scale(.98); opacity:0; filter: blur(1px); } to{ transform:none; opacity:1; filter:none; } }
+.medal{ font-size: clamp(22px, 4vw, 36px); }
+.place{ font-weight:900; margin-top:6px; font-size: clamp(16px, 3.2vw, 22px); }
+.name { font-weight:900; margin-top:4px; font-size: clamp(18px, 3.6vw, 28px); }
+.code { color:#9aa6bb; font-variant-numeric: tabular-nums; }
+.points{ margin-top:6px; font-weight:900; color:var(--pts); font-variant-numeric: tabular-nums; }
+.ribbon{
+position:absolute; inset:auto -30px -12px -30px; height:6px;
+background: linear-gradient(90deg, var(--up), var(--neon), var(--down));
+filter: blur(6px); opacity:.5;
+}
+.s2.show{ animation-delay:.10s } .s1.show{ animation-delay:.20s } .s3.show{ animation-delay:.30s }
+.podium-close{ position:absolute; top:10px; right:12px; background:transparent; border:0; color:#9aa6bb; cursor:pointer; font-size:20px; }
 
-    /* Confete */
-    .confetti{ position:fixed; inset:0; pointer-events:none; z-index:10000; overflow:hidden }
-    .confetti i{ position:absolute; top:-10px; width:6px; height:10px; border-radius:2px; animation: drop linear forwards; opacity:.9; }
-    @keyframes drop{ to { transform: translateY(110vh) rotate(360deg); opacity:.95 } }
+/* Confete */
+.confetti{ position:fixed; inset:0; pointer-events:none; z-index:10000; overflow:hidden }
+.confetti i{ position:absolute; top:-10px; width:6px; height:10px; border-radius:2px; animation: drop linear forwards; opacity:.9; }
+@keyframes drop{ to { transform: translateY(110vh) rotate(360deg); opacity:.95 } }
 
-    /* Troca suave do ranking no Telão */
-    .swapHost{ position:relative; min-height:420px; }
-    .pane{ position:absolute; inset:0; }
-    .pane-current{ position:relative; }
-    .swap-in{ animation: telaoIn .50s ease forwards; }
-    .swap-out{ animation: telaoOut .50s ease forwards; }
-    @keyframes telaoIn{ from{ opacity:0; transform:translateY(8px) scale(.98); filter:blur(1px) } to{ opacity:1; transform:none; filter:blur(0) } }
-    @keyframes telaoOut{ from{ opacity:1; transform:none; filter:blur(0) } to{ opacity:0; transform:translateY(-6px) scale(.995); filter:blur(1px) } }
+/* Troca suave do ranking no Telão */
+.swapHost{ position:relative; min-height:420px; }
+.pane{ position:absolute; inset:0; }
+.pane-current{ position:relative; }
+.swap-in{ animation: telaoIn .50s ease forwards; }
+.swap-out{ animation: telaoOut .50s ease forwards; }
+@keyframes telaoIn{ from{ opacity:0; transform:translateY(8px) scale(.98); filter:blur(1px) } to{ opacity:1; transform:none; filter:blur(0) } }
+@keyframes telaoOut{ from{ opacity:1; transform:none; filter:blur(0) } to{ opacity:0; transform:translateY(-6px) scale(.995); filter:blur(1px) } }
 
-    /* Barra de progressão do telão */
-    .telao-progress{ position:absolute; left:0; right:0; top:0; height:6px; background: rgba(255,255,255,.07); overflow:hidden; z-index:9999; }
-    .telao-progress .bar{ height:100%; width:0; background: linear-gradient(90deg, var(--up), var(--neon), var(--down)); box-shadow: 0 0 12px rgba(57,243,255,.35); transform-origin: left; }
-    .telao-progress .bar.play{ animation: telaoProgress var(--slide-ms, 10s) linear forwards; }
-    @keyframes telaoProgress{ from{ width:0% } to{ width:100% } }
-  </style>
+/* Barra de progressão do telão */
+.telao-progress{ position:absolute; left:0; right:0; top:0; height:6px; background: rgba(255,255,255,.07); overflow:hidden; z-index:9999; }
+.telao-progress .bar{ height:100%; width:0; background: linear-gradient(90deg, var(--up), var(--neon), var(--down)); box-shadow: 0 0 12px rgba(57,243,255,.35); transform-origin: left; }
+.telao-progress .bar.play{ animation: telaoProgress var(--slide-ms, 10s) linear forwards; }
+@keyframes telaoProgress{ from{ width:0% } to{ width:100% } }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>ClimbFest 2025</h1>
-        <div class="muted">Leaderboard público — selecione a categoria</div>
-      </div>
-      <div class="topbar-controls">
-        <select id="selectCategoryTop" class="small">
-          <option value="boulder">Boulder (solo)</option>
-          <option value="routes">Vias / Desafios (times)</option>
-        </select>
-        <button id="btnOpenLogin" class="btn btn-ghost">Login (juiz/admin)</button>
-      </div>
-    </header>
-
-    <main class="grid" style="margin-top:12px">
-      <div>
-        <div id="panelRanking" class="card">
-          <div class="section-title">
-            <h2 id="rankingTitle">Boulder — Ranking</h2>
-            <div class="flex">
-              <select id="filterCategory" class="small" title="Filtro de categoria (boulder)">
-                <option value="all">Todas categorias</option>
-                <option value="kids">Kids (≤12)</option>
-                <option value="juvenil">Juvenil (13–15)</option>
-                <option value="juvenil-m">Juvenil Masculino</option>
-                <option value="juvenil-f">Juvenil Feminino</option>
-                <option value="masters">Masters (≥40)</option>
-                <option value="trans-nao-binario">Trans / Não binários</option>
-                <option value="geral">Geral</option>
-                <option value="geral-m">Geral Masculino</option>
-                <option value="geral-f">Geral Feminino</option>
-                <option value="pro">PRO</option>
-              </select>
-              <button id="btnExportCSV" class="btn btn-ghost">Exportar CSV</button>
-            </div>
-          </div>
-          <div style="margin-top:10px;max-height:520px;overflow:auto">
-            <table>
-              <thead>
-                <tr><th>#</th><th>Código/Nome</th><th>Categoria</th><th>Gênero</th><th>Pontos</th></tr>
-              </thead>
-              <tbody id="rankingBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Boulder do Momento -->
-        <div id="boulderDoMomentoCard" class="card hidden" style="margin-top:12px; border:1px solid #00c77f;">
-          <div style="font-weight:700; color:#00c77f; margin-bottom:4px;">🔥 Boulder do Momento</div>
-          <div id="boulderDoMomentoName" style="font-size:1.1rem; font-weight:600;"></div>
-          <div id="boulderDoMomentoCount" class="muted small"></div>
-        </div>
-
-        <div style="height:12px"></div>
-        <div class="card" style="margin-top:12px">
-          <div class="muted small">Observações</div>
-          <ul>
-            <li class="muted small">Juízes: use a área de login para registrar envios.</li>
-            <li class="muted small">Boulders são individuais. Vias/Desafios são por <b>times</b> de 3.</li>
-            <li class="muted small">Se um escalador/time já completou o desafio, sistema bloqueia nova pontuação.</li>
-            <li class="muted small">Times com pelo menos um(a) atleta <b>Kids</b> começam com <b>+900 pontos</b>.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Right: login / admin / juiz -->
-      <aside>
-        <div id="loginCard" class="card">
-          <h3>Login — Juiz / Admin</h3>
-          <input id="inputPassword" type="password" placeholder="Digite a senha" />
-          <div class="flex" style="margin-top:8px">
-            <button id="btnLogin" class="btn btn-primary">Entrar</button>
-            <button id="btnLogout" class="btn btn-ghost hidden">Sair</button>
-          </div>
-        </div>
-
-        <!-- Admin panel -->
-        <div id="adminCard" class="card hidden" style="margin-top:12px">
-          <h3>Admin — Gerenciar</h3>
-          <div class="muted small">Cadastros por seleção (mais rápido)</div>
-
-          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-          <strong>Escaladores</strong>
-          <div style="margin-top:8px" class="row">
-            <input id="newClimberName" placeholder="Nome"/>
-            <input id="newClimberCode" placeholder="Código (ex: 001)"/>
-            <input id="newClimberAge" type="number" placeholder="Idade"/>
-            <select id="newClimberGender" title="Gênero">
-              <option value="masculino">Masculino</option>
-              <option value="feminino">Feminino</option>
-              <option value="trans-nao-binario">Trans / Não binário</option>
-              <option value="outro">Outro</option>
-            </select>
-            <label style="display:flex;align-items:center;gap:6px">
-              <input id="newClimberPro" type="checkbox" style="width:auto;margin-top:0"> É PRO?
-            </label>
-          </div>
-          <div class="flex" style="margin-top:8px">
-            <button id="btnAddClimber" class="btn btn-primary">Adicionar</button>
-            <button id="btnDeleteClimber" class="btn btn-ghost">Excluir selecionado</button>
-          </div>
-          <select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
-
-          <!-- Editor manual de pontos do escalador -->
-          <div class="row" style="margin-top:8px">
-            <input id="editClimberPoints" type="number" placeholder="Pontos (override)"/>
-            <button id="btnSaveClimberPoints" class="btn btn-ghost">Salvar pontos do selecionado</button>
-          </div>
-          <div class="muted small">Dica: selecione um escalador na lista acima, digite o novo total e clique em “Salvar pontos”.</div>
-
-          <hr style="border:none;border-top:1px solid #122233;margin:12px 0" />
-          <strong>Desafios / Vias / Boulders</strong>
-          <div style="margin-top:8px" class="row">
-            <input id="newRouteCode" placeholder="Código (ex: B01)"/>
-            <input id="newRouteName" placeholder="Nome do desafio"/>
-            <select id="newRouteType">
-              <option value="boulder">Boulder</option>
-              <option value="via">Via</option>
-              <option value="desafio">Kilter/Desafio</option>
-            </select>
-          </div>
-          <div class="flex" style="margin-top:8px">
-            <button id="btnAddRoute" class="btn btn-primary">Adicionar</button>
-            <button id="btnDeleteRoute" class="btn btn-ghost">Excluir selecionado</button>
-          </div>
-          <select id="selectRoutesAdmin" size="6" style="margin-top:8px"></select>
-
-          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-          <strong>Times (para Vias / Desafios)</strong>
-          <div class="muted small">Selecione 3 escaladores e clique em "Criar Time". Se houver pelo menos um(a) Kids, o time começa com +900.</div>
-          <select id="selectClimbersForTeam" multiple size="6" style="margin-top:8px"></select>
-          <input id="teamNameInput" placeholder="Nome do time (ex: Team A)"/>
-          <div class="flex" style="margin-top:8px">
-            <button id="btnCreateTeam" class="btn btn-primary">Criar Time</button>
-            <button id="btnDeleteTeam" class="btn btn-ghost">Excluir time selecionado</button>
-          </div>
-          <select id="selectTeamsAdmin" size="6" style="margin-top:8px"></select>
-
-          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-          <strong>Premiações / Sorteio</strong>
-          <div class="muted small">Sorteia 1 escalador e mostra ao vivo por ~5s para todos online.</div>
-          <div class="flex" style="margin-top:8px">
-            <button id="btnRaffle" class="btn btn-primary">Sortear escalador (ao vivo)</button>
-            <button id="btnEndLive" class="btn btn-ghost">Encerrar anúncio</button>
-          </div>
-
-          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-          <strong>Modo Telão</strong>
-          <div class="muted small">Exibe o ranking automaticamente no telão.</div>
-          <button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
-
-          <!-- >>>>>>> MODO PÓDIO (DENTRO do Admin) <<<<<<< -->
-          <hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
-          <strong>Modo Pódio</strong>
-          <div class="muted small">Exibe o top 3 ao vivo para todos online.</div>
-
-          <div class="row" style="margin-top:8px">
-            <select id="podiumType">
-              <option value="boulder">Boulder (individual)</option>
-              <option value="team">Times (geral)</option>
-            </select>
-            <select id="podiumCategory">
-              <option value="all">Geral</option>
-              <option value="kids">Kids (≤12)</option>
-              <option value="juvenil">Juvenil (13–15)</option>
-              <option value="juvenil-m">Juvenil Masculino</option>
-              <option value="juvenil-f">Juvenil Feminino</option>
-              <option value="masters">Masters (≥40)</option>
-              <option value="trans-nao-binario">Trans / Não binários</option>
-              <option value="geral-m">Geral Masculino</option>
-              <option value="geral-f">Geral Feminino</option>
-              <option value="pro">PRO</option>
-            </select>
-          </div>
-          <div class="flex" style="margin-top:8px">
-            <button id="btnShowPodium" class="btn btn-primary">Mostrar Pódio</button>
-            <button id="btnHidePodium" class="btn btn-ghost">Encerrar Pódio</button>
-          </div>
-        </div>
-
-        <!-- Judge panel -->
-        <div id="judgeCard" class="card hidden" style="margin-top:12px">
-          <h3>Juiz — Registrar envio</h3>
-          <div>
-            <label class="muted small">Categoria</label>
-            <select id="judgeCategory">
-              <option value="boulder">Boulder (individual)</option>
-              <option value="routes">Vias / Desafios (time)</option>
-            </select>
-
-            <label class="muted small">Escalador / Time</label>
-            <select id="judgeActorSelect" style="margin-top:6px"></select>
-
-            <label class="muted small">Desafio</label>
-            <select id="judgeRouteSelect"></select>
-
-            <label class="muted small">Tipo de envio</label>
-            <select id="judgeSendType">
-              <option value="flash">Flash — 300 pts</option>
-              <option value="cadena">Cadena — 100 pts</option>
-            </select>
-
-            <div class="flex" style="margin-top:8px">
-              <button id="btnRegister" class="btn btn-primary">Registrar</button>
-              <button id="btnClearSelection" class="btn btn-ghost">Limpar</button>
-            </div>
-
-            <div style="margin-top:10px">
-              <div class="muted small">Últimos envios</div>
-              <ul id="recentList" class="muted small" style="padding-left:14px;margin-top:6px"></ul>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </main>
-  </div>
-
-  <!-- Overlay global do Live (usada na vinheta) -->
-  <div id="liveOverlay" class="overlay">
-    <div class="overlay-card">
-      <div class="overlay-title">SORTEIO — CLIMBFEST</div>
-      <div id="liveName" class="overlay-name">Nome do Escalador</div>
-      <div id="liveCode" class="overlay-code">CÓDIGO</div>
-      <div id="liveRolling" class="roll muted small" style="margin-top:8px"></div>
-    </div>
-  </div>
-  <div id="confetti" class="confetti hidden"></div>
-
-  <!-- Overlay do Pódio (broadcast) -->
-  <div id="podiumOverlay" class="podium-overlay">
-    <div class="podium-card">
-      <button id="podiumClose" class="podium-close" title="Fechar">✕</button>
-      <div class="podium-head">
-        <div class="podium-kicker">CLIMBFEST — PÓDIO AO VIVO</div>
-        <div id="podiumTitle" class="podium-title">Boulder — Geral</div>
-        <div id="podiumSub" class="podium-sub"></div>
-      </div>
-
-      <div class="podium-grid">
-        <div id="slot2" class="podium-slot s2">
-          <div class="medal">🥈</div>
-          <div class="place">2º Lugar</div>
-          <div class="name" id="s2Name">—</div>
-          <div class="code" id="s2Code"></div>
-          <div class="points" id="s2Pts"></div>
-          <div class="ribbon"></div>
-        </div>
-        <div id="slot1" class="podium-slot s1">
-          <div class="medal">🥇</div>
-          <div class="place">1º Lugar</div>
-          <div class="name" id="s1Name">—</div>
-          <div class="code" id="s1Code"></div>
-          <div class="points" id="s1Pts"></div>
-          <div class="ribbon"></div>
-        </div>
-        <div id="slot3" class="podium-slot s3">
-          <div class="medal">🥉</div>
-          <div class="place">3º Lugar</div>
-          <div class="name" id="s3Name">—</div>
-          <div class="code" id="s3Code"></div>
-          <div class="points" id="s3Pts"></div>
-          <div class="ribbon"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Telão -->
-  <div id="telaoContainer">
-    <div class="telao-progress"><div id="telaoProgressBar" class="bar"></div></div>
-    <div class="telao-grid">
-      <div class="telao-col">
-        <div id="telaoMainTitle" class="telao-title">Boulder — TOP 10</div>
-        <div id="telaoMainSub" class="telao-sub">Atualiza automaticamente</div>
-        <div id="telaoListHost" class="swapHost">
-          <ul id="telaoMainList" class="telao-list pane pane-current"></ul>
-        </div>
-      </div>
-
-      <div class="telao-col">
-        <div class="moment-card" id="momentCard">
-          <div class="moment-title">🔥 Boulder do Momento</div>
-          <div id="momentName" class="moment-name">—</div>
-          <div id="momentCount" class="moment-count">—</div>
-        </div>
-
-        <div class="ticker">
-          <div class="ticker-head">📡 Últimos envios (ao vivo)</div>
-          <div id="tickerBody" class="ticker-body"></div>
-        </div>
-      </div>
-    </div>
-    <div style="position:absolute; bottom:12px; left:0; right:0; text-align:center; opacity:.45">Pressione ESC para sair</div>
-  </div>
-
-  <!-- Firebase (modular v11) -->
-  <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc,
-  onSnapshot, query, where, serverTimestamp, arrayUnion,
-  clearIndexedDbPersistence
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-// >>> FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyB-CnTOLGSfC_cDCEv_vp14r8lQyyXgImM",
-  authDomain: "climbfest-224ed.firebaseapp.com",
-  projectId: "climbfest-224ed",
-  storageBucket: "climbfest-224ed.firebasestorage.app",
-  messagingSenderId: "808584030721",
-  appId: "1:808584030721:web:3313cdc4c9f57150396e00"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-/* =======================
-   CONFIGURÁVEIS / UTILS
-   ======================= */
-// Quantidade de envios recentes considerados no "Boulder do Momento"
-const MOMENTO_RECENT_LIMIT = 100; // altere aqui (ex.: 50, 100, 200)
-
-// Pódio: tempo de validade (ex.: 10 minutos)
-const PODIUM_TTL_MS = 10 * 60 * 1000;
-
-// Natural compare (ordenação "humana" para códigos tipo 1,2,10,20 e também A1, A10, B2...)
-function chunkify(str){
-  return String(str ?? '').trim().match(/\d+|\D+/g) || [String(str ?? '')];
-}
-function naturalCompare(a, b){
-  const ac = chunkify(a), bc = chunkify(b);
-  const n = Math.min(ac.length, bc.length);
-  for (let i=0;i<n;i++){
-    const x = ac[i], y = bc[i];
-    const xd = /^\d+$/.test(x), yd = /^\d+$/.test(y);
-    if (xd && yd){
-      const xi = parseInt(x,10), yi = parseInt(y,10);
-      if (xi !== yi) return xi - yi;
-    } else {
-      const cmp = x.localeCompare(y, undefined, { sensitivity:'base', numeric:false });
-      if (cmp !== 0) return cmp;
-    }
-  }
-  if (ac.length !== bc.length) return ac.length - bc.length;
-  return String(a).localeCompare(String(b), undefined, { sensitivity:'base' });
-}
-const byCode = (get)=> (a,b)=> naturalCompare(get(a), get(b));
-
-/* =======================
-   PODIUM REFS
-   ======================= */
-const podiumOverlay = document.getElementById('podiumOverlay');
-const podiumTitle   = document.getElementById('podiumTitle');
-const podiumSub     = document.getElementById('podiumSub');
-const podiumClose   = document.getElementById('podiumClose');
-
-const s1Name = document.getElementById('s1Name');
-const s1Code = document.getElementById('s1Code');
-const s1Pts  = document.getElementById('s1Pts');
-const s2Name = document.getElementById('s2Name');
-const s2Code = document.getElementById('s2Code');
-const s2Pts  = document.getElementById('s2Pts');
-const s3Name = document.getElementById('s3Name');
-const s3Code = document.getElementById('s3Code');
-const s3Pts  = document.getElementById('s3Pts');
-
-// Admin – controles do pódio
-const podiumType     = document.getElementById('podiumType');
-const podiumCategory = document.getElementById('podiumCategory');
-const btnShowPodium  = document.getElementById('btnShowPodium');
-const btnHidePodium  = document.getElementById('btnHidePodium');
-
-let unsubPodium = null;
-
-// Boulder do momento refs (página)
-const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
-const boulderDoMomentoName = document.getElementById('boulderDoMomentoName');
-const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
-
-// SENHAS
-const ADMIN_PASS = "266213";
-const JUDGE_PASS = "jcf2025";
-
-// DOM refs (ranking/filters)
-const selectCategoryTop = document.getElementById('selectCategoryTop');
-const rankingTitle = document.getElementById('rankingTitle');
-const rankingBody = document.getElementById('rankingBody');
-const filterCategory = document.getElementById('filterCategory');
-const btnExportCSV = document.getElementById('btnExportCSV');
-
-// Login
-const btnOpenLogin = document.getElementById('btnOpenLogin');
-const inputPassword = document.getElementById('inputPassword');
-const btnLogin = document.getElementById('btnLogin');
-const btnLogout = document.getElementById('btnLogout');
-const adminCard = document.getElementById('adminCard');
-const judgeCard = document.getElementById('judgeCard');
-
-// ===== TELÃO =====
-let telaoMode = false;
-let telaoIndex = 0; // 0 = Boulder TOP10, 1 = Times TOP10
-let telaoTimer = null;
-let tickerSeenIds = new Set();
-let prevTopBoulder = []; // ids na ordem
-let prevTopTeams = [];
-let prevMomentId = null;
-
-const DURATION_BOULDER = 12000; // ranking individual por mais tempo
-const DURATION_TEAMS   = 7000;  // times por menos tempo
-
-const telaoContainer = document.getElementById('telaoContainer');
-const telaoMainTitle = document.getElementById('telaoMainTitle');
-const telaoMainSub = document.getElementById('telaoMainSub');
-const progressBar = document.getElementById('telaoProgressBar');
-
-function filterBoulderByCategory(rows, cat){
-  const c = (cat||'all').toLowerCase();
-  if (c === 'all') return rows;
-  if (c === 'juvenil-m') return rows.filter(r => r.category==='juvenil' && r.gender==='masculino');
-  if (c === 'juvenil-f') return rows.filter(r => r.category==='juvenil' && r.gender==='feminino');
-  if (c === 'geral-m')   return rows.filter(r => r.category==='geral'   && r.gender==='masculino');
-  if (c === 'geral-f')   return rows.filter(r => r.category==='geral'   && r.gender==='feminino');
-  return rows.filter(r => (r.category||'').toLowerCase() === c);
-}
-
-function computeTop3(kind, cat='all'){
-  if (kind === 'team'){
-    const rows = teamsCache
-      .map(t => ({ id:t.id, name:t.data.name, points: t.data.points||0, code: '' }))
-      .sort((a,b)=> (b.points)-(a.points))
-      .slice(0,3);
-    return rows;
-  } else {
-    const rowsAll = climbersCache.map(c => ({
-      id:c.id, name:c.data.name, code:(c.data.code||c.id), points:c.data.points||0,
-      category:(c.data.category||'').toLowerCase(), gender:(c.data.gender||'').toLowerCase()
-    }));
-    const rows = filterBoulderByCategory(rowsAll, cat)
-      .sort((a,b)=> (b.points)-(a.points))
-      .slice(0,3);
-    return rows;
-  }
-}
-
-function showPodiumOverlay(payload){
-  if (!payload || !payload.active){ hidePodiumOverlay(); return; }
-
-  podiumTitle.textContent = payload.title || 'Pódio';
-  podiumSub.textContent   = payload.sub || '';
-
-  const top = payload.top || [];
-  const safe = (i)=> top[i] || { name:'—', code:'', points:'' };
-
-  const t1 = safe(0), t2 = safe(1), t3 = safe(2);
-  s1Name.textContent = t1.name || '—';
-  s1Code.textContent = t1.code ? `(${t1.code})` : '';
-  s1Pts.textContent  = t1.points!=='' ? `${t1.points} pts` : '';
-
-  s2Name.textContent = t2.name || '—';
-  s2Code.textContent = t2.code ? `(${t2.code})` : '';
-  s2Pts.textContent  = t2.points!=='' ? `${t2.points} pts` : '';
-
-  s3Name.textContent = t3.name || '—';
-  s3Code.textContent = t3.code ? `(${t3.code})` : '';
-  s3Pts.textContent  = t3.points!=='' ? `${t3.points} pts` : '';
-
-  // reset animação dos slots
-  ['slot1','slot2','slot3'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-  });
-
-  podiumOverlay.classList.add('show');
-}
-function hidePodiumOverlay(){
-  podiumOverlay.classList.remove('show');
-}
-// fechar pódio também desativa no Firestore (segurança)
-podiumClose.addEventListener('click', async () => {
-  hidePodiumOverlay();
-  try {
-    await setDoc(doc(db,'live','podium'), { active:false }, { merge:true });
-  } catch (e) {
-    console.error('Erro ao encerrar pódio pelo X:', e);
-  }
-});
-
-// Barra de progresso sincronizada com o slide atual
-function playProgress(ms){
-  if (!progressBar) return;
-  progressBar.style.setProperty('--slide-ms', ms+'ms');
-  progressBar.classList.remove('play'); void progressBar.offsetWidth; progressBar.classList.add('play');
-}
-function stopProgress(){
-  if (!progressBar) return;
-  progressBar.classList.remove('play');
-  progressBar.style.removeProperty('--slide-ms');
-}
-function currentDuration(){ return (telaoIndex === 0) ? DURATION_BOULDER : DURATION_TEAMS; }
-
-const momentCard = document.getElementById('momentCard');
-const momentName = document.getElementById('momentName');
-const momentCount = document.getElementById('momentCount');
-
-const tickerBody = document.getElementById('tickerBody');
-const btnOpenTelao = document.getElementById('btnOpenTelao');
-
-// caches
-let climbersCache = [];
-let routesCache = [];
-let teamsCache = [];
-let scoresCache = [];
-
-// unsubscribers
-let unsubClimbers = null;
-let unsubRoutes = null;
-let unsubTeams = null;
-let unsubScores = null;
-let unsubLive = null;
-
-// Debounce de UI
-let uiTimer = null;
-function queueUIRedraw(){
-  if (uiTimer) clearTimeout(uiTimer);
-  uiTimer = setTimeout(()=>{
-    refreshRanking(true);
-    if (telaoMode) renderTelaoFrame(telaoIndex);
-  }, 700);
-}
-
-// Helpers
-const displayCategory = (cat) => {
-  const c = (cat||'').toLowerCase();
-  return {'kids':'Kids','juvenil':'Juvenil','masters':'Masters','trans-nao-binario':'Trans / Não Binários','geral':'Geral','pro':'PRO'}[c] || cat || '';
-};
-const displayGender = (g) => {
-  const x = (g||'').toLowerCase();
-  return {'masculino':'Masculino','feminino':'Feminino','trans-nao-binario':'Trans / Não Binário','outro':'Outro'}[x] || g || '';
-};
-const normalizeGender = (g) => {
-  const x = (g||'').toString().trim().toLowerCase();
-  if (['m','masc','masculino'].includes(x)) return 'masculino';
-  if (['f','fem','feminino'].includes(x)) return 'feminino';
-  if (['trans','tnb','trans-nb','trans nao binario','trans não binário','trans-nao-binario','trans-não-binário'].includes(x)) return 'trans-nao-binario';
-  return 'outro';
-};
-function computeCategory(age, gender, isPro){
-  if (isPro) return 'pro';
-  const g = normalizeGender(gender);
-  const a = Number.isFinite(+age) ? +age : 0;
-  if (g === 'trans-nao-binario') return 'trans-nao-binario';
-  if (!a) return 'geral';
-  if (a <= 12) return 'kids';
-  if (a >= 13 && a <= 15) return 'juvenil';
-  if (a >= 40) return 'masters';
-  return 'geral';
-}
-function showToast(msg){ alert(msg); } // (mantido)
-
-// Login
-btnOpenLogin.addEventListener('click', ()=> inputPassword.focus());
-btnLogin.addEventListener('click', ()=> {
-  const pass = inputPassword.value.trim();
-  if (pass === ADMIN_PASS) {
-    adminCard.classList.remove('hidden'); judgeCard.classList.add('hidden');
-    btnLogout.classList.remove('hidden'); showToast('Admin: modo ativado');
-    loadAllForAdmin();
-  } else if (pass === JUDGE_PASS) {
-    judgeCard.classList.remove('hidden'); adminCard.classList.add('hidden');
-    btnLogout.classList.remove('hidden'); showToast('Juiz: modo ativado');
-    loadSelectorsForJudge();
-  } else showToast('Senha incorreta.');
-  inputPassword.value='';
-});
-btnLogout.addEventListener('click', ()=> {
-  adminCard.classList.add('hidden'); judgeCard.classList.add('hidden');
-  btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
-});
-
-// Telão
-btnOpenTelao.addEventListener('click', startTelao);
-document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && telaoMode) stopTelao(); });
-
-function startTelao(){
-  if (telaoMode) return;
-  telaoMode = true;
-  telaoContainer.classList.add('show');
-  renderTelaoFrame(telaoIndex);
-  playProgress(currentDuration());
-  scheduleNextTelaoTick();
-}
-function stopTelao(){
-  telaoMode = false;
-  telaoContainer.classList.remove('show');
-  if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
-  stopProgress();
-}
-function scheduleNextTelaoTick(){
-  if (!telaoMode) return;
-  if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
-  const delay = currentDuration();
-  telaoTimer = setTimeout(() => {
-    telaoIndex = (telaoIndex + 1) % 2;
-    renderTelaoFrame(telaoIndex);
-    playProgress(currentDuration());
-    scheduleNextTelaoTick();
-  }, delay);
-}
-
-// Snapshots
-(async function tryClearLocalPersistence(){
-  try { await clearIndexedDbPersistence(db); } catch (e) {}
-  registerSnapshots();
-})();
-
-function registerSnapshots(){
-  // unsubscribe previous
-  if (typeof unsubPodium === 'function') { try{unsubPodium();}catch(e){}; unsubPodium = null; }
-  if (typeof unsubClimbers === 'function') { try { unsubClimbers(); } catch(e){}; unsubClimbers = null; }
-  if (typeof unsubRoutes === 'function') { try { unsubRoutes(); } catch(e){}; unsubRoutes = null; }
-  if (typeof unsubTeams === 'function') { try { unsubTeams(); } catch(e){}; unsubTeams = null; }
-  if (typeof unsubScores === 'function') { try { unsubScores(); } catch(e){}; unsubScores = null; }
-  if (typeof unsubLive === 'function') { try { unsubLive(); } catch(e){}; unsubLive = null; }
-
-  // reset local UI state to avoid stale/locked UI after big mutations
-  tickerSeenIds = new Set();
-  if (tickerBody) tickerBody.innerHTML = '';
-  prevTopBoulder = [];
-  prevTopTeams = [];
-  prevMomentId = null;
-  if (momentName) { momentName.textContent = '—'; }
-  if (momentCount) { momentCount.textContent = ''; }
-
-  // ---- Listener do PÓDIO com TTL anti-pódio antigo
-  unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
-    if (!dsnap.exists()){ hidePodiumOverlay(); return; }
-    const data = dsnap.data();
-
-    // checa validade
-    const now = Date.now();
-    const exp = typeof data.expiresAtMs === 'number' ? data.expiresAtMs : 0;
-    const stillValid = exp === 0 ? true : (now <= exp);
-
-    if (data.active && stillValid) {
-      showPodiumOverlay(data);
-    } else {
-      hidePodiumOverlay();
-    }
-  }, (err)=>console.error('podium listener error', err));
-
-  unsubClimbers = onSnapshot(collection(db,'climbers'), snap => {
-    climbersCache = [];
-    snap.docs.forEach(d => {
-      const c = d.data();
-      c.gender = normalizeGender(c.gender);
-      c.category = (c.category||'').toLowerCase();
-      climbersCache.push({ id:d.id, data:c, meta:d.metadata });
-    });
-    populateAdminClimbers();
-    loadSelectorsForJudge();
-    queueUIRedraw();
-  });
-
-  unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
-    routesCache = [];
-    snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
-    populateAdminRoutes();
-    loadSelectorsForJudge();
-    queueUIRedraw();
-  });
-
-  unsubTeams = onSnapshot(collection(db,'teams'), snap => {
-    teamsCache = [];
-    snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
-    populateAdminTeams();
-    loadSelectorsForJudge();
-    queueUIRedraw();
-  });
-
-  unsubScores = onSnapshot(collection(db,'scores'), snap => {
-    scoresCache = [];
-    snap.docs.forEach(d => {
-      if (d.metadata && d.metadata.hasPendingWrites) return;
-      scoresCache.push({ id:d.id, data:d.data(), meta:d.metadata });
-    });
-    // ao atualizar scores, reset parcial do tickerSeenIds para permitir re-render
-    // se você quiser preservar os vistos entre atualizações pequenas, comente a linha abaixo
-    // mas em casos de operações massivas (delete/insert) isso previne bloqueio visual.
-    tickerSeenIds = new Set();
-    if (tickerBody) tickerBody.innerHTML = '';
-
-    populateRecent();
-    updateBoulderDoMomento();
-    queueUIRedraw();
-  });
-
-  // Live listener (sorteio)
-  unsubLive = onSnapshot(doc(db,'live','announcement'), (dsnap) => {
-    if (!dsnap.exists()) { hideLive(); return; }
-    const data = dsnap.data();
-    if (data.active) {
-      playRaffleSequence(data.name || '', data.code || '');
-    } else {
-      hideLive();
-    }
-  }, (err)=>console.error('live listener error', err));
-
-}
-
-// ADMIN: CRUD (inalterado)
-const newClimberName = document.getElementById('newClimberName');
-const newClimberCode = document.getElementById('newClimberCode');
-const newClimberAge = document.getElementById('newClimberAge');
-const newClimberGender = document.getElementById('newClimberGender');
-const newClimberPro = document.getElementById('newClimberPro');
-const btnAddClimber = document.getElementById('btnAddClimber');
-const selectClimbersAdmin = document.getElementById('selectClimbersAdmin');
-const btnDeleteClimber = document.getElementById('btnDeleteClimber');
-
-const newRouteCode = document.getElementById('newRouteCode');
-const newRouteName = document.getElementById('newRouteName');
-const newRouteType = document.getElementById('newRouteType');
-const btnAddRoute = document.getElementById('btnAddRoute');
-const selectRoutesAdmin = document.getElementById('selectRoutesAdmin');
-const btnDeleteRoute = document.getElementById('btnDeleteRoute');
-
-const selectClimbersForTeam = document.getElementById('selectClimbersForTeam');
-const btnCreateTeam = document.getElementById('btnCreateTeam');
-const selectTeamsAdmin = document.getElementById('selectTeamsAdmin');
-const teamNameInput = document.getElementById('teamNameInput');
-const btnDeleteTeam = document.getElementById('btnDeleteTeam');
-
-// Editor manual de pontos
-const editClimberPoints = document.getElementById('editClimberPoints');
-const btnSaveClimberPoints = document.getElementById('btnSaveClimberPoints');
-
-// JUIZ inputs
-const judgeCategory = document.getElementById('judgeCategory');
-const judgeActorSelect = document.getElementById('judgeActorSelect');
-const judgeRouteSelect = document.getElementById('judgeRouteSelect');
-const judgeSendType = document.getElementById('judgeSendType');
-const btnRegister = document.getElementById('btnRegister');
-const btnClearSelection = document.getElementById('btnClearSelection');
-const recentList = document.getElementById('recentList');
-
-// ===== Admin: ações
-btnAddClimber.addEventListener('click', async () => {
-  try {
-    const name = newClimberName.value.trim();
-    const code = newClimberCode.value.trim() || null;
-    const age = parseInt(newClimberAge.value || '0',10);
-    const gender = normalizeGender(newClimberGender.value);
-    const isPro = !!newClimberPro.checked;
-    if (!name) return showToast('Nome obrigatório.');
-    const category = computeCategory(age, gender, isPro);
-    await addDoc(collection(db,'climbers'), { name, code, age, gender, isPro, category, points:0, done:[], doneTeam:[] });
-    newClimberName.value=''; newClimberCode.value=''; newClimberAge.value='';
-    newClimberGender.value='masculino'; newClimberPro.checked=false;
-    showToast('Escalador adicionado.');
-  } catch (err) { console.error(err); showToast('Erro ao adicionar escalador: '+(err.message||err)); }
-});
-
-btnSaveClimberPoints.addEventListener('click', async ()=>{
-  const sel = selectClimbersAdmin.value;
-  if (!sel) return showToast('Selecione um escalador na lista.');
-  const val = Number(editClimberPoints.value);
-  if (!Number.isFinite(val) || val < 0) return showToast('Informe um número de pontos válido (≥ 0).');
-  try { await updateDoc(doc(db,'climbers', sel), { points: Math.floor(val) }); showToast('Pontos atualizados.'); editClimberPoints.value=''; }
-  catch (e){ console.error(e); showToast('Erro ao salvar pontos: '+(e.message||e)); }
-});
-
-btnDeleteClimber.addEventListener('click', async () => {
-  const sel = selectClimbersAdmin.value;
-  if (!sel) return showToast('Selecione um escalador para excluir.');
-  if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
-  try {
-    const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','climber'), where('actorId','==', sel)));
-    for (const s of scoresSnap.docs) await deleteDoc(doc(db,'scores', s.id));
-    const teamsSnap = await getDocs(collection(db,'teams'));
-    for (const t of teamsSnap.docs) {
-      const data = t.data();
-      if (Array.isArray(data.members) && data.members.includes(sel)) {
-        const newMembers = data.members.filter(m => m !== sel);
-        if (newMembers.length < 3) await deleteDoc(doc(db,'teams', t.id));
-        else await updateDoc(doc(db,'teams', t.id), { members: newMembers });
-      }
-    }
-    await deleteDoc(doc(db,'climbers', sel));
-    showToast('Escalador e referências excluídos.');
-  } catch (err) { console.error('Erro ao excluir escalador:', err); showToast('Erro ao excluir escalador: '+(err.message||err)); }
-});
-
-btnAddRoute.addEventListener('click', async () => {
-  try {
-    const code = newRouteCode.value.trim() || null;
-    const name = newRouteName.value.trim();
-    const type = newRouteType.value;
-    if (!name) return showToast('Nome do desafio obrigatório.');
-    await addDoc(collection(db,'routes'), { code, name, type });
-    newRouteCode.value=''; newRouteName.value='';
-    showToast('Desafio adicionado.');
-  } catch (err) { console.error(err); showToast('Erro ao adicionar desafio: '+(err.message||err)); }
-});
-
-btnDeleteRoute.addEventListener('click', async () => {
-  const sel = selectRoutesAdmin.value;
-  if (!sel) return showToast('Selecione um desafio para excluir.');
-  if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos.')) return;
-  try {
-    const scoresSnap = await getDocs(query(collection(db,'scores'), where('routeId','==', sel)));
-    const scoresDocs = scoresSnap.docs.map(d => ({ id: d.id, data: d.data() }));
-    for (const s of scoresDocs) {
-      const sc = s.data, pts = sc.points || 0;
-      if (sc.actorType === 'climber') {
-        const cRef = doc(db,'climbers', sc.actorId);
-        const cSnap = await getDoc(cRef);
-        if (cSnap.exists()) {
-          const cdata = cSnap.data();
-          await updateDoc(cRef, { points: Math.max(0,(cdata.points||0)-pts), done: (Array.isArray(cdata.done)? cdata.done.filter(x=>x!==sel):[]) });
+<div class="wrap">
+<header>
+<div>
+<h1>ClimbFest 2025</h1>
+<div class="muted">Leaderboard público — selecione a categoria</div>
+</div>
+<div class="topbar-controls">
+<select id="selectCategoryTop" class="small">
+<option value="boulder">Boulder (solo)</option>
+<option value="routes">Vias / Desafios (times)</option>
+</select>
+<button id="btnOpenLogin" class="btn btn-ghost">Login (juiz/admin)</button>
+</div>
+</header>
+
+<main class="grid" style="margin-top:12px">
+<div>
+<div id="panelRanking" class="card">
+<div class="section-title">
+<h2 id="rankingTitle">Boulder — Ranking</h2>
+<div class="flex">
+<select id="filterCategory" class="small" title="Filtro de categoria (boulder)">
+<option value="all">Todas categorias</option>
+<option value="kids">Kids (≤12)</option>
+<option value="juvenil">Juvenil (13–15)</option>
+<option value="juvenil-m">Juvenil Masculino</option>
+<option value="juvenil-f">Juvenil Feminino</option>
+<option value="masters">Masters (≥40)</option>
+<option value="trans-nao-binario">Trans / Não binários</option>
+<option value="geral">Geral</option>
+<option value="geral-m">Geral Masculino</option>
+<option value="geral-f">Geral Feminino</option>
+<option value="pro">PRO</option>
+</select>
+<button id="btnExportCSV" class="btn btn-ghost">Exportar CSV</button>
+</div>
+</div>
+<div style="margin-top:10px;max-height:520px;overflow:auto">
+<table>
+<thead>
+<tr><th>#</th><th>Código/Nome</th><th>Categoria</th><th>Gênero</th><th>Pontos</th></tr>
+</thead>
+<tbody id="rankingBody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- Boulder do Momento -->
+<div id="boulderDoMomentoCard" class="card hidden" style="margin-top:12px; border:1px solid #00c77f;">
+<div style="font-weight:700; color:#00c77f; margin-bottom:4px;">🔥 Boulder do Momento</div>
+<div id="boulderDoMomentoName" style="font-size:1.1rem; font-weight:600;"></div>
+<div id="boulderDoMomentoCount" class="muted small"></div>
+</div>
+
+<div style="height:12px"></div>
+<div class="card" style="margin-top:12px">
+<div class="muted small">Observações</div>
+<ul>
+<li class="muted small">Juízes: use a área de login para registrar envios.</li>
+<li class="muted small">Boulders são individuais. Vias/Desafios são por <b>times</b> de 3.</li>
+<li class="muted small">Se um escalador/time já completou o desafio, sistema bloqueia nova pontuação.</li>
+<li class="muted small">Times com pelo menos um(a) atleta <b>Kids</b> começam com <b>+900 pontos</b>. (Novos bônus: Juvenil +300; Masters +300 — cumulativos, sem duplicar)</li>
+</ul>
+</div>
+</div>
+
+<!-- Right: login / admin / juiz -->
+<aside>
+<div id="loginCard" class="card">
+<h3>Login — Juiz / Admin</h3>
+<input id="inputPassword" type="password" placeholder="Digite a senha" />
+<div class="flex" style="margin-top:8px">
+<button id="btnLogin" class="btn btn-primary">Entrar</button>
+<button id="btnLogout" class="btn btn-ghost hidden">Sair</button>
+</div>
+</div>
+
+<!-- Admin panel -->
+<div id="adminCard" class="card hidden" style="margin-top:12px">
+<h3>Admin — Gerenciar</h3>
+<div class="muted small">Cadastros por seleção (mais rápido)</div>
+
+<hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Escaladores</strong>
+<div style="margin-top:8px" class="row">
+<input id="newClimberName" placeholder="Nome"/>
+<input id="newClimberCode" placeholder="Código (ex: 001)"/>
+<input id="newClimberAge" type="number" placeholder="Idade"/>
+<select id="newClimberGender" title="Gênero">
+<option value="masculino">Masculino</option>
+<option value="feminino">Feminino</option>
+<option value="trans-nao-binario">Trans / Não binário</option>
+<option value="outro">Outro</option>
+</select>
+<label style="display:flex;align-items:center;gap:6px">
+<input id="newClimberPro" type="checkbox" style="width:auto;margin-top:0"> É PRO?
+</label>
+</div>
+<div class="flex" style="margin-top:8px">
+<button id="btnAddClimber" class="btn btn-primary">Adicionar</button>
+<button id="btnDeleteClimber" class="btn btn-ghost">Excluir selecionado</button>
+</div>
+<select id="selectClimbersAdmin" size="4" style="margin-top:8px"></select>
+
+<!-- Editor manual de pontos do escalador -->
+<div class="row" style="margin-top:8px">
+<input id="editClimberPoints" type="number" placeholder="Pontos (override)"/>
+<button id="btnSaveClimberPoints" class="btn btn-ghost">Salvar pontos do selecionado</button>
+</div>
+<div class="muted small">Dica: selecione um escalador na lista acima, digite o novo total e clique em “Salvar pontos”.</div>
+
+<hr style="border:none;border-top:1px solid #122233;margin:12px 0" />
+<strong>Desafios / Vias / Boulders</strong>
+<div style="margin-top:8px" class="row">
+<input id="newRouteCode" placeholder="Código (ex: B01)"/>
+<input id="newRouteName" placeholder="Nome do desafio"/>
+<select id="newRouteType">
+<option value="boulder">Boulder</option>
+<option value="via">Via</option>
+<option value="desafio">Kilter/Desafio</option>
+</select>
+</div>
+<div class="flex" style="margin-top:8px">
+<button id="btnAddRoute" class="btn btn-primary">Adicionar</button>
+<button id="btnDeleteRoute" class="btn btn-ghost">Excluir selecionado</button>
+</div>
+<select id="selectRoutesAdmin" size="6" style="margin-top:8px"></select>
+
+<hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Times (para Vias / Desafios)</strong>
+<div class="muted small">Selecione 3 escaladores e clique em "Criar Time". Se houver pelo menos um(a) Kids, o time começa com +900.</div>
+<select id="selectClimbersForTeam" multiple size="6" style="margin-top:8px"></select>
+<input id="teamNameInput" placeholder="Nome do time (ex: Team A)"/>
+<div class="flex" style="margin-top:8px">
+<button id="btnCreateTeam" class="btn btn-primary">Criar Time</button>
+<button id="btnDeleteTeam" class="btn btn-ghost">Excluir time selecionado</button>
+</div>
+<select id="selectTeamsAdmin" size="6" style="margin-top:8px"></select>
+
+<!-- Editor manual de pontos do TIME (NOVO: override para times) -->
+<div style="margin-top:10px" class="muted small">Override de pontos do TIME (admin)</div>
+<div class="row" style="margin-top:8px">
+<input id="editTeamPoints" type="number" placeholder="Pontos (override para o time selecionado)"/>
+<button id="btnSaveTeamPoints" class="btn btn-ghost">Salvar pontos do time</button>
+</div>
+
+<hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Premiações / Sorteio</strong>
+<div class="muted small">Sorteia 1 escalador e mostra ao vivo por ~5s para todos online.</div>
+<div class="flex" style="margin-top:8px">
+<button id="btnRaffle" class="btn btn-primary">Sortear escalador (ao vivo)</button>
+<button id="btnEndLive" class="btn btn-ghost">Encerrar anúncio</button>
+</div>
+
+<hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Modo Telão</strong>
+<div class="muted small">Exibe o ranking automaticamente no telão.</div>
+<button id="btnOpenTelao" class="btn btn-primary" style="margin-top:8px">Iniciar Modo Telão</button>
+
+<!-- >>>>>>> MODO PÓDIO (DENTRO do Admin) <<<<<<< -->
+<hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Modo Pódio</strong>
+<div class="muted small">Exibe o top 3 ao vivo para todos online.</div>
+
+<div class="row" style="margin-top:8px">
+<select id="podiumType">
+<option value="boulder">Boulder (individual)</option>
+<option value="team">Times (geral)</option>
+</select>
+<select id="podiumCategory">
+<option value="all">Geral</option>
+<option value="kids">Kids (≤12)</option>
+<option value="juvenil">Juvenil (13–15)</option>
+<option value="juvenil-m">Juvenil Masculino</option>
+<option value="juvenil-f">Juvenil Feminino</option>
+<option value="masters">Masters (≥40)</option>
+<option value="trans-nao-binario">Trans / Não binários</option>
+<option value="geral-m">Geral Masculino</option>
+<option value="geral-f">Geral Feminino</option>
+<option value="pro">PRO</option>
+</select>
+</div>
+<div class="flex" style="margin-top:8px">
+<button id="btnShowPodium" class="btn btn-primary">Mostrar Pódio</button>
+<button id="btnHidePodium" class="btn btn-ghost">Encerrar Pódio</button>
+</div>
+
+<!-- NOVO: Sortear uma das 3 do pódio -->
+<div style="margin-top:10px" class="muted small">Sortear aleatoriamente uma das 3 pessoas do pódio atual</div>
+<div class="flex" style="margin-top:8px">
+<button id="btnPodiumRaffle" class="btn btn-primary">Sortear pessoa do pódio</button>
+</div>
+
+<hr style="border:none;border-top:1px solid #122233;margin:8px 0" />
+<strong>Bônus / Overrides (Admin)</strong>
+<div class="muted small">Aplicar pontos extras para escalador ou time (cumulativos).</div>
+<div style="margin-top:8px">
+<select id="bonusTargetType">
+<option value="climber">Escalador</option>
+<option value="team">Time</option>
+</select>
+<select id="selectBonusClimber" style="margin-top:8px"></select>
+<select id="selectBonusTeam" style="margin-top:8px"></select>
+
+<select id="bonusType" style="margin-top:8px">
+<option value="alimento">TRAZER 1KG DE ALIMENTO — 100 PTS</option>
+<option value="camisa">CAMISA DE OUTROS EVENTOS TREELAB — 100 PTS</option>
+<option value="stickers">TIME COMPLETO 5 STICKERS — 300 PTS</option>
+<option value="slackline">TRAVESSIA SLACKLINE — 100 PTS</option>
+<option value="instagram">SEGUIR NO INSTAGRAM E TER UM POST — 100 PTS</option>
+<option value="quiz">QUIZ TREELAB — 100 PTS</option>
+</select>
+<div class="flex" style="margin-top:8px">
+<button id="btnApplyBonus" class="btn btn-primary">Aplicar Bônus</button>
+</div>
+<div class="muted small" style="margin-top:6px">Os bônus são cumulativos e podem ser aplicados várias vezes.</div>
+</div>
+</div>
+
+<!-- Judge panel -->
+<div id="judgeCard" class="card hidden" style="margin-top:12px">
+<h3>Juiz — Registrar envio</h3>
+<div>
+<label class="muted small">Categoria</label>
+<select id="judgeCategory">
+<option value="boulder">Boulder (individual)</option>
+<option value="routes">Vias / Desafios (time)</option>
+</select>
+
+<label class="muted small">Escalador / Time</label>
+<select id="judgeActorSelect" style="margin-top:6px"></select>
+
+<label class="muted small">Desafio</label>
+<select id="judgeRouteSelect"></select>
+
+<label class="muted small">Tipo de envio</label>
+<select id="judgeSendType">
+<option value="flash">Flash — 300 pts</option>
+<option value="cadena">Cadena — 100 pts</option>
+</select>
+
+<div class="flex" style="margin-top:8px">
+<button id="btnRegister" class="btn btn-primary">Registrar</button>
+<button id="btnClearSelection" class="btn btn-ghost">Limpar</button>
+</div>
+
+<div style="margin-top:10px">
+<div class="muted small">Últimos envios</div>
+<ul id="recentList" class="muted small" style="padding-left:14px;margin-top:6px"></ul>
+</div>
+</div>
+</div>
+
+<!-- Judge card end -->
+</aside>
+</main>
+</div>
+
+<!-- Overlay global do Live (usada na vinheta) -->
+<div id="liveOverlay" class="overlay">
+<div class="overlay-card">
+<div class="overlay-title">SORTEIO — CLIMBFEST</div>
+<div id="liveName" class="overlay-name">Nome do Escalador</div>
+<div id="liveCode" class="overlay-code">CÓDIGO</div>
+<div id="liveRolling" class="roll muted small" style="margin-top:8px"></div>
+</div>
+</div>
+<div id="confetti" class="confetti hidden"></div>
+
+<!-- Overlay do Pódio (broadcast) -->
+<div id="podiumOverlay" class="podium-overlay">
+<div class="podium-card">
+<button id="podiumClose" class="podium-close" title="Fechar">✕</button>
+<div class="podium-head">
+<div class="podium-kicker">CLIMBFEST — PÓDIO AO VIVO</div>
+<div id="podiumTitle" class="podium-title">Boulder — Geral</div>
+<div id="podiumSub" class="podium-sub"></div>
+</div>
+
+<div class="podium-grid">
+<div id="slot2" class="podium-slot s2">
+<div class="medal">🥈</div>
+<div class="place">2º Lugar</div>
+<div class="name" id="s2Name">—</div>
+<div class="code" id="s2Code"></div>
+<div class="points" id="s2Pts"></div>
+<div class="ribbon"></div>
+</div>
+<div id="slot1" class="podium-slot s1">
+<div class="medal">🥇</div>
+<div class="place">1º Lugar</div>
+<div class="name" id="s1Name">—</div>
+<div class="code" id="s1Code"></div>
+<div class="points" id="s1Pts"></div>
+<div class="ribbon"></div>
+</div>
+<div id="slot3" class="podium-slot s3">
+<div class="medal">🥉</div>
+<div class="place">3º Lugar</div>
+<div class="name" id="s3Name">—</div>
+<div class="code" id="s3Code"></div>
+<div class="points" id="s3Pts"></div>
+<div class="ribbon"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Telão -->
+<div id="telaoContainer">
+<div class="telao-progress"><div id="telaoProgressBar" class="bar"></div></div>
+<div class="telao-grid">
+<div class="telao-col">
+<div id="telaoMainTitle" class="telao-title">Boulder — TOP 10</div>
+<div id="telaoMainSub" class="telao-sub">Atualiza automaticamente</div>
+<div id="telaoListHost" class="swapHost">
+<ul id="telaoMainList" class="telao-list pane pane-current"></ul>
+</div>
+</div>
+
+<div class="telao-col">
+<div class="moment-card" id="momentCard">
+<div class="moment-title">🔥 Boulder do Momento</div>
+<div id="momentName" class="moment-name">—</div>
+<div id="momentCount" class="moment-count">—</div>
+</div>
+
+<div class="ticker">
+<div class="ticker-head">📡 Últimos envios (ao vivo)</div>
+<div id="tickerBody" class="ticker-body"></div>
+</div>
+</div>
+</div>
+<div style="position:absolute; bottom:12px; left:0; right:0; text-align:center; opacity:.45">Pressione ESC para sair</div>
+</div>
+<!-- Firebase (modular v11) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc,
+      onSnapshot, query, where, serverTimestamp, arrayUnion, clearIndexedDbPersistence
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // >>> FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyB-CnTOLGSfC_cDCEv_vp14r8lQyyXgImM",
+      authDomain: "climbfest-224ed.firebaseapp.com",
+      projectId: "climbfest-224ed",
+      storageBucket: "climbfest-224ed.firebasestorage.app",
+      messagingSenderId: "808584030721",
+      appId: "1:808584030721:web:3313cdc4c9f57150396e00"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    /* =======================
+       CONFIGURÁVEIS / UTILS
+       ======================= */
+    const MOMENTO_RECENT_LIMIT = 100;
+    const PODIUM_TTL_MS = 10 * 60 * 1000;
+
+    // Bônus definidos (fixos)
+    const BONUS_DEFINITIONS = {
+      alimento: { label: 'TRAZER 1KG DE ALIMENTO', pts: 100 },
+      camisa: { label: 'CAMISA DE OUTROS EVENTOS TREELAB', pts: 100 },
+      stickers: { label: 'TIME COMPLETO 5 STICKERS', pts: 300 },
+      slackline: { label: 'TRAVESSIA SLACKLINE', pts: 100 },
+      instagram: { label: 'SEGUIR NO INSTAGRAM E TER UM POST', pts: 100 },
+      quiz: { label: 'QUIZ TREELAB', pts: 100 }
+    };
+
+    // Natural compare
+    function chunkify(str){ return String(str ?? '').trim().match(/\d+|\D+/g) || [String(str ?? '')]; }
+    function naturalCompare(a, b){
+      const ac = chunkify(a), bc = chunkify(b);
+      const n = Math.min(ac.length, bc.length);
+      for (let i=0;i<n;i++){
+        const x = ac[i], y = bc[i];
+        const xd = /^\d+$/.test(x), yd = /^\d+$/.test(y);
+        if (xd && yd){
+          const xi = parseInt(x,10), yi = parseInt(y,10);
+          if (xi !== yi) return xi - yi;
+        } else {
+          const cmp = x.localeCompare(y, undefined, { sensitivity:'base', numeric:false });
+          if (cmp !== 0) return cmp;
         }
-      } else if (sc.actorType === 'team') {
-        const tRef = doc(db,'teams', sc.actorId);
-        const tSnap = await getDoc(tRef);
-        if (tSnap.exists()) {
-          const tdata = tSnap.data();
-          await updateDoc(tRef, { points: Math.max(0,(tdata.points||0)-pts), done: (Array.isArray(tdata.done)? tdata.done.filter(x=>x!==sel):[]) });
+      }
+      if (ac.length !== bc.length) return ac.length - bc.length;
+      return String(a).localeCompare(String(b), undefined, { sensitivity:'base' });
+    }
+    const byCode = (get)=> (a,b)=> naturalCompare(get(a), get(b));
+
+    /* =======================
+       REFS DOM
+       ======================= */
+    const podiumOverlay = document.getElementById('podiumOverlay');
+    const podiumTitle   = document.getElementById('podiumTitle');
+    const podiumSub     = document.getElementById('podiumSub');
+    const podiumClose   = document.getElementById('podiumClose');
+
+    const s1Name = document.getElementById('s1Name');
+    const s1Code = document.getElementById('s1Code');
+    const s1Pts  = document.getElementById('s1Pts');
+    const s2Name = document.getElementById('s2Name');
+    const s2Code = document.getElementById('s2Code');
+    const s2Pts  = document.getElementById('s2Pts');
+    const s3Name = document.getElementById('s3Name');
+    const s3Code = document.getElementById('s3Code');
+    const s3Pts  = document.getElementById('s3Pts');
+
+    const podiumType     = document.getElementById('podiumType');
+    const podiumCategory = document.getElementById('podiumCategory');
+    const btnShowPodium  = document.getElementById('btnShowPodium');
+    const btnHidePodium  = document.getElementById('btnHidePodium');
+    const btnPodiumRaffle = document.getElementById('btnPodiumRaffle');
+
+    const boulderDoMomentoCard = document.getElementById('boulderDoMomentoCard');
+    const boulderDoMomentoName = document.getElementById('boulderDoMomentoName');
+    const boulderDoMomentoCount = document.getElementById('boulderDoMomentoCount');
+
+    const bonusTargetType = document.getElementById('bonusTargetType');
+    const selectBonusClimber = document.getElementById('selectBonusClimber');
+    const selectBonusTeam = document.getElementById('selectBonusTeam');
+    const bonusType = document.getElementById('bonusType');
+    const btnApplyBonus = document.getElementById('btnApplyBonus');
+
+    const ADMIN_PASS = "266213";
+    const JUDGE_PASS = "jcf2025";
+
+    const selectCategoryTop = document.getElementById('selectCategoryTop');
+    const rankingTitle = document.getElementById('rankingTitle');
+    const rankingBody = document.getElementById('rankingBody');
+    const filterCategory = document.getElementById('filterCategory');
+    const btnExportCSV = document.getElementById('btnExportCSV');
+
+    const btnOpenLogin = document.getElementById('btnOpenLogin');
+    const inputPassword = document.getElementById('inputPassword');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnLogout = document.getElementById('btnLogout');
+    const adminCard = document.getElementById('adminCard');
+    const judgeCard = document.getElementById('judgeCard');
+
+    let telaoMode = false;
+    let telaoIndex = 0;
+    let telaoTimer = null;
+    let tickerSeenIds = new Set();
+    let prevTopBoulder = [];
+    let prevTopTeams = [];
+    let prevMomentId = null;
+
+    const DURATION_BOULDER = 12000;
+    const DURATION_TEAMS   = 7000;
+
+    const telaoContainer = document.getElementById('telaoContainer');
+    const telaoMainTitle = document.getElementById('telaoMainTitle');
+    const telaoMainSub = document.getElementById('telaoMainSub');
+    const progressBar = document.getElementById('telaoProgressBar');
+
+    const momentCard = document.getElementById('momentCard');
+    const momentName = document.getElementById('momentName');
+    const momentCount = document.getElementById('momentCount');
+
+    const tickerBody = document.getElementById('tickerBody');
+    const btnOpenTelao = document.getElementById('btnOpenTelao');
+
+    // caches
+    let climbersCache = [];
+    let routesCache = [];
+    let teamsCache = [];
+    let scoresCache = [];
+
+    // unsubscribers
+    let unsubClimbers = null;
+    let unsubRoutes = null;
+    let unsubTeams = null;
+    let unsubScores = null;
+    let unsubLive = null;
+    let unsubPodium = null;
+
+    // Debounce UI
+    let uiTimer = null;
+    function queueUIRedraw(){
+      if (uiTimer) clearTimeout(uiTimer);
+      uiTimer = setTimeout(()=>{
+        refreshRanking(true);
+        if (telaoMode) renderTelaoFrame(telaoIndex);
+      }, 700);
+    }
+
+    // Helpers
+    const displayCategory = (cat) => {
+      const c = (cat||'').toLowerCase();
+      return {'kids':'Kids','juvenil':'Juvenil','masters':'Masters','trans-nao-binario':'Trans / Não Binários','geral':'Geral','pro':'PRO'}[c] || cat || '';
+    };
+    const displayGender = (g) => {
+      const x = (g||'').toLowerCase();
+      return {'masculino':'Masculino','feminino':'Feminino','trans-nao-binario':'Trans / Não Binário','outro':'Outro'}[x] || g || '';
+    };
+    const normalizeGender = (g) => {
+      const x = (g||'').toString().trim().toLowerCase();
+      if (['m','masc','masculino'].includes(x)) return 'masculino';
+      if (['f','fem','feminino'].includes(x)) return 'feminino';
+      if (['trans','tnb','trans-nb','trans nao binario','trans não binário','trans-nao-binario','trans-não-binário'].includes(x)) return 'trans-nao-binario';
+      return 'outro';
+    };
+    function computeCategory(age, gender, isPro){
+      if (isPro) return 'pro';
+      const g = normalizeGender(gender);
+      const a = Number.isFinite(+age) ? +age : 0;
+      if (g === 'trans-nao-binario') return 'trans-nao-binario';
+      if (!a) return 'geral';
+      if (a <= 12) return 'kids';
+      if (a >= 13 && a <= 15) return 'juvenil';
+      if (a >= 40) return 'masters';
+      return 'geral';
+    }
+    function showToast(msg){ alert(msg); }
+
+    // ======= NOVO: cálculo de bônus de time por categorias únicas =======
+    // retorna { bonus, reasonsArray }
+    function computeTeamCategoryBonus(memberIds){
+      const seen = new Set();
+      for (const id of memberIds){
+        const c = climbersCache.find(x=>x.id===id);
+        if (!c) continue;
+        const cat = (c.data.category||'').toLowerCase();
+        if (cat === 'kids') seen.add('kids');
+        if (cat === 'juvenil') seen.add('juvenil');
+        if (cat === 'masters') seen.add('masters');
+      }
+      let bonus = 0;
+      const reasons = [];
+      if (seen.has('kids')) { bonus += 900; reasons.push('Kids +900'); }
+      if (seen.has('juvenil')) { bonus += 300; reasons.push('Juvenil +300'); }
+      if (seen.has('masters')) { bonus += 300; reasons.push('Masters +300'); }
+      return { bonus, reasons };
+    }
+
+    // Login handlers
+    
+    btnOpenLogin.addEventListener('click', ()=> inputPassword.focus());
+    btnLogin.addEventListener('click', ()=> {
+      const pass = inputPassword.value.trim();
+      if (pass === ADMIN_PASS) {
+        adminCard.classList.remove('hidden'); judgeCard.classList.add('hidden');
+        btnLogout.classList.remove('hidden'); showToast('Admin: modo ativado');
+        loadAllForAdmin();
+      } else if (pass === JUDGE_PASS) {
+        judgeCard.classList.remove('hidden'); adminCard.classList.add('hidden');
+        btnLogout.classList.remove('hidden'); showToast('Juiz: modo ativado');
+        loadSelectorsForJudge();
+      } else showToast('Senha incorreta.');
+      inputPassword.value='';
+    });
+    btnLogout.addEventListener('click', ()=> {
+      adminCard.classList.add('hidden'); judgeCard.classList.add('hidden');
+      btnLogout.classList.add('hidden'); showToast('Sessão encerrada.');
+    });
+
+    // Telão controls
+    btnOpenTelao.addEventListener('click', startTelao);
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && telaoMode) stopTelao(); });
+    function startTelao(){
+      if (telaoMode) return;
+      telaoMode = true;
+      telaoContainer.classList.add('show');
+      renderTelaoFrame(telaoIndex);
+      playProgress(currentDuration());
+      scheduleNextTelaoTick();
+    }
+    function stopTelao(){
+      telaoMode = false;
+      telaoContainer.classList.remove('show');
+      if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
+      stopProgress();
+    }
+    function scheduleNextTelaoTick(){
+      if (!telaoMode) return;
+      if (telaoTimer) { clearTimeout(telaoTimer); telaoTimer = null; }
+      const delay = currentDuration();
+      telaoTimer = setTimeout(() => {
+        telaoIndex = (telaoIndex + 1) % 2;
+        renderTelaoFrame(telaoIndex);
+        playProgress(currentDuration());
+        scheduleNextTelaoTick();
+      }, delay);
+    }
+
+    // Snapshots
+    (async function tryClearLocalPersistence(){
+      try { await clearIndexedDbPersistence(db); } catch (e) {}
+      registerSnapshots();
+    })();
+
+    function registerSnapshots(){
+      if (typeof unsubPodium === 'function') { try{unsubPodium();}catch(e){}; unsubPodium = null; }
+      if (typeof unsubClimbers === 'function') { try { unsubClimbers(); } catch(e){}; unsubClimbers = null; }
+      if (typeof unsubRoutes === 'function') { try { unsubRoutes(); } catch(e){}; unsubRoutes = null; }
+      if (typeof unsubTeams === 'function') { try { unsubTeams(); } catch(e){}; unsubTeams = null; }
+      if (typeof unsubScores === 'function') { try { unsubScores(); } catch(e){}; unsubScores = null; }
+      if (typeof unsubLive === 'function') { try { unsubLive(); } catch(e){}; unsubLive = null; }
+
+      unsubPodium = onSnapshot(doc(db,'live','podium'), (dsnap) => {
+        if (!dsnap.exists()){ hidePodiumOverlay(); return; }
+        const data = dsnap.data();
+        const now = Date.now();
+        const exp = typeof data.expiresAtMs === 'number' ? data.expiresAtMs : 0;
+        const stillValid = exp === 0 ? true : (now <= exp);
+        if (data.active && stillValid) {
+          showPodiumOverlay(data);
+        } else {
+          hidePodiumOverlay();
+        }
+      }, (err)=>console.error('podium listener error', err));
+
+      unsubClimbers = onSnapshot(collection(db,'climbers'), snap => {
+        climbersCache = [];
+        snap.docs.forEach(d => {
+          const c = d.data();
+          c.gender = normalizeGender(c.gender);
+          c.category = (c.category||'').toLowerCase();
+          climbersCache.push({ id:d.id, data:c, meta:d.metadata });
+        });
+        populateAdminClimbers();
+        loadSelectorsForJudge();
+        queueUIRedraw();
+      });
+
+      unsubRoutes = onSnapshot(collection(db,'routes'), snap => {
+        routesCache = [];
+        snap.docs.forEach(d => routesCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
+        populateAdminRoutes();
+        loadSelectorsForJudge();
+        queueUIRedraw();
+      });
+
+      unsubTeams = onSnapshot(collection(db,'teams'), snap => {
+        teamsCache = [];
+        snap.docs.forEach(d => teamsCache.push({ id:d.id, data:d.data(), meta:d.metadata }));
+        populateAdminTeams();
+        loadSelectorsForJudge();
+        queueUIRedraw();
+      });
+
+      unsubScores = onSnapshot(collection(db,'scores'), snap => {
+        scoresCache = [];
+        snap.docs.forEach(d => {
+          if (d.metadata && d.metadata.hasPendingWrites) return;
+          scoresCache.push({ id:d.id, data:d.data(), meta:d.metadata });
+        });
+        populateRecent();
+        updateBoulderDoMomento();
+        queueUIRedraw();
+      });
+
+      unsubLive = onSnapshot(doc(db,'live','announcement'), (dsnap) => {
+        if (!dsnap.exists()) { hideLive(); return; }
+        const data = dsnap.data();
+        if (data.active) {
+          playRaffleSequence(data.name || '', data.code || '');
+        } else {
+          hideLive();
+        }
+      }, (err)=>console.error('live listener error', err));
+    }
+
+    // ===== ADMIN CRUD (adaptado) =====
+    const newClimberName = document.getElementById('newClimberName');
+    const newClimberCode = document.getElementById('newClimberCode');
+    const newClimberAge = document.getElementById('newClimberAge');
+    const newClimberGender = document.getElementById('newClimberGender');
+    const newClimberPro = document.getElementById('newClimberPro');
+    const btnAddClimber = document.getElementById('btnAddClimber');
+    const selectClimbersAdmin = document.getElementById('selectClimbersAdmin');
+    const btnDeleteClimber = document.getElementById('btnDeleteClimber');
+
+    const newRouteCode = document.getElementById('newRouteCode');
+    const newRouteName = document.getElementById('newRouteName');
+    const newRouteType = document.getElementById('newRouteType');
+    const btnAddRoute = document.getElementById('btnAddRoute');
+    const selectRoutesAdmin = document.getElementById('selectRoutesAdmin');
+    const btnDeleteRoute = document.getElementById('btnDeleteRoute');
+
+    const selectClimbersForTeam = document.getElementById('selectClimbersForTeam');
+    const btnCreateTeam = document.getElementById('btnCreateTeam');
+    const selectTeamsAdmin = document.getElementById('selectTeamsAdmin');
+    const teamNameInput = document.getElementById('teamNameInput');
+    const btnDeleteTeam = document.getElementById('btnDeleteTeam');
+
+    const editClimberPoints = document.getElementById('editClimberPoints');
+    const btnSaveClimberPoints = document.getElementById('btnSaveClimberPoints');
+
+    const editTeamPoints = document.getElementById('editTeamPoints');
+    const btnSaveTeamPoints = document.getElementById('btnSaveTeamPoints');
+
+    const judgeCategory = document.getElementById('judgeCategory');
+    const judgeActorSelect = document.getElementById('judgeActorSelect');
+    const judgeRouteSelect = document.getElementById('judgeRouteSelect');
+    const judgeSendType = document.getElementById('judgeSendType');
+    const btnRegister = document.getElementById('btnRegister');
+    const btnClearSelection = document.getElementById('btnClearSelection');
+    const recentList = document.getElementById('recentList');
+
+    // ADD CLIMBER
+    btnAddClimber.addEventListener('click', async () => {
+      try {
+        const name = newClimberName.value.trim();
+        const code = newClimberCode.value.trim() || null;
+        const age = parseInt(newClimberAge.value || '0',10);
+        const gender = normalizeGender(newClimberGender.value);
+        const isPro = !!newClimberPro.checked;
+        if (!name) return showToast('Nome obrigatório.');
+        const category = computeCategory(age, gender, isPro);
+        // adiciona array "bonuses" para registrar bônus administrativos
+        await addDoc(collection(db,'climbers'), { name, code, age, gender, isPro, category, points:0, done:[], doneTeam:[], bonuses: [] });
+        newClimberName.value=''; newClimberCode.value=''; newClimberAge.value='';
+        newClimberGender.value='masculino'; newClimberPro.checked=false;
+        showToast('Escalador adicionado.');
+      } catch (err) { console.error(err); showToast('Erro ao adicionar escalador: '+(err.message||err)); }
+    });
+
+    // SAVE CLIMBER OVERRIDE
+    btnSaveClimberPoints.addEventListener('click', async ()=> {
+      const sel = selectClimbersAdmin.value;
+      if (!sel) return showToast('Selecione um escalador na lista.');
+      const val = Number(editClimberPoints.value);
+      if (!Number.isFinite(val) || val < 0) return showToast('Informe um número de pontos válido (≥ 0).');
+      try { await updateDoc(doc(db,'climbers', sel), { points: Math.floor(val) }); showToast('Pontos atualizados.'); editClimberPoints.value=''; }
+      catch (e){ console.error(e); showToast('Erro ao salvar pontos: '+(e.message||e)); }
+    });
+
+    // DELETE CLIMBER (ajusta times)
+    btnDeleteClimber.addEventListener('click', async () => {
+      const sel = selectClimbersAdmin.value;
+      if (!sel) return showToast('Selecione um escalador para excluir.');
+      if (!confirm('Excluir escalador? Isso removerá também as referências em times e scores.')) return;
+      try {
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','climber'), where('actorId','==', sel)));
+        for (const s of scoresSnap.docs) await deleteDoc(doc(db,'scores', s.id));
+        const teamsSnap = await getDocs(collection(db,'teams'));
+        for (const t of teamsSnap.docs) {
+          const data = t.data();
+          if (Array.isArray(data.members) && data.members.includes(sel)) {
+            const newMembers = data.members.filter(m => m !== sel);
+            if (newMembers.length < 3) await deleteDoc(doc(db,'teams', t.id));
+            else {
+              // recompute category base bonus (mantém bonuses extras)
+              const { bonus, reasons } = computeTeamCategoryBonus(newMembers);
+              await updateDoc(doc(db,'teams', t.id), { members: newMembers, points: Math.max(0,(data.points||0) - (data.bonus||0) + bonus), bonus, bonusReason: reasons.join(', ') });
+            }
+          }
+        }
+        await deleteDoc(doc(db,'climbers', sel));
+        showToast('Escalador e referências excluídos.');
+      } catch (err) { console.error('Erro ao excluir escalador:', err); showToast('Erro ao excluir escalador: '+(err.message||err)); }
+    });
+
+    // ADD ROUTE
+    btnAddRoute.addEventListener('click', async () => {
+      try {
+        const code = newRouteCode.value.trim() || null;
+        const name = newRouteName.value.trim();
+        const type = newRouteType.value;
+        if (!name) return showToast('Nome do desafio obrigatório.');
+        await addDoc(collection(db,'routes'), { code, name, type });
+        newRouteCode.value=''; newRouteName.value='';
+        showToast('Desafio adicionado.');
+      } catch (err) { console.error(err); showToast('Erro ao adicionar desafio: '+(err.message||err)); }
+    });
+
+    // DELETE ROUTE (inalterado)
+    btnDeleteRoute.addEventListener('click', async () => {
+      const sel = selectRoutesAdmin.value;
+      if (!sel) return showToast('Selecione um desafio para excluir.');
+      if (!confirm('Excluir desafio? Isso removerá também scores e ajustará os pontos.')) return;
+      try {
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('routeId','==', sel)));
+        const scoresDocs = scoresSnap.docs.map(d => ({ id: d.id, data: d.data() }));
+        for (const s of scoresDocs) {
+          const sc = s.data, pts = sc.points || 0;
+          if (sc.actorType === 'climber') {
+            const cRef = doc(db,'climbers', sc.actorId);
+            const cSnap = await getDoc(cRef);
+            if (cSnap.exists()) {
+              const cdata = cSnap.data();
+              await updateDoc(cRef, { points: Math.max(0,(cdata.points||0)-pts), done: (Array.isArray(cdata.done)? cdata.done.filter(x=>x!==sel):[]) });
+            }
+          } else if (sc.actorType === 'team') {
+            const tRef = doc(db,'teams', sc.actorId);
+            const tSnap = await getDoc(tRef);
+            if (tSnap.exists()) {
+              const tdata = tSnap.data();
+              await updateDoc(tRef, { points: Math.max(0,(tdata.points||0)-pts), done: (Array.isArray(tdata.done)? tdata.done.filter(x=>x!==sel):[]) });
+              if (Array.isArray(tdata.members)) {
+                for (const mid of tdata.members) {
+                  try {
+                    const mRef = doc(db,'climbers', mid);
+                    const mSnap = await getDoc(mRef);
+                    if (mSnap.exists()) {
+                      const mdata = mSnap.data();
+                      const newDoneTeam = Array.isArray(mdata.doneTeam) ? mdata.doneTeam.filter(routeId => routeId !== sel) : [];
+                      await updateDoc(mRef, { doneTeam: newDoneTeam });
+                    }
+                  } catch {}
+                }
+              }
+            }
+          }
+          try { await deleteDoc(doc(db,'scores', s.id)); } catch {}
+        }
+        const cSnapAll = await getDocs(collection(db,'climbers'));
+        for (const cdoc of cSnapAll.docs) {
+          const cdata = cdoc.data();
+          if (Array.isArray(cdata.done) && cdata.done.includes(sel))
+            await updateDoc(doc(db,'climbers', cdoc.id), { done: cdata.done.filter(x=>x!==sel) });
+          if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel))
+            await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: cdata.doneTeam.filter(x=>x!==sel) });
+        }
+        const tSnapAll = await getDocs(collection(db,'teams'));
+        for (const tdoc of tSnapAll.docs) {
+          const tdata = tdoc.data();
+          if (Array.isArray(tdata.done) && tdata.done.includes(sel))
+            await updateDoc(doc(db,'teams', tdoc.id), { done: tdata.done.filter(x=>x!==sel) });
+        }
+        await deleteDoc(doc(db,'routes', sel));
+        showToast('Rota excluída e pontos ajustados.');
+      } catch (err) { console.error('Erro ao excluir rota com ajuste de pontos:', err); showToast('Erro ao excluir rota: ' + (err.message || err)); }
+    });
+
+    // CREATE TEAM (com bônus de categoria)
+    btnCreateTeam.addEventListener('click', async () => {
+      const selected = Array.from(selectClimbersForTeam.selectedOptions).map(o=>o.value);
+      if (selected.length !== 3) return showToast('Selecione exatamente 3 escaladores para o time.');
+      const name = (teamNameInput.value.trim() || `Team ${Date.now()}`);
+      try {
+        const { bonus, reasons } = computeTeamCategoryBonus(selected);
+        const basePoints = bonus; // bônus inicial do time
+        const bonusReason = reasons.join(', ');
+        // armazenar array "bonuses" para extras aplicados via admin
+        await addDoc(collection(db,'teams'), { name, members: selected, points: basePoints, done: [], bonus: basePoints, bonusReason, bonuses: [] });
+        teamNameInput.value='';
+        showToast(`Time criado${basePoints ? ' (com bônus inicial: ' + basePoints + ')' : ''}.`);
+      } catch (err) { console.error(err); showToast('Erro ao criar time: '+(err.message||err)); }
+    });
+
+    // DELETE TEAM (inalterado)
+    btnDeleteTeam.addEventListener('click', async () => {
+      const sel = selectTeamsAdmin.value;
+      if (!sel) return showToast('Selecione um time para excluir.');
+      if (!confirm('Excluir time? Isso removerá scores do time.')) return;
+      try {
+        const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','team'), where('actorId','==', sel)));
+        for (const s of scoresSnap.docs) await deleteDoc(doc(db,'scores', s.id));
+        const tdoc = await getDoc(doc(db,'teams', sel));
+        if (tdoc.exists()) {
+          const tdata = tdoc.data();
           if (Array.isArray(tdata.members)) {
             for (const mid of tdata.members) {
-              try {
-                const mRef = doc(db,'climbers', mid);
-                const mSnap = await getDoc(mRef);
-                if (mSnap.exists()) {
-                  const mdata = mSnap.data();
-                  const newDoneTeam = Array.isArray(mdata.doneTeam) ? mdata.doneTeam.filter(routeId => routeId !== sel) : [];
+              const mRef = doc(db,'climbers', mid);
+              const mSnap = await getDoc(mRef);
+              if (mSnap.exists()) {
+                const m = mSnap.data();
+                if (Array.isArray(m.doneTeam)) {
+                  const newDoneTeam = m.doneTeam.filter(routeId => !(Array.isArray(tdata.done) && tdata.done.includes(routeId)));
                   await updateDoc(mRef, { doneTeam: newDoneTeam });
                 }
-              } catch {}
+              }
             }
           }
         }
-      }
-      try { await deleteDoc(doc(db,'scores', s.id)); } catch {}
-    }
-    const cSnapAll = await getDocs(collection(db,'climbers'));
-    for (const cdoc of cSnapAll.docs) {
-      const cdata = cdoc.data();
-      if (Array.isArray(cdata.done) && cdata.done.includes(sel))
-        await updateDoc(doc(db,'climbers', cdoc.id), { done: cdata.done.filter(x=>x!==sel) });
-      if (Array.isArray(cdata.doneTeam) && cdata.doneTeam.includes(sel))
-        await updateDoc(doc(db,'climbers', cdoc.id), { doneTeam: cdata.doneTeam.filter(x=>x!==sel) });
-    }
-    const tSnapAll = await getDocs(collection(db,'teams'));
-    for (const tdoc of tSnapAll.docs) {
-      const tdata = tdoc.data();
-      if (Array.isArray(tdata.done) && tdata.done.includes(sel))
-        await updateDoc(doc(db,'teams', tdoc.id), { done: tdata.done.filter(x=>x!==sel) });
-    }
-    await deleteDoc(doc(db,'routes', sel));
-    showToast('Rota excluída e pontos ajustados.');
-  } catch (err) { console.error('Erro ao excluir rota com ajuste de pontos:', err); showToast('Erro ao excluir rota: ' + (err.message || err)); }
-});
+        await deleteDoc(doc(db,'teams', sel));
+        showToast('Time excluído e referências removidas.');
+      } catch (err) { console.error('Erro ao excluir time:', err); showToast('Erro ao excluir time: '+(err.message||err)); }
+    });
 
-btnCreateTeam.addEventListener('click', async () => {
-  const selected = Array.from(selectClimbersForTeam.selectedOptions).map(o=>o.value);
-  if (selected.length !== 3) return showToast('Selecione exatamente 3 escaladores para o time.');
-  const name = (teamNameInput.value.trim() || `Team ${Date.now()}`);
-  try {
-    let hasKids = false;
-    for (const id of selected) {
-      const c = climbersCache.find(x=>x.id===id);
-      if (c && (c.data.category||'').toLowerCase() === 'kids') { hasKids = true; break; }
-    }
-    const basePoints = hasKids ? 900 : 0;
-    const bonusReason = hasKids ? 'Bônus +900: time com pelo menos um atleta Kids' : '';
-    await addDoc(collection(db,'teams'), { name, members: selected, points: basePoints, done: [], bonus: basePoints, bonusReason });
-    teamNameInput.value='';
-    showToast(`Time criado${hasKids ? ' (com +900 de bônus Kids)' : ''}.`);
-  } catch (err) { console.error(err); showToast('Erro ao criar time: '+(err.message||err)); }
-});
+    // JUDGE: registrar score (inalterado lógica, mantém bônus já no campo points do team)
+    btnRegister.addEventListener('click', async () => {
+      try {
+        const category = judgeCategory.value;
+        const actorId = judgeActorSelect.value;
+        const routeId = judgeRouteSelect.value;
+        const sendType = judgeSendType.value;
+        if (!actorId || !routeId) return showToast('Escolha escalador/time e desafio.');
+        const points = (sendType === 'flash') ? 300 : 100;
 
-btnDeleteTeam.addEventListener('click', async () => {
-  const sel = selectTeamsAdmin.value;
-  if (!sel) return showToast('Selecione um time para excluir.');
-  if (!confirm('Excluir time? Isso removerá scores do time.')) return;
-  try {
-    const scoresSnap = await getDocs(query(collection(db,'scores'), where('actorType','==','team'), where('actorId','==', sel)));
-    for (const s of scoresSnap.docs) await deleteDoc(doc(db,'scores', s.id));
-    const tdoc = await getDoc(doc(db,'teams', sel));
-    if (tdoc.exists()) {
-      const tdata = tdoc.data();
-      if (Array.isArray(tdata.members)) {
-        for (const mid of tdata.members) {
-          const mRef = doc(db,'climbers', mid);
-          const mSnap = await getDoc(mRef);
-          if (mSnap.exists()) {
-            const m = mSnap.data();
-            if (Array.isArray(m.doneTeam)) {
-              const newDoneTeam = m.doneTeam.filter(routeId => !(Array.isArray(tdata.done) && tdata.done.includes(routeId)));
-              await updateDoc(mRef, { doneTeam: newDoneTeam });
+        if (category === 'boulder') {
+          const cRef = doc(db,'climbers',actorId);
+          const cSnap = await getDoc(cRef);
+          if (!cSnap.exists()) return showToast('Escalador não encontrado.');
+          const c = cSnap.data();
+          if (Array.isArray(c.done) && c.done.includes(routeId)) return showToast('Escalador já completou esse boulder.');
+          const newPoints = (c.points || 0) + points;
+          const newDone = Array.isArray(c.done) ? [...c.done, routeId] : [routeId];
+          await updateDoc(cRef,{ points:newPoints, done:newDone });
+          await addDoc(collection(db,'scores'), { actorType:'climber', actorId, actorName:c.name, actorCategory:c.category||'geral', routeId, sendType, points, timestamp: serverTimestamp() });
+          showToast(`Registrado ${points} pts para ${c.name}`);
+        } else {
+          const tRef = doc(db,'teams',actorId);
+          const tSnap = await getDoc(tRef);
+          if (!tSnap.exists()) return showToast('Time não encontrado.');
+          const t = tSnap.data();
+          if (Array.isArray(t.done) && t.done.includes(routeId)) return showToast('Time já completou esse desafio.');
+          const newPoints = (t.points || 0) + points;
+          const newDone = Array.isArray(t.done) ? [...t.done, routeId] : [routeId];
+          await updateDoc(tRef,{ points:newPoints, done:newDone });
+          await addDoc(collection(db,'scores'), {
+            actorType:'team', actorId, actorName:t.name, actorCategory:'team',
+            routeId, sendType, points, timestamp: serverTimestamp(),
+            note: t.bonus ? (t.bonusReason || 'Bônus inicial de time') : ''
+          });
+          if (Array.isArray(t.members)) {
+            for (const memberId of t.members) {
+              try { const mRef = doc(db,'climbers',memberId); await updateDoc(mRef, { doneTeam: arrayUnion(routeId) }); } catch(e){}
             }
           }
+          showToast(`Registrado ${points} pts para o time ${t.name}`);
         }
+      } catch (err) {
+        console.error(err); showToast('Erro ao registrar pontuação: '+(err.message||err));
       }
-    }
-    await deleteDoc(doc(db,'teams', sel));
-    showToast('Time excluído e referências removidas.');
-  } catch (err) { console.error('Erro ao excluir time:', err); showToast('Erro ao excluir time: '+(err.message||err)); }
-});
+    });
+    btnClearSelection.addEventListener('click', ()=> { judgeActorSelect.selectedIndex = 0; judgeRouteSelect.selectedIndex=0; });
 
-// JUIZ: registrar score
-btnRegister.addEventListener('click', async () => {
-  try {
-    const category = judgeCategory.value;
-    const actorId = judgeActorSelect.value;
-    const routeId = judgeRouteSelect.value;
-    const sendType = judgeSendType.value;
-    if (!actorId || !routeId) return showToast('Escolha escalador/time e desafio.');
-    const points = (sendType === 'flash') ? 300 : 100;
-
-    if (category === 'boulder') {
-      const cRef = doc(db,'climbers',actorId);
-      const cSnap = await getDoc(cRef);
-      if (!cSnap.exists()) return showToast('Escalador não encontrado.');
-      const c = cSnap.data();
-      if (Array.isArray(c.done) && c.done.includes(routeId)) return showToast('Escalador já completou esse boulder.');
-      const newPoints = (c.points || 0) + points;
-      const newDone = Array.isArray(c.done) ? [...c.done, routeId] : [routeId];
-      await updateDoc(cRef,{ points:newPoints, done:newDone });
-      await addDoc(collection(db,'scores'), { actorType:'climber', actorId, actorName:c.name, actorCategory:c.category||'geral', routeId, sendType, points, timestamp: serverTimestamp() });
-      showToast(`Registrado ${points} pts para ${c.name}`);
-    } else {
-      const tRef = doc(db,'teams',actorId);
-      const tSnap = await getDoc(tRef);
-      if (!tSnap.exists()) return showToast('Time não encontrado.');
-      const t = tSnap.data();
-      if (Array.isArray(t.done) && t.done.includes(routeId)) return showToast('Time já completou esse desafio.');
-      const newPoints = (t.points || 0) + points;
-      const newDone = Array.isArray(t.done) ? [...t.done, routeId] : [routeId];
-      await updateDoc(tRef,{ points:newPoints, done:newDone });
-      await addDoc(collection(db,'scores'), {
-        actorType:'team', actorId, actorName:t.name, actorCategory:'team',
-        routeId, sendType, points, timestamp: serverTimestamp(),
-        note: t.bonus ? (t.bonusReason || 'Bônus inicial de time') : ''
-      });
-      if (Array.isArray(t.members)) {
-        for (const memberId of t.members) {
-          try { const mRef = doc(db,'climbers',memberId); await updateDoc(mRef, { doneTeam: arrayUnion(routeId) }); } catch(e){}
+    // EXPORT CSV
+    btnExportCSV.addEventListener('click', async () => {
+      try {
+        const cat = selectCategoryTop.value;
+        let rows = [];
+        if (cat === 'boulder') {
+          const snap = await getDocs(collection(db,'climbers'));
+          snap.forEach(d => {
+            const c = d.data();
+            rows.push([c.code || d.id, c.name, displayCategory(c.category), displayGender(c.gender), c.points || 0]);
+          });
+        } else {
+          const snap = await getDocs(collection(db,'teams'));
+          snap.forEach(d => {
+            const t = d.data();
+            rows.push([d.id, t.name, (t.members || []).join('|'), t.points || 0, (t.bonus||0), (t.bonusReason||'')]);
+          });
         }
-      }
-      showToast(`Registrado ${points} pts para o time ${t.name}`);
-    }
-  } catch (err) {
-    console.error(err); showToast('Erro ao registrar pontuação: '+(err.message||err));
-  }
-});
-btnClearSelection.addEventListener('click', ()=> { judgeActorSelect.selectedIndex = 0; judgeRouteSelect.selectedIndex=0; });
+        const header = (selectCategoryTop.value === 'boulder') ? 'Codigo,Nome,Categoria,Genero,Pontos' : 'ID,Time,Membros,Pontos,Bonus,BonusReason';
+        const csv = [header].concat(rows.map(r => r.map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(','))).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `${selectCategoryTop.value}_leaderboard.csv`; a.click();
+      } catch (err) { console.error('Erro export CSV', err); showToast('Erro ao exportar CSV: '+(err.message||err)); }
+    });
 
-// EXPORT CSV
-btnExportCSV.addEventListener('click', async () => {
-  try {
-    const cat = selectCategoryTop.value;
-    let rows = [];
-    if (cat === 'boulder') {
-      const snap = await getDocs(collection(db,'climbers'));
-      snap.forEach(d => {
-        const c = d.data();
-        rows.push([c.code || d.id, c.name, displayCategory(c.category), displayGender(c.gender), c.points || 0]);
-      });
-    } else {
-      const snap = await getDocs(collection(db,'teams'));
-      snap.forEach(d => {
-        const t = d.data();
-        rows.push([d.id, t.name, (t.members || []).join('|'), t.points || 0, (t.bonus||0), (t.bonusReason||'')]);
+    /* =======================
+       SELECTS ORDENADOS (NATURAL)
+       ======================= */
+    function populateAdminClimbers(){
+      selectClimbersAdmin.innerHTML = '';
+      selectClimbersForTeam.innerHTML = '';
+      selectBonusClimber.innerHTML = '';
+      const ordered = climbersCache.slice().sort(byCode(c => c.data.code || c.id));
+      ordered.forEach(c => {
+        const label = `${c.data.code || c.id} — ${c.data.name} (${displayCategory(c.data.category)}, ${displayGender(c.data.gender)}${c.data.isPro?' · PRO':''})`;
+        const o = document.createElement('option'); o.value = c.id; o.textContent = label; selectClimbersAdmin.appendChild(o);
+        const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = label; selectClimbersForTeam.appendChild(o2);
+        const o3 = document.createElement('option'); o3.value = c.id; o3.textContent = `${c.data.name} — ${c.data.code || c.id}`; selectBonusClimber.appendChild(o3);
       });
     }
-    const header = (selectCategoryTop.value === 'boulder') ? 'Codigo,Nome,Categoria,Genero,Pontos' : 'ID,Time,Membros,Pontos,Bonus,BonusReason';
-    const csv = [header].concat(rows.map(r => r.map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(','))).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `${selectCategoryTop.value}_leaderboard.csv`; a.click();
-  } catch (err) { console.error('Erro export CSV', err); showToast('Erro ao exportar CSV: '+(err.message||err)); }
-});
-
-/* =======================
-   SELECTS ORDENADOS (NATURAL)
-   ======================= */
-function populateAdminClimbers(){
-  selectClimbersAdmin.innerHTML = '';
-  selectClimbersForTeam.innerHTML = '';
-  const ordered = climbersCache.slice().sort(byCode(c => c.data.code || c.id));
-  ordered.forEach(c => {
-    const label = `${c.data.code || c.id} — ${c.data.name} (${displayCategory(c.data.category)}, ${displayGender(c.data.gender)}${c.data.isPro?' · PRO':''})`;
-    const o = document.createElement('option'); o.value = c.id; o.textContent = label; selectClimbersAdmin.appendChild(o);
-    const o2 = document.createElement('option'); o2.value = c.id; o2.textContent = label; selectClimbersForTeam.appendChild(o2);
-  });
-}
-function populateAdminRoutes(){
-  selectRoutesAdmin.innerHTML = '';
-  const ordered = routesCache.slice().sort(byCode(r => r.data.code || r.id));
-  ordered.forEach(r => {
-    const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; selectRoutesAdmin.appendChild(o);
-  });
-}
-function populateAdminTeams(){
-  selectTeamsAdmin.innerHTML = '';
-  const ordered = teamsCache.slice().sort(byCode(t => t.data.name || t.id)); // times por nome
-  ordered.forEach(t => {
-    const membersNames = (t.data.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
-    const extra = t.data.bonus ? ` · Bônus ${t.data.bonus}` : '';
-    const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${membersNames} — ${t.data.points || 0} pts${extra}`; selectTeamsAdmin.appendChild(o);
-  });
-}
-
-// Judge selectors (ordenados por código)
-async function loadSelectorsForJudge(){
-  const cat = judgeCategory.value;
-  judgeActorSelect.innerHTML = '';
-  judgeRouteSelect.innerHTML = '';
-
-  if (cat === 'boulder') {
-    const orderedClimbers = climbersCache.slice().sort(byCode(c => c.data.code || c.id));
-    orderedClimbers.forEach(c => {
-      const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.data.code || c.id} — ${c.data.name}`; judgeActorSelect.appendChild(o);
-    });
-    const orderedBoulders = routesCache.filter(r=>r.data.type==='boulder')
-      .slice().sort(byCode(r => r.data.code || r.id));
-    orderedBoulders.forEach(r=>{
-      const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name}`; judgeRouteSelect.appendChild(o);
-    });
-  } else {
-    // times: ordenar por nome (ou por um "code" se existisse)
-    const orderedTeams = teamsCache.slice().sort(byCode(t => t.data.name || t.id));
-    orderedTeams.forEach(t => {
-      const bonus = t.data.bonus ? ` (+${t.data.bonus})` : '';
-      const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${t.data.points || 0} pts${bonus}`; judgeActorSelect.appendChild(o);
-    });
-    const orderedRoutes = routesCache.filter(r=>r.data.type==='via' || r.data.type==='desafio')
-      .slice().sort(byCode(r => r.data.code || r.id));
-    orderedRoutes.forEach(r=>{
-      const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; judgeRouteSelect.appendChild(o);
-    });
-  }
-}
-judgeCategory.addEventListener('change', loadSelectorsForJudge);
-
-// Recent list + Boulder do Momento
-function populateRecent(){
-  recentList.innerHTML = '';
-  const sorted = scoresCache.slice().sort((a,b)=>{
-    const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
-    const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
-    return tb - ta;
-  });
-  sorted.slice(0,50).forEach(s => {
-    const routeExists = !!routesCache.find(r => r.id === s.data.routeId);
-    const actorExists = s.data.actorType === 'climber' ? !!climbersCache.find(c => c.id === s.data.actorId) : !!teamsCache.find(t => t.id === s.data.actorId);
-    if (!routeExists || !actorExists) return;
-    const route = routesCache.find(r=>r.id===s.data.routeId);
-    const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
-    const li = document.createElement('li');
-    const extra = s.data.note ? ` — ${s.data.note}` : '';
-    li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
-    recentList.appendChild(li);
-  });
-}
-
-function updateBoulderDoMomento(){
-  if (selectCategoryTop.value !== 'boulder') { boulderDoMomentoCard.classList.add('hidden'); return; }
-  const recent = scoresCache
-    .filter(s => s.data.routeId && s.data.actorType === 'climber')
-    .sort((a,b)=>{
-      const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
-      const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
-      return tb - ta;
-    })
-    .slice(0, MOMENTO_RECENT_LIMIT); // <<<<<< AQUI
-
-  if (!recent.length) { boulderDoMomentoCard.classList.add('hidden'); return; }
-
-  const counts = {};
-  recent.forEach(s=>{
-    const r = routesCache.find(x=>x.id===s.data.routeId);
-    if (!r) return;
-    if (r.data.type !== 'boulder') return;
-    counts[r.id] = (counts[r.id]||0) + 1;
-  });
-  const entries = Object.entries(counts);
-  if (!entries.length) { boulderDoMomentoCard.classList.add('hidden'); return; }
-  entries.sort((a,b)=> b[1] - a[1]);
-  const bestId = entries[0][0], bestCount = entries[0][1];
-  const bestRoute = routesCache.find(r=>r.id===bestId);
-  if (!bestRoute) { boulderDoMomentoCard.classList.add('hidden'); return; }
-  boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
-  boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
-  boulderDoMomentoCard.classList.remove('hidden');
-}
-
-// Ranking público
-const prevOrder = { boulder:[], routes:[] };
-selectCategoryTop.addEventListener('change', ()=>refreshRanking(true));
-filterCategory.addEventListener('change', ()=>refreshRanking(true));
-
-function refreshRanking(fromSnapshot=false){
-  const cat = selectCategoryTop.value;
-  rankingTitle.textContent = (cat === 'boulder') ? 'Boulder — Ranking' : 'Vias / Desafios — Ranking';
-  const oldOrder = prevOrder[cat].slice();
-  rankingBody.innerHTML = '';
-
-  if (cat === 'boulder') {
-    let rows = climbersCache.map(c => ({ id:c.id, ...c.data }));
-    const filt = (filterCategory.value||'all').toLowerCase();
-    if (filt === 'juvenil-m') rows = rows.filter(r => r.category==='juvenil' && r.gender==='masculino');
-    else if (filt === 'juvenil-f') rows = rows.filter(r => r.category==='juvenil' && r.gender==='feminino');
-    else if (filt === 'geral-m') rows = rows.filter(r => r.category==='geral' && r.gender==='masculino');
-    else if (filt === 'geral-f') rows = rows.filter(r => r.category==='geral' && r.gender==='feminino');
-    else if (filt !== 'all') rows = rows.filter(r => r.category === filt);
-
-    rows.sort((a,b)=> (b.points||0) - (a.points||0));
-    const newOrder = rows.map(r=>r.id);
-    rows.forEach((r,i)=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${displayCategory(r.category)}</td><td>${displayGender(r.gender)}</td><td>${r.points||0}</td>`;
-      tr.addEventListener('click', ()=> showClimberDetails(r.id));
-      const oldPos = oldOrder.indexOf(r.id);
-      if (oldOrder.length && oldPos !== -1){
-        if (i < oldPos) tr.classList.add('rise');
-        else if (i > oldPos) tr.classList.add('fall');
-      }
-      rankingBody.appendChild(tr);
-    });
-    prevOrder.boulder = newOrder;
-  } else {
-    let rows = teamsCache.map(t => ({ id:t.id, ...t.data }));
-    rows.sort((a,b)=> (b.points||0) - (a.points||0));
-    const newOrder = rows.map(r=>r.id);
-    rows.forEach((r,i)=>{
-      const names = (r.members||[]).map(id => { const c=climbersCache.find(x=>x.id===id); return c?c.data.name:id; }).join(' | ');
-      const bonus = r.bonus ? ` (+${r.bonus})` : '';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${r.name}${bonus}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
-      tr.addEventListener('click', ()=> showTeamDetails(r.id));
-      const oldPos = oldOrder.indexOf(r.id);
-      if (oldOrder.length && oldPos !== -1){
-        if (i < oldPos) tr.classList.add('rise'); else if (i > oldPos) tr.classList.add('fall');
-      }
-      rankingBody.appendChild(tr);
-    });
-    prevOrder.routes = newOrder;
-  }
-  if (!fromSnapshot) updateBoulderDoMomento();
-}
-
-// Telão helpers
-function haveDifferentOrder(a,b){
-  if (a.length !== b.length) return true;
-  for (let i=0;i<a.length;i++) if (a[i]!==b[i]) return true;
-  return false;
-}
-
-function renderTelaoFrame(indexToShow){
-  if (!telaoMode || !telaoContainer.classList.contains('show')) return;
-  const host = document.getElementById('telaoListHost');
-  if (!host) return;
-
-  if (indexToShow === 0){
-    telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
-    const list = climbersCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
-    renderRankListTelao(list, 'boulder', host);
-  } else {
-    telaoMainTitle.textContent = "🏆 Times — TOP 10";
-    const list = teamsCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
-    renderRankListTelao(list, 'team', host);
-  }
-  renderMoment();
-  renderTicker();
-}
-
-function renderRankListTelao(list, kind, host){
-  // host deve ser o container que segura as panes
-  const current = host.querySelector('.pane-current');
-
-  const incoming = document.createElement('ul');
-  incoming.className = 'telao-list pane swap-in';
-
-  const currentIds = list.map(x => x.id);
-  const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
-  const changed = haveDifferentOrder(prevArr, currentIds);
-
-  list.forEach((item, i) => {
-    const li = document.createElement('li');
-    li.className = 'telao-item';
-
-    if (prevArr.length){
-      const oldPos = prevArr.indexOf(item.id);
-      if (oldPos !== -1){
-        if (i < oldPos) li.classList.add('rise');
-        else if (i > oldPos) li.classList.add('fall');
-      }
-    } else if (changed){
-      li.classList.add('flash');
+    function populateAdminRoutes(){
+      selectRoutesAdmin.innerHTML = '';
+      const ordered = routesCache.slice().sort(byCode(r => r.data.code || r.id));
+      ordered.forEach(r => {
+        const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; selectRoutesAdmin.appendChild(o);
+      });
+    }
+    function populateAdminTeams(){
+      selectTeamsAdmin.innerHTML = '';
+      selectBonusTeam.innerHTML = '';
+      const ordered = teamsCache.slice().sort(byCode(t => t.data.name || t.id));
+      ordered.forEach(t => {
+        const membersNames = (t.data.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
+        const extra = t.data.bonus ? ` · Bônus ${t.data.bonus}` : '';
+        const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${membersNames} — ${t.data.points || 0} pts${extra}`; selectTeamsAdmin.appendChild(o);
+        const o2 = document.createElement('option'); o2.value = t.id; o2.textContent = `${t.data.name} — ${t.data.points || 0} pts`; selectBonusTeam.appendChild(o2);
+      });
     }
 
-    li.innerHTML = `
-      <div class="telao-pos">${i+1}º</div>
-      <div class="telao-name">${item.data.name}</div>
-      <div class="telao-points">${(item.data.points||0)} pts</div>
-    `;
-    incoming.appendChild(li);
-  });
+    // Judge selectors
+    async function loadSelectorsForJudge(){
+      const cat = judgeCategory.value;
+      judgeActorSelect.innerHTML = '';
+      judgeRouteSelect.innerHTML = '';
 
-  // força uma altura estática pra animação não "quebrar" layout
-  host.style.height = host.offsetHeight + 'px';
-  host.appendChild(incoming);
-
-  // se houver um current válido, anima para fora e remove após
-  if (current){
-    current.classList.add('swap-out');
-    current.addEventListener('animationend', () => { try{ current.remove(); } catch(e){} }, { once:true });
-  } else {
-    // se não tiver current (estado estranho), remove qualquer pane órfão antigo imediatamente
-    const orphans = host.querySelectorAll('.pane');
-    orphans.forEach(p => {
-      if (p !== incoming) try{ p.remove(); } catch(e){}
-    });
-  }
-
-  // Garante que a pane entrante finalize corretamente — fallback de remoção se a animação falhar
-  incoming.addEventListener('animationend', () => {
-    incoming.classList.remove('swap-in');
-    incoming.classList.add('pane-current');
-    host.style.height = '';
-  }, { once:true });
-
-  // caso a animação não ocorra (ex.: browser bloqueou), removemos antigos após pequeno timeout
-  setTimeout(() => {
-    const panes = host.querySelectorAll('.pane');
-    panes.forEach((p, idx) => {
-      if (p !== incoming && p !== host.querySelector('.pane-current')) try{ p.remove(); } catch(e){}
-    });
-  }, 1200);
-
-  if (kind==='boulder') prevTopBoulder = currentIds;
-  else prevTopTeams = currentIds;
-
-  telaoMainSub.textContent = 'Atualiza automaticamente';
-}
-
-// Moment / Ticker
-function renderMoment(){
-  const recent = scoresCache
-    .filter(s => s.data.actorType==='climber' && !!s.data.routeId)
-    .sort((a,b)=>{
-      const ta = a.data.timestamp ? (a.data.timestamp.seconds||a.data.timestamp) : 0;
-      const tb = b.data.timestamp ? (b.data.timestamp.seconds||b.data.timestamp) : 0;
-      return tb - ta;
-    })
-    .slice(0, MOMENTO_RECENT_LIMIT);
-
-  if (!recent.length){ if (momentName) momentName.textContent = '—'; if (momentCount) momentCount.textContent=''; return; }
-
-  const counts = {};
-  recent.forEach(s=>{
-    const r = routesCache.find(x=>x.id===s.data.routeId);
-    if (!r || r.data.type!=='boulder') return;
-    counts[r.id] = (counts[r.id]||0) + 1;
-  });
-
-  const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  if (!entries.length){ if (momentName) momentName.textContent = '—'; if (momentCount) momentCount.textContent=''; return; }
-
-  const [bestId, bestCount] = entries[0];
-  const best = routesCache.find(r=>r.id===bestId);
-  if (!best){ if (momentName) momentName.textContent = '—'; if (momentCount) momentCount.textContent=''; return; }
-
-  const label = `${best.data.code || bestId} — ${best.data.name}`;
-  if (prevMomentId !== bestId && momentCard){
-    momentCard.classList.remove('pop'); void momentCard.offsetWidth; momentCard.classList.add('pop');
-  }
-  if (momentName) momentName.textContent = label;
-  if (momentCount) momentCount.textContent = `${bestCount} envios recentes`;
-  prevMomentId = bestId;
-}
-
-function routeLabelById(id){
-  const r = routesCache.find(x=>x.id===id);
-  if (!r) return id || '—';
-  return `${r.data.code || ''} ${r.data.name}`.trim();
-}
-
-function renderTicker(){
-  // caso já tenhamos visto muitos IDs e houve uma grande mutação, tickerSeenIds é resetado no snapshot
-  const sorted = scoresCache.slice().sort((a,b)=>{
-    const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
-    const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
-    return tb - ta;
-  }).slice(0,20);
-
-  sorted.forEach(s=>{
-    if (tickerSeenIds.has(s.id)) return;
-    const routeName = routeLabelById(s.data.routeId);
-    const who = s.data.actorName || s.data.actorId || '—';
-    const pts = s.data.points || 0;
-    const type = (s.data.sendType || '').toLowerCase();
-    const icon = type==='flash' ? '💥' : '✅';
-    const iconClass = type==='flash' ? 'flash' : 'cadena';
-    const when = 'agora';
-    const cat = (s.data.actorCategory||'geral');
-
-    const div = document.createElement('div');
-    div.className = 'ticker-msg';
-    div.innerHTML = `
-      <div class="ticker-meta"><span class="tick-icon ${iconClass}">${icon}</span>${when} • ${type || 'envio'} • <span class="tick-pts">+${pts}</span></div>
-      <div class="ticker-text"><span class="tick-name" style="color:${categoryColor(cat)}">${who}</span> mandou <span class="tick-route"><b>${routeName}</b></span></div>
-    `;
-    // prepend novo
-    if (tickerBody) tickerBody.prepend(div);
-    tickerSeenIds.add(s.id);
-    if (tickerBody) while (tickerBody.children.length > 30) tickerBody.removeChild(tickerBody.lastElementChild);
-  });
-}
-function categoryColor(cat){
-  const c=(cat||'').toLowerCase();
-  if (c==='kids') return 'var(--kids)';
-  if (c==='juvenil') return 'var(--juvenil)';
-  if (c==='masters') return 'var(--masters)';
-  if (c==='pro') return 'var(--pro)';
-  if (c==='trans-nao-binario') return 'var(--tnb)';
-  return 'var(--geral)';
-}
-
-// Details
-async function showClimberDetails(docId){
-  try {
-    const snap = await getDoc(doc(db,'climbers',docId));
-    if (!snap.exists()) return alert('Não encontrado.');
-    const c = snap.data();
-    const cat = displayCategory(c.category);
-    const gen = displayGender(c.gender);
-
-    const doneBoulderIds = Array.isArray(c.done) ? c.done : [];
-    const doneTeamIds = Array.isArray(c.doneTeam) ? c.doneTeam : [];
-
-    const boulderLines = doneBoulderIds.map(routeId => {
-      const route = routesCache.find(r => r.id === routeId);
-      const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
-      const s = scoresCache.find(sc => sc.data.actorType === 'climber' && sc.data.actorId === docId && sc.data.routeId === routeId);
-      if (s) return `${routeLabel} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
-      return `${routeLabel} — (sem registro de score visível)`;
-    });
-
-    const teamLines = doneTeamIds.map(routeId => {
-      const route = routesCache.find(r => r.id === routeId);
-      const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
-      const s = scoresCache.find(sc => sc.data.actorType === 'team' && sc.data.routeId === routeId && (() => {
-        const teamId = sc.data.actorId;
-        const team = teamsCache.find(t => t.id === teamId);
-        return team && Array.isArray(team.data.members) && team.data.members.includes(docId);
-      })());
-      if (s) {
-        const team = teamsCache.find(t => t.id === s.data.actorId);
-        const teamName = team ? team.data.name : s.data.actorName || s.data.actorId;
-        return `${routeLabel} — pelo time ${teamName} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+      if (cat === 'boulder') {
+        const orderedClimbers = climbersCache.slice().sort(byCode(c => c.data.code || c.id));
+        orderedClimbers.forEach(c => {
+          const o = document.createElement('option'); o.value = c.id; o.textContent = `${c.data.code || c.id} — ${c.data.name}`; judgeActorSelect.appendChild(o);
+        });
+        const orderedBoulders = routesCache.filter(r=>r.data.type==='boulder')
+          .slice().sort(byCode(r => r.data.code || r.id));
+        orderedBoulders.forEach(r=>{
+          const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name}`; judgeRouteSelect.appendChild(o);
+        });
+      } else {
+        const orderedTeams = teamsCache.slice().sort(byCode(t => t.data.name || t.id));
+        orderedTeams.forEach(t => {
+          const bonus = t.data.bonus ? ` (+${t.data.bonus})` : '';
+          const o = document.createElement('option'); o.value = t.id; o.textContent = `${t.data.name} — ${t.data.points || 0} pts${bonus}`; judgeActorSelect.appendChild(o);
+        });
+        const orderedRoutes = routesCache.filter(r=>r.data.type==='via' || r.data.type==='desafio')
+          .slice().sort(byCode(r => r.data.code || r.id));
+        orderedRoutes.forEach(r=>{
+          const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; judgeRouteSelect.appendChild(o);
+        });
       }
-      return `${routeLabel} — (participação registrada, score não encontrado)`;
-    });
+    }
+    judgeCategory.addEventListener('change', loadSelectorsForJudge);
 
-    const msg = `${c.name} — ${c.code || docId}
+    // Recent list + Boulder do Momento
+    function populateRecent(){
+      recentList.innerHTML = '';
+      const sorted = scoresCache.slice().sort((a,b)=>{
+        const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+        const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
+        return tb - ta;
+      });
+      sorted.slice(0,50).forEach(s => {
+        const routeExists = !!routesCache.find(r => r.id === s.data.routeId);
+        const actorExists = s.data.actorType === 'climber' ? !!climbersCache.find(c => c.id === s.data.actorId) : !!teamsCache.find(t => t.id === s.data.actorId);
+        if (!routeExists || !actorExists) return;
+        const route = routesCache.find(r=>r.id===s.data.routeId);
+        const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
+        const li = document.createElement('li');
+        const extra = s.data.note ? ` — ${s.data.note}` : '';
+        li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
+        recentList.appendChild(li);
+      });
+    }
+
+    function updateBoulderDoMomento(){
+      if (selectCategoryTop.value !== 'boulder') { boulderDoMomentoCard.classList.add('hidden'); return; }
+      const recent = scoresCache
+        .filter(s => s.data.routeId && s.data.actorType === 'climber')
+        .sort((a,b)=>{
+          const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+          const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
+          return tb - ta;
+        })
+        .slice(0, MOMENTO_RECENT_LIMIT);
+
+      if (!recent.length) { boulderDoMomentoCard.classList.add('hidden'); return; }
+
+      const counts = {};
+      recent.forEach(s=>{
+        const r = routesCache.find(x=>x.id===s.data.routeId);
+        if (!r) return;
+        if (r.data.type !== 'boulder') return;
+        counts[r.id] = (counts[r.id]||0) + 1;
+      });
+
+      const entries = Object.entries(counts);
+      if (!entries.length){ boulderDoMomentoCard.classList.add('hidden'); return; }
+      entries.sort((a,b)=> b[1] - a[1]);
+      const bestId = entries[0][0], bestCount = entries[0][1];
+      const bestRoute = routesCache.find(r=>r.id===bestId);
+      if (!bestRoute){ boulderDoMomentoCard.classList.add('hidden'); return; }
+      boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
+      boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
+      boulderDoMomentoCard.classList.remove('hidden');
+    }
+
+    // Ranking público
+    const prevOrder = { boulder:[], routes:[] };
+    selectCategoryTop.addEventListener('change', ()=>refreshRanking(true));
+    filterCategory.addEventListener('change', ()=>refreshRanking(true));
+
+    function refreshRanking(fromSnapshot=false){
+      const cat = selectCategoryTop.value;
+      rankingTitle.textContent = (cat === 'boulder') ? 'Boulder — Ranking' : 'Vias / Desafios — Ranking';
+      const oldOrder = prevOrder[cat].slice();
+      rankingBody.innerHTML = '';
+
+      if (cat === 'boulder') {
+        let rows = climbersCache.map(c => ({ id:c.id, ...c.data }));
+        const filt = (filterCategory.value||'all').toLowerCase();
+        if (filt === 'juvenil-m') rows = rows.filter(r => r.category==='juvenil' && r.gender==='masculino');
+        else if (filt === 'juvenil-f') rows = rows.filter(r => r.category==='juvenil' && r.gender==='feminino');
+        else if (filt === 'geral-m') rows = rows.filter(r => r.category==='geral' && r.gender==='masculino');
+        else if (filt === 'geral-f') rows = rows.filter(r => r.category==='geral' && r.gender==='feminino');
+        else if (filt !== 'all') rows = rows.filter(r => r.category === filt);
+
+        rows.sort((a,b)=> (b.points||0) - (a.points||0));
+        const newOrder = rows.map(r=>r.id);
+        rows.forEach((r,i)=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${i+1}</td><td>${r.code||r.id} — ${r.name}</td><td>${displayCategory(r.category)}</td><td>${displayGender(r.gender)}</td><td>${r.points||0}</td>`;
+          tr.addEventListener('click', ()=> showClimberDetails(r.id));
+          const oldPos = oldOrder.indexOf(r.id);
+          if (oldOrder.length && oldPos !== -1){
+            if (i < oldPos) tr.classList.add('rise');
+            else if (i > oldPos) tr.classList.add('fall');
+          }
+          rankingBody.appendChild(tr);
+        });
+        prevOrder.boulder = newOrder;
+      } else {
+        let rows = teamsCache.map(t => ({ id:t.id, ...t.data }));
+        rows.sort((a,b)=> (b.points||0) - (a.points||0));
+        const newOrder = rows.map(r=>r.id);
+        rows.forEach((r,i)=>{
+          const names = (r.members||[]).map(id => { const c=climbersCache.find(x=>x.id===id); return c?c.data.name:id; }).join(' | ');
+          const bonus = r.bonus ? ` (+${r.bonus})` : '';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${i+1}</td><td>${r.name}${bonus}</td><td colspan="2">${names}</td><td>${r.points||0}</td>`;
+          tr.addEventListener('click', ()=> showTeamDetails(r.id));
+          const oldPos = oldOrder.indexOf(r.id);
+          if (oldOrder.length && oldPos !== -1){
+            if (i < oldPos) tr.classList.add('rise'); else if (i > oldPos) tr.classList.add('fall');
+          }
+          rankingBody.appendChild(tr);
+        });
+        prevOrder.routes = newOrder;
+      }
+      if (!fromSnapshot) updateBoulderDoMomento();
+    }
+
+    // Telão helpers (inalterados muitas partes)
+    function haveDifferentOrder(a,b){
+      if (a.length !== b.length) return true;
+      for (let i=0;i<a.length;i++) if (a[i]!==b[i]) return true;
+      return false;
+    }
+
+    function renderTelaoFrame(indexToShow){
+      if (!telaoMode || !telaoContainer.classList.contains('show')) return;
+      const host = document.getElementById('telaoListHost');
+
+      if (indexToShow === 0){
+        telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
+        const list = climbersCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
+        renderRankListTelao(list, 'boulder', host);
+      } else {
+        telaoMainTitle.textContent = "🏆 Times — TOP 10";
+        const list = teamsCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
+        renderRankListTelao(list, 'team', host);
+      }
+      renderMoment();
+      renderTicker();
+    }
+
+    function renderRankListTelao(list, kind, host){
+      const current = host.querySelector('.pane-current');
+
+      const incoming = document.createElement('ul');
+      incoming.className = 'telao-list pane swap-in';
+
+      const currentIds = list.map(x => x.id);
+      const prevArr = (kind==='boulder') ? prevTopBoulder : prevTopTeams;
+      const changed = haveDifferentOrder(prevArr, currentIds);
+
+      list.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.className = 'telao-item';
+
+        if (prevArr.length){
+          const oldPos = prevArr.indexOf(item.id);
+          if (oldPos !== -1){
+            if (i < oldPos) li.classList.add('rise');
+            else if (i > oldPos) li.classList.add('fall');
+          }
+        } else if (changed){
+          li.classList.add('flash');
+        }
+
+        li.innerHTML = `
+          <div class="telao-pos">${i+1}º</div>
+          <div class="telao-name">${item.data.name}</div>
+          <div class="telao-points">${(item.data.points||0)} pts</div>
+        `;
+        incoming.appendChild(li);
+      });
+
+      host.style.height = host.offsetHeight + 'px';
+      host.appendChild(incoming);
+
+      if (current){
+        current.classList.add('swap-out');
+        current.addEventListener('animationend', () => { current.remove(); }, { once:true });
+      }
+
+      incoming.addEventListener('animationend', () => {
+        incoming.classList.remove('swap-in');
+        incoming.classList.add('pane-current');
+        host.style.height = '';
+      }, { once:true });
+
+      if (kind==='boulder') prevTopBoulder = currentIds;
+      else prevTopTeams = currentIds;
+
+      telaoMainSub.textContent = 'Atualiza automaticamente';
+    }
+
+    // Moment / Ticker
+    function renderMoment(){
+      const recent = scoresCache
+        .filter(s => s.data.actorType==='climber' && !!s.data.routeId)
+        .sort((a,b)=>{
+          const ta = a.data.timestamp ? (a.data.timestamp.seconds||a.data.timestamp) : 0;
+          const tb = b.data.timestamp ? (b.data.timestamp.seconds||b.data.timestamp) : 0;
+          return tb - ta;
+        })
+        .slice(0, MOMENTO_RECENT_LIMIT);
+
+      if (!recent.length){ momentName.textContent = '—'; momentCount.textContent=''; return; }
+
+      const counts = {};
+      recent.forEach(s=>{
+        const r = routesCache.find(x=>x.id===s.data.routeId);
+        if (!r || r.data.type!=='boulder') return;
+        counts[r.id] = (counts[r.id]||0) + 1;
+      });
+
+      const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+      if (!entries.length){ momentName.textContent = '—'; momentCount.textContent=''; return; }
+
+      const [bestId, bestCount] = entries[0];
+      const best = routesCache.find(r=>r.id===bestId);
+      if (!best){ momentName.textContent = '—'; momentCount.textContent=''; return; }
+
+      const label = `${best.data.code || bestId} — ${best.data.name}`;
+      if (prevMomentId !== bestId){
+        momentCard.classList.remove('pop'); void momentCard.offsetWidth; momentCard.classList.add('pop');
+      }
+      momentName.textContent = label;
+      momentCount.textContent = `${bestCount} envios recentes`;
+      prevMomentId = bestId;
+    }
+
+    function routeLabelById(id){
+      const r = routesCache.find(x=>x.id===id);
+      if (!r) return id || '—';
+      return `${r.data.code || ''} ${r.data.name}`.trim();
+    }
+
+    function renderTicker(){
+      const sorted = scoresCache.slice().sort((a,b)=>{
+        const ta = a.data.timestamp ? (a.data.timestamp.seconds || a.data.timestamp) : 0;
+        const tb = b.data.timestamp ? (b.data.timestamp.seconds || b.data.timestamp) : 0;
+        return tb - ta;
+      }).slice(0,20);
+
+      sorted.forEach(s=>{
+        if (tickerSeenIds.has(s.id)) return;
+        const routeName = routeLabelById(s.data.routeId);
+        const who = s.data.actorName || s.data.actorId || '—';
+        const pts = s.data.points || 0;
+        const type = (s.data.sendType || '').toLowerCase();
+        const icon = type==='flash' ? '💥' : '✅';
+        const iconClass = type==='flash' ? 'flash' : 'cadena';
+        const when = 'agora';
+        const cat = (s.data.actorCategory||'geral');
+
+        const div = document.createElement('div');
+        div.className = 'ticker-msg';
+        div.innerHTML = `
+          <div class="ticker-meta"><span class="tick-icon ${iconClass}">${icon}</span>${when} • ${type || 'envio'} • <span class="tick-pts">+${pts}</span></div>
+          <div class="ticker-text"><span class="tick-name" style="color:${categoryColor(cat)}">${who}</span> mandou <span class="tick-route"><b>${routeName}</b></span></div>
+        `;
+        tickerBody.prepend(div);
+        tickerSeenIds.add(s.id);
+        while (tickerBody.children.length > 30) tickerBody.removeChild(tickerBody.lastElementChild);
+      });
+    }
+    function categoryColor(cat){
+      const c=(cat||'').toLowerCase();
+      if (c==='kids') return 'var(--kids)';
+      if (c==='juvenil') return 'var(--juvenil)';
+      if (c==='masters') return 'var(--masters)';
+      if (c==='pro') return 'var(--pro)';
+      if (c==='trans-nao-binario') return 'var(--tnb)';
+      return 'var(--geral)';
+    }
+
+    // Details
+    async function showClimberDetails(docId){
+      try {
+        const snap = await getDoc(doc(db,'climbers',docId));
+        if (!snap.exists()) return alert('Não encontrado.');
+        const c = snap.data();
+        const cat = displayCategory(c.category);
+        const gen = displayGender(c.gender);
+
+        const doneBoulderIds = Array.isArray(c.done) ? c.done : [];
+        const doneTeamIds = Array.isArray(c.doneTeam) ? c.doneTeam : [];
+
+        const boulderLines = doneBoulderIds.map(routeId => {
+          const route = routesCache.find(r => r.id === routeId);
+          const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
+          const s = scoresCache.find(sc => sc.data.actorType === 'climber' && sc.data.actorId === docId && sc.data.routeId === routeId);
+          if (s) return `${routeLabel} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+          return `${routeLabel} — (sem registro de score visível)`;
+        });
+
+        const teamLines = doneTeamIds.map(routeId => {
+          const route = routesCache.find(r => r.id === routeId);
+          const routeLabel = route ? `${route.data.name} (${route.data.type})` : routeId;
+          const s = scoresCache.find(sc => sc.data.actorType === 'team' && sc.data.routeId === routeId && (() => {
+            const teamId = sc.data.actorId;
+            const team = teamsCache.find(t => t.id === teamId);
+            return team && Array.isArray(team.data.members) && team.data.members.includes(docId);
+          })());
+          if (s) {
+            const team = teamsCache.find(t => t.id === s.data.actorId);
+            const teamName = team ? team.data.name : s.data.actorName || s.data.actorId;
+            return `${routeLabel} — pelo time ${teamName} — ${s.data.sendType || '—'} — ${s.data.points || 0} pts`;
+          }
+          return `${routeLabel} — (participação registrada, score não encontrado)`;
+        });
+
+        const bonusLines = Array.isArray(c.bonuses) ? c.bonuses.map(b => `${b.label} +${b.pts} — ${new Date(b.ts).toLocaleString()}`) : [];
+
+        const msg = `${c.name} — ${c.code || docId}
 Categoria: ${cat}${c.isPro?' (PRO)':''}
 Gênero: ${gen}
 Pontos: ${c.points || 0}
@@ -1579,171 +1528,340 @@ Boulders feitos:
 ${boulderLines.length ? boulderLines.join('\n') : '(nenhum)'}
 
 Participações por time (rotas):
-${teamLines.length ? teamLines.join('\n') : '(nenhuma)'}`;
-    alert(msg);
-  } catch (err) {
-    console.error('Erro em showClimberDetails:', err);
-    alert('Erro ao carregar detalhes do escalador: ' + (err.message || err));
-  }
-}
+${teamLines.length ? teamLines.join('\n') : '(nenhuma)'}
 
-async function showTeamDetails(teamId){
-  const tSnap = await getDoc(doc(db,'teams',teamId));
-  if (!tSnap.exists()) return alert('Time não encontrado.');
-  const t = tSnap.data();
-  const teamScores = scoresCache.filter(s => s.data.actorType==='team' && s.data.actorId === teamId);
-  const lines = teamScores.map(s => {
-    const route = routesCache.find(r => r.id === s.data.routeId);
-    const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
-    const extra = s.data.note ? ` — ${s.data.note}` : '';
-    return `${routeName} — ${s.data.sendType} — ${s.data.points} pts${extra}`;
-  });
-  const membersNames = (t.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
-  const bonusLine = t.bonus ? `Bônus inicial: +${t.bonus} (${t.bonusReason||'—'})\n` : '';
-  const msg = `${t.name} — ${t.points || 0} pts
-${bonusLine}Membros: ${membersNames}
+Bônus aplicados:
+${bonusLines.length ? bonusLines.join('\n') : '(nenhum)'}`;
+        alert(msg);
+      } catch (err) {
+        console.error('Erro em showClimberDetails:', err);
+        alert('Erro ao carregar detalhes do escalador: ' + (err.message || err));
+      }
+    }
+
+    async function showTeamDetails(teamId){
+      const tSnap = await getDoc(doc(db,'teams',teamId));
+      if (!tSnap.exists()) return alert('Time não encontrado.');
+      const t = tSnap.data();
+      const teamScores = scoresCache.filter(s => s.data.actorType==='team' && s.data.actorId === teamId);
+      const lines = teamScores.map(s => {
+        const route = routesCache.find(r => r.id === s.data.routeId);
+        const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
+        const extra = s.data.note ? ` — ${s.data.note}` : '';
+        return `${routeName} — ${s.data.sendType} — ${s.data.points} pts${extra}`;
+      });
+      const membersNames = (t.members||[]).map(id => { const c = climbersCache.find(x=>x.id===id); return c ? c.data.name : id; }).join(' | ');
+      const bonusLine = t.bonus ? `Bônus inicial (categoria): +${t.bonus} (${t.bonusReason||'—'})\n` : '';
+      const extraBonuses = Array.isArray(t.bonuses) ? t.bonuses.map(b => `${b.label} +${b.pts} — ${new Date(b.ts).toLocaleString()}`) : [];
+      const extrasText = extraBonuses.length ? `Bônus extras:\n${extraBonuses.join('\n')}\n` : '';
+      const msg = `${t.name} — ${t.points || 0} pts
+${bonusLine}${extrasText}Membros: ${membersNames}
 
 Histórico de rotas:
 ${lines.join('\n') || '(nenhuma)'}`;
-  alert(msg);
-}
-
-// Admin helpers
-function loadAllForAdmin(){ populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams(); refreshRanking(true); }
-
-// Sorteio
-const liveOverlay = document.getElementById('liveOverlay');
-const liveName = document.getElementById('liveName');
-const liveCode = document.getElementById('liveCode');
-const liveRolling = document.getElementById('liveRolling');
-const confettiLayer = document.getElementById('confetti');
-const btnRaffle = document.getElementById('btnRaffle');
-const btnEndLive = document.getElementById('btnEndLive');
-
-btnRaffle.addEventListener('click', async ()=>{
-  if (!climbersCache.length) return showToast('Não há escaladores.');
-  const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
-  const name = pick.data.name || '(sem nome)';
-  const code = pick.data.code || pick.id;
-  try {
-    await setDoc(doc(db,'live','announcement'), {
-      active: true, kind: 'raffle', name, code, climberId: pick.id,
-      nonce: Date.now(), timestamp: serverTimestamp()
-    });
-  } catch (e) { console.error('Erro ao iniciar anúncio ao vivo:', e); showToast('Erro ao iniciar o anúncio ao vivo.'); }
-});
-
-btnEndLive.addEventListener('click', async ()=>{ try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){ console.error(e); } });
-
-function showLive(){ liveOverlay.classList.add('show'); }
-function hideLive(){
-  liveOverlay.classList.remove('show');
-  stopConfetti();
-  liveRolling.textContent = '';
-}
-
-function playRaffleSequence(finalName, finalCode){
-  showLive();
-  liveName.textContent = '—';
-  liveCode.textContent = '';
-  liveRolling.textContent = 'Preparando sorteio…';
-
-  const rounds = 8 + Math.floor(Math.random()*7);
-  const pool = climbersCache.map(c => c.data.name || c.id);
-  let i=0, delay=90, timer=null;
-
-  const tick = ()=>{
-    if (i < rounds){
-      const rname = pool[Math.floor(Math.random()*pool.length)] || '—';
-      liveRolling.textContent = rname;
-      i++; delay = Math.min(300, delay + 20);
-      timer = setTimeout(tick, delay);
-    } else {
-      liveRolling.textContent = '';
-      liveName.textContent = finalName;
-      liveCode.textContent = `CÓDIGO: ${finalCode}`;
-      liveName.style.textShadow = '0 0 18px rgba(57,243,255,.35), 0 0 36px rgba(37,255,178,.22)';
-      liveName.classList.add('pop');
-      startConfetti();
-      setTimeout(async ()=>{
-        stopConfetti();
-        liveName.classList.remove('pop');
-        try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){}
-      }, 5000);
+      alert(msg);
     }
-  };
-  setTimeout(tick, 250);
-}
 
-function startConfetti(){
-  confettiLayer.classList.remove('hidden');
-  confettiLayer.innerHTML = '';
-  const colors = ['#39f3ff','#25ffb2','#f9ff53','#ff3d6e','#c07dff'];
-  const amount = 60;
-  for (let i=0;i<amount;i++){
-    const p = document.createElement('i');
-    p.style.left = Math.random()*100 + 'vw';
-    p.style.background = colors[Math.floor(Math.random()*colors.length)];
-    p.style.animationDuration = (1.2 + Math.random()*1.5) + 's';
-    p.style.transform = `translateY(-10px) rotate(${Math.random()*180}deg)`;
-    p.style.width = (4 + Math.random()*6) + 'px';
-    p.style.height = (8 + Math.random()*10) + 'px';
-    confettiLayer.appendChild(p);
-  }
-}
-function stopConfetti(){
-  confettiLayer.classList.add('hidden');
-  confettiLayer.innerHTML = '';
-}
+    // Admin helpers
+    function loadAllForAdmin(){ populateAdminClimbers(); populateAdminRoutes(); populateAdminTeams(); refreshRanking(true); }
 
-// ===== Modo PÓDIO (handlers)
-podiumType.addEventListener('change', ()=>{
-  podiumCategory.disabled = (podiumType.value === 'team');
-});
+    // Sorteio normal (já existente)
+    const liveOverlay = document.getElementById('liveOverlay');
+    const liveName = document.getElementById('liveName');
+    const liveCode = document.getElementById('liveCode');
+    const liveRolling = document.getElementById('liveRolling');
+    const confettiLayer = document.getElementById('confetti');
+    const btnRaffle = document.getElementById('btnRaffle');
+    const btnEndLive = document.getElementById('btnEndLive');
 
-btnShowPodium.addEventListener('click', async ()=>{
-  try{
-    const kind = podiumType.value;     // 'boulder' | 'team'
-    const cat  = podiumCategory.value; // 'all' ou categoria
-    const top  = computeTop3(kind, cat);
+    btnRaffle.addEventListener('click', async ()=> {
+      if (!climbersCache.length) return showToast('Não há escaladores.');
+      const pick = climbersCache[Math.floor(Math.random() * climbersCache.length)];
+      const name = pick.data.name || '(sem nome)';
+      const code = pick.data.code || pick.id;
+      try {
+        await setDoc(doc(db,'live','announcement'), {
+          active: true, kind: 'raffle', name, code, climberId: pick.id,
+          nonce: Date.now(), timestamp: serverTimestamp()
+        });
+      } catch (e) { console.error('Erro ao iniciar anúncio ao vivo:', e); showToast('Erro ao iniciar o anúncio ao vivo.'); }
+    });
+    btnEndLive.addEventListener('click', async ()=>{ try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){ console.error(e); } });
 
-    const catLabelMap = {
-      'all':'Geral','kids':'Kids','juvenil':'Juvenil','masters':'Masters',
-      'trans-nao-binario':'Trans / Não Binários','geral-m':'Geral Masculino','geral-f':'Geral Feminino',
-      'juvenil-m':'Juvenil Masculino','juvenil-f':'Juvenil Feminino','pro':'PRO'
+    function showLive(){ liveOverlay.classList.add('show'); }
+    function hideLive(){ liveOverlay.classList.remove('show'); stopConfetti(); liveRolling.textContent = ''; }
+
+    function playRaffleSequence(finalName, finalCode){
+      showLive();
+      liveName.textContent = '—';
+      liveCode.textContent = '';
+      liveRolling.textContent = 'Preparando sorteio…';
+
+      const rounds = 8 + Math.floor(Math.random()*7);
+      const pool = climbersCache.map(c => c.data.name || c.id);
+      let i=0, delay=90, timer=null;
+
+      const tick = ()=> {
+        if (i < rounds){
+          const rname = pool[Math.floor(Math.random()*pool.length)] || '—';
+          liveRolling.textContent = rname;
+          i++; delay = Math.min(300, delay + 20);
+          timer = setTimeout(tick, delay);
+        } else {
+          liveRolling.textContent = '';
+          liveName.textContent = finalName;
+          liveCode.textContent = `CÓDIGO: ${finalCode}`;
+          liveName.style.textShadow = '0 0 18px rgba(57,243,255,.35), 0 0 36px rgba(37,255,178,.22)';
+          liveName.classList.add('pop');
+          startConfetti();
+          setTimeout(async ()=>{
+            stopConfetti();
+            liveName.classList.remove('pop');
+            try { await setDoc(doc(db,'live','announcement'), { active:false }, { merge:true }); } catch(e){}
+          }, 5000);
+        }
+      };
+      setTimeout(tick, 250);
+    }
+
+    function startConfetti(){
+      confettiLayer.classList.remove('hidden');
+      confettiLayer.innerHTML = '';
+      const colors = ['#39f3ff','#25ffb2','#f9ff53','#ff3d6e','#c07dff'];
+      const amount = 60;
+      for (let i=0;i<amount;i++){
+        const p = document.createElement('i');
+        p.style.left = Math.random()*100 + 'vw';
+        p.style.background = colors[Math.floor(Math.random()*colors.length)];
+        p.style.animationDuration = (1.2 + Math.random()*1.5) + 's';
+        p.style.transform = `translateY(-10px) rotate(${Math.random()*180}deg)`;
+        p.style.width = (4 + Math.random()*6) + 'px';
+        p.style.height = (8 + Math.random()*10) + 'px';
+        confettiLayer.appendChild(p);
+      }
+    }
+    function stopConfetti(){ confettiLayer.classList.add('hidden'); confettiLayer.innerHTML = ''; }
+
+    // PODIUM overlay show/hide
+    function showPodiumOverlay(payload){
+      if (!payload || !payload.active){ hidePodiumOverlay(); return; }
+
+      podiumTitle.textContent = payload.title || 'Pódio';
+      podiumSub.textContent   = payload.sub || '';
+
+      const top = payload.top || [];
+      const safe = (i)=> top[i] || { name:'—', code:'', points:'' };
+
+      const t1 = safe(0), t2 = safe(1), t3 = safe(2);
+      s1Name.textContent = t1.name || '—';
+      s1Code.textContent = t1.code ? `(${t1.code})` : '';
+      s1Pts.textContent  = t1.points!=='' ? `${t1.points} pts` : '';
+
+      s2Name.textContent = t2.name || '—';
+      s2Code.textContent = t2.code ? `(${t2.code})` : '';
+      s2Pts.textContent  = t2.points!=='' ? `${t2.points} pts` : '';
+
+      s3Name.textContent = t3.name || '—';
+      s3Code.textContent = t3.code ? `(${t3.code})` : '';
+      s3Pts.textContent  = t3.points!=='' ? `${t3.points} pts` : '';
+
+      ['slot1','slot2','slot3'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+      });
+
+      podiumOverlay.classList.add('show');
+    }
+    function hidePodiumOverlay(){ podiumOverlay.classList.remove('show'); }
+    podiumClose.addEventListener('click', async () => {
+      hidePodiumOverlay();
+      try { await setDoc(doc(db,'live','podium'), { active:false }, { merge:true }); } catch (e) { console.error('Erro ao encerrar pódio pelo X:', e); }
+    });
+
+    // Botão mostrar pódio (já tinha)
+    btnShowPodium.addEventListener('click', async ()=> {
+      try{
+        const kind = podiumType.value;
+        const cat  = podiumCategory.value;
+        const top  = computeTop3(kind, cat);
+
+        const catLabelMap = {
+          'all':'Geral','kids':'Kids','juvenil':'Juvenil','masters':'Masters',
+          'trans-nao-binario':'Trans / Não Binários','geral-m':'Geral Masculino','geral-f':'Geral Feminino',
+          'juvenil-m':'Juvenil Masculino','juvenil-f':'Juvenil Feminino','pro':'PRO'
+        };
+        const title = (kind==='team') ? 'Times — Pódio Geral' : `Boulder — Pódio ${catLabelMap[cat]||cat}`;
+        const sub   = (kind==='team') ? 'Top 3 times por pontuação' : 'Top 3 individuais por pontuação';
+
+        const now = Date.now();
+        const payload = {
+          active: true,
+          kind,
+          category: (kind==='team') ? 'team' : cat,
+          title, sub,
+          top: top.map(t => ({ name:t.name, code:t.code||'', points:t.points||0 })),
+          nonce: now,
+          timestamp: serverTimestamp(),
+          expiresAtMs: now + PODIUM_TTL_MS
+        };
+
+        await setDoc(doc(db,'live','podium'), payload);
+      }catch(e){ console.error(e); }
+    });
+
+    btnHidePodium.addEventListener('click', async ()=> {
+      try{ await setDoc(doc(db,'live','podium'), { active:false }, { merge:true }); }catch(e){ console.error(e); }
+    });
+
+    // ======= NOVO: Sortear uma das 3 pessoas do pódio atual =======
+    btnPodiumRaffle.addEventListener('click', async () => {
+      try {
+        // tenta ler pódio atual; se não estiver ativo, recalcula com computeTop3
+        const ds = await getDoc(doc(db,'live','podium'));
+        let top = [];
+        if (ds.exists() && ds.data().active) {
+          top = (ds.data().top || []).filter(x => x && (x.name || x.code));
+        } else {
+          // recalcula localmente
+          const kind = podiumType.value;
+          const cat = podiumCategory.value;
+          const computed = computeTop3(kind, cat);
+          top = computed.map(t => ({ name: t.name, code: t.code || '', points: t.points || 0 }));
+        }
+        if (!top.length) return showToast('Não há pódio disponível para sortear.');
+        const valid = top.filter(x => x && x.name);
+        if (!valid.length) return showToast('Pódio não tem nomes suficientes para sortear.');
+        const pick = valid[Math.floor(Math.random() * valid.length)];
+        // dispara anúncio ao vivo (reaproveita live/announcement)
+        await setDoc(doc(db,'live','announcement'), {
+          active: true, kind: 'podium-raffle', name: pick.name, code: pick.code || '', nonce: Date.now(), timestamp: serverTimestamp()
+        });
+      } catch (e) {
+        console.error('Erro no podium raffle', e);
+        showToast('Erro ao sortear pessoa do pódio.');
+      }
+    });
+
+    // ======= NOVO: Aplicar bônus via admin =======
+    btnApplyBonus.addEventListener('click', async () => {
+      try {
+        const targetType = bonusTargetType.value; // 'climber' | 'team'
+        const bonusKey = bonusType.value;
+        const def = BONUS_DEFINITIONS[bonusKey];
+        if (!def) return showToast('Bônus inválido.');
+        if (targetType === 'climber'){
+          const climberId = selectBonusClimber.value;
+          if (!climberId) return showToast('Selecione um escalador para aplicar o bônus.');
+          const cRef = doc(db,'climbers', climberId);
+          const cSnap = await getDoc(cRef);
+          if (!cSnap.exists()) return showToast('Escalador não encontrado.');
+          const cdata = cSnap.data();
+          const newPoints = (cdata.points || 0) + def.pts;
+          await updateDoc(cRef, { points: newPoints, bonuses: arrayUnion({ key: bonusKey, label: def.label, pts: def.pts, ts: Date.now() }) });
+          showToast(`+${def.pts} pts aplicado para ${cdata.name}.`);
+        } else {
+          const teamId = selectBonusTeam.value;
+          if (!teamId) return showToast('Selecione um time para aplicar o bônus.');
+          const tRef = doc(db,'teams', teamId);
+          const tSnap = await getDoc(tRef);
+          if (!tSnap.exists()) return showToast('Time não encontrado.');
+          const tdata = tSnap.data();
+          const newPoints = (tdata.points || 0) + def.pts;
+          await updateDoc(tRef, { points: newPoints, bonuses: arrayUnion({ key: bonusKey, label: def.label, pts: def.pts, ts: Date.now() }) });
+          showToast(`+${def.pts} pts aplicado para o time ${tdata.name}.`);
+        }
+      } catch (e) {
+        console.error('Erro ao aplicar bônus', e);
+        showToast('Erro ao aplicar bônus.');
+      }
+    });
+
+    // ======= NOVO: override pontos time (admin) =======
+    btnSaveTeamPoints.addEventListener('click', async () => {
+      const sel = selectTeamsAdmin.value;
+      if (!sel) return showToast('Selecione um time na lista.');
+      const val = Number(editTeamPoints.value);
+      if (!Number.isFinite(val) || val < 0) return showToast('Informe um número de pontos válido (≥ 0).');
+      try {
+        await updateDoc(doc(db,'teams', sel), { points: Math.floor(val) });
+        showToast('Pontos do time atualizados.');
+        editTeamPoints.value = '';
+      } catch (e) {
+        console.error('Erro ao salvar pontos do time', e);
+        showToast('Erro ao salvar pontos do time.');
+      }
+    });
+
+    // Helpers progress bar
+    function playProgress(ms){
+      if (!progressBar) return;
+      progressBar.style.setProperty('--slide-ms', ms+'ms');
+      progressBar.classList.remove('play'); void progressBar.offsetWidth; progressBar.classList.add('play');
+    }
+    function stopProgress(){ if (!progressBar) return; progressBar.classList.remove('play'); progressBar.style.removeProperty('--slide-ms'); }
+    function currentDuration(){ return (telaoIndex === 0) ? DURATION_BOULDER : DURATION_TEAMS; }
+
+    /* =======================
+       UTILITÁRIOS FINAIS
+       ======================= */
+    function computeTop3(kind, cat='all'){
+      if (kind === 'team'){
+        const rows = teamsCache
+          .map(t => ({ id:t.id, name:t.data.name, points: t.data.points||0, code: '' }))
+          .sort((a,b)=> (b.points)-(a.points))
+          .slice(0,3);
+        return rows;
+      } else {
+        const rowsAll = climbersCache.map(c => ({
+          id:c.id, name:c.data.name, code:(c.data.code||c.id), points:c.data.points||0,
+          category:(c.data.category||'').toLowerCase(), gender:(c.data.gender||'').toLowerCase()
+        }));
+        const rows = filterBoulderByCategory(rowsAll, cat)
+          .sort((a,b)=> (b.points)-(a.points))
+          .slice(0,3);
+        return rows;
+      }
+    }
+
+    function filterBoulderByCategory(rows, cat){
+      const c = (cat||'all').toLowerCase();
+      if (c === 'all') return rows;
+      if (c === 'juvenil-m') return rows.filter(r => r.category==='juvenil' && r.gender==='masculino');
+      if (c === 'juvenil-f') return rows.filter(r => r.category==='juvenil' && r.gender==='feminino');
+      if (c === 'geral-m')   return rows.filter(r => r.category==='geral'   && r.gender==='masculino');
+      if (c === 'geral-f')   return rows.filter(r => r.category==='geral'   && r.gender==='feminino');
+      return rows.filter(r => (r.category||'').toLowerCase() === c);
+    }
+
+    // Verbose: ensure selectors reload friendly to admin
+    function loadSelectorsForJudgeAndAdmin(){
+      loadSelectorsForJudge();
+      populateAdminClimbers();
+      populateAdminTeams();
+      populateAdminRoutes();
+    }
+
+    // first load: easy call
+    loadSelectorsForJudgeAndAdmin();
+
+    // Expose a small debug helper on window for quick manual recalculation if needed
+    window._recomputeTeamBonuses = async function(){
+      // recomputa o bonus base (categoria) para todos os times e atualiza o campo bonus/bonusReason e points ajustando diferença
+      try {
+        const snap = await getDocs(collection(db,'teams'));
+        for (const tdoc of snap.docs){
+          const tdata = tdoc.data();
+          const members = Array.isArray(tdata.members) ? tdata.members : [];
+          const { bonus, reasons } = computeTeamCategoryBonus(members);
+          const prevBonus = tdata.bonus || 0;
+          const newPoints = Math.max(0, (tdata.points || 0) - prevBonus + bonus);
+          await updateDoc(doc(db,'teams', tdoc.id), { bonus, bonusReason: reasons.join(', '), points: newPoints });
+        }
+        showToast('Recomputado bônus de categoria para todos os times.');
+      } catch (e) { console.error(e); showToast('Erro ao recomputar bônus.'); }
     };
-    const title = (kind==='team') ? 'Times — Pódio Geral' : `Boulder — Pódio ${catLabelMap[cat]||cat}`;
-    const sub   = (kind==='team') ? 'Top 3 times por pontuação' : 'Top 3 individuais por pontuação';
 
-    const now = Date.now();
-    const payload = {
-      active: true,
-      kind,
-      category: (kind==='team') ? 'team' : cat,
-      title, sub,
-      top: top.map(t => ({ name:t.name, code:t.code||'', points:t.points||0 })),
-      nonce: now,
-      timestamp: serverTimestamp(),
-      expiresAtMs: now + PODIUM_TTL_MS
-    };
-
-    await setDoc(doc(db,'live','podium'), payload);
-    // sem alert aqui
-  }catch(e){
-    console.error(e);
-  }
-});
-
-btnHidePodium.addEventListener('click', async ()=>{
-  try{
-    await setDoc(doc(db,'live','podium'), { active:false }, { merge:true });
-  }catch(e){
-    console.error(e);
-  }
-});
-
-// Garante overlay pódio escondido ao carregar (defensivo)
-hidePodiumOverlay();
+    // fim do script
 </script>
 
 </body>
