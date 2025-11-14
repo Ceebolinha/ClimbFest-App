@@ -38,6 +38,16 @@ select,input{width:100%;padding:8px;border-radius:8px;border:1px solid #203040;b
 @media(max-width:420px){ .row{grid-template-columns:1fr} }
 
 /* ===== Overlay ao vivo (sorteio) ===== */
+
+/* Telão compacto — aplica quando listagem for curta (<=3) */
+.telao-compact .telao-list .telao-item {
+  padding: 18px 12px;
+  font-size: 1.25rem;
+}
+.telao-compact .telao-col { display:flex; flex-direction:column; justify-content:center; }
+.telao-compact .telao-list { gap:10px; }
+
+
 .overlay {
 position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
 background: rgba(0,0,0,0.75); backdrop-filter: blur(3px);
@@ -315,8 +325,8 @@ filter: blur(6px); opacity:.5;
 <hr style="border:none;border-top:1px solid #122233;margin:12px 0" />
 <strong>Desafios / Vias / Boulders</strong>
 <div style="margin-top:8px" class="row">
-<input id="newRouteCode" placeholder="Código (ex: B01)"/>
-<input id="newRouteName" placeholder="Nome do desafio"/>
+<input id="newRouteCode" placeholder="Número / Código (ex: 01)" />
+<!-- removido o newRouteName -->
 <select id="newRouteType">
 <option value="boulder">Boulder</option>
 <option value="via">Via</option>
@@ -652,8 +662,8 @@ filter: blur(6px); opacity:.5;
     let prevTopTeams = [];
     let prevMomentId = null;
 
-    const DURATION_BOULDER = 12000;
-    const DURATION_TEAMS   = 7000;
+    const DURATION_BOULDER = 20000;
+    const DURATION_TEAMS   = 5000;
 
     const telaoContainer = document.getElementById('telaoContainer');
     const telaoMainTitle = document.getElementById('telaoMainTitle');
@@ -879,7 +889,6 @@ filter: blur(6px); opacity:.5;
     const btnDeleteClimber = document.getElementById('btnDeleteClimber');
 
     const newRouteCode = document.getElementById('newRouteCode');
-    const newRouteName = document.getElementById('newRouteName');
     const newRouteType = document.getElementById('newRouteType');
     const btnAddRoute = document.getElementById('btnAddRoute');
     const selectRoutesAdmin = document.getElementById('selectRoutesAdmin');
@@ -961,16 +970,17 @@ filter: blur(6px); opacity:.5;
 
     // ADD ROUTE
     btnAddRoute.addEventListener('click', async () => {
-      try {
-        const code = newRouteCode.value.trim() || null;
-        const name = newRouteName.value.trim();
-        const type = newRouteType.value;
-        if (!name) return showToast('Nome do desafio obrigatório.');
-        await addDoc(collection(db,'routes'), { code, name, type });
-        newRouteCode.value=''; newRouteName.value='';
-        showToast('Desafio adicionado.');
-      } catch (err) { console.error(err); showToast('Erro ao adicionar desafio: '+(err.message||err)); }
-    });
+  try {
+    const code = (newRouteCode.value || '').trim() || null;
+    const type = newRouteType.value;
+    if (!code) return showToast('Número / código do desafio obrigatório.');
+    // salve name como vazio para compatibilidade com versões antigas
+    await addDoc(collection(db,'routes'), { code, name: '', type });
+    newRouteCode.value = '';
+    showToast('Desafio adicionado.');
+  } catch (err) { console.error(err); showToast('Erro ao adicionar desafio: '+(err.message||err)); }
+});
+
 
     // DELETE ROUTE (inalterado)
     btnDeleteRoute.addEventListener('click', async () => {
@@ -1167,12 +1177,17 @@ filter: blur(6px); opacity:.5;
       });
     }
     function populateAdminRoutes(){
-      selectRoutesAdmin.innerHTML = '';
-      const ordered = routesCache.slice().sort(byCode(r => r.data.code || r.id));
-      ordered.forEach(r => {
-        const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.data.code || r.id} — ${r.data.name} (${r.data.type})`; selectRoutesAdmin.appendChild(o);
-      });
-    }
+  selectRoutesAdmin.innerHTML = '';
+  const ordered = routesCache.slice().sort(byCode(r => r.data.code || r.id));
+  ordered.forEach(r => {
+    const label = `${r.data.code || r.id} — ${r.data.type}`;
+    const o = document.createElement('option');
+    o.value = r.id;
+    o.textContent = label;
+    selectRoutesAdmin.appendChild(o);
+  });
+}
+
     function populateAdminTeams(){
       selectTeamsAdmin.innerHTML = '';
       selectBonusTeam.innerHTML = '';
@@ -1229,7 +1244,7 @@ filter: blur(6px); opacity:.5;
         const actorExists = s.data.actorType === 'climber' ? !!climbersCache.find(c => c.id === s.data.actorId) : !!teamsCache.find(t => t.id === s.data.actorId);
         if (!routeExists || !actorExists) return;
         const route = routesCache.find(r=>r.id===s.data.routeId);
-        const routeName = route ? `${route.data.name} (${route.data.type})` : s.data.routeId;
+        const routeName = route ? `${routeLabelById(route.id)} (${route.data.type})` : s.data.routeId;
         const li = document.createElement('li');
         const extra = s.data.note ? ` — ${s.data.note}` : '';
         li.textContent = `${s.data.actorName || ''} | ${routeName} | ${s.data.sendType || ''} | ${s.data.points || 0} pts${extra}`;
@@ -1264,7 +1279,7 @@ filter: blur(6px); opacity:.5;
       const bestId = entries[0][0], bestCount = entries[0][1];
       const bestRoute = routesCache.find(r=>r.id===bestId);
       if (!bestRoute){ boulderDoMomentoCard.classList.add('hidden'); return; }
-      boulderDoMomentoName.textContent = `${bestRoute.data.code || bestId} — ${bestRoute.data.name}`;
+      boulderDoMomentoName.textContent = routeLabelById(bestId);
       boulderDoMomentoCount.textContent = `${bestCount} envios recentes`;
       boulderDoMomentoCard.classList.remove('hidden');
     }
@@ -1336,14 +1351,17 @@ filter: blur(6px); opacity:.5;
       const host = document.getElementById('telaoListHost');
 
       if (indexToShow === 0){
-        telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
-        const list = climbersCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
-        renderRankListTelao(list, 'boulder', host);
-      } else {
-        telaoMainTitle.textContent = "🏆 Times — TOP 10";
-        const list = teamsCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
-        renderRankListTelao(list, 'team', host);
-      }
+  telaoMainTitle.textContent = "🥇 Boulder — TOP 10";
+  const list = climbersCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,10);
+  renderRankListTelao(list, 'boulder', host);
+} else {
+  // <-- ALTERE AQUI: mostrar TOP 3 para times
+  telaoMainTitle.textContent = "🏆 Times — TOP 3";
+  const list = teamsCache.slice().sort((a,b)=>(b.data.points||0)-(a.data.points||0)).slice(0,3); // antes 0,10
+  renderRankListTelao(list, 'team', host);
+}
+
+
       renderMoment();
       renderTicker();
     }
@@ -1398,6 +1416,15 @@ filter: blur(6px); opacity:.5;
       else prevTopTeams = currentIds;
 
       telaoMainSub.textContent = 'Atualiza automaticamente';
+
+      // dentro de renderRankListTelao, logo antes de terminar a função, adicione:
+  // aplica layout compacto se a lista tiver 3 ou menos (ajusta visual)
+  try {
+    const telaoRoot = document.getElementById('telaoContainer');
+    if (list.length <= 3) telaoRoot.classList.add('telao-compact');
+    else telaoRoot.classList.remove('telao-compact');
+  } catch(e){ /* silencioso */ }
+
     }
 
     // Moment / Ticker
@@ -1427,7 +1454,7 @@ filter: blur(6px); opacity:.5;
       const best = routesCache.find(r=>r.id===bestId);
       if (!best){ momentName.textContent = '—'; momentCount.textContent=''; return; }
 
-      const label = `${best.data.code || bestId} — ${best.data.name}`;
+      const label = routeLabelById(bestId);
       if (prevMomentId !== bestId){
         momentCard.classList.remove('pop'); void momentCard.offsetWidth; momentCard.classList.add('pop');
       }
@@ -1437,10 +1464,14 @@ filter: blur(6px); opacity:.5;
     }
 
     function routeLabelById(id){
-      const r = routesCache.find(x=>x.id===id);
-      if (!r) return id || '—';
-      return `${r.data.code || ''} ${r.data.name}`.trim();
-    }
+  const r = routesCache.find(x=>x.id===id);
+  if (!r) return id || '—';
+  // prioriza código (número). Mantém nome se houver, mas default é código.
+  if (r.data.code) return `${r.data.code}`.trim();
+  if (r.data.name) return `${r.data.name}`.trim();
+  return id;
+}
+
 
     function renderTicker(){
       const sorted = scoresCache.slice().sort((a,b)=>{
